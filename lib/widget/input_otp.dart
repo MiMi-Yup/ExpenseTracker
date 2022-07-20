@@ -26,31 +26,32 @@ import 'package:flutter/services.dart';
 typedef CodeInputBuilder = Widget Function(bool hasFocus, String char);
 
 class CodeInput extends StatefulWidget {
-  CodeInput._({
-    Key? key,
-    required this.length,
-    required this.focusNode,
-    required this.keyboardType,
-    required this.inputFormatters,
-    required this.builder,
-    this.spacing = 8,
-    this.onChanged,
-    this.onFilled,
-    this.onDone,
-  }) : super(key: key);
+  CodeInput._(
+      {Key? key,
+      required this.length,
+      required this.focusNode,
+      required this.keyboardType,
+      required this.inputFormatters,
+      required this.builder,
+      this.spacing = 8,
+      this.onChanged,
+      this.onFilled,
+      this.onDone,
+      required this.clearOnDone})
+      : super(key: key);
 
-  factory CodeInput({
-    Key? key,
-    required int length,
-    FocusNode? focusNode,
-    TextInputType keyboardType = TextInputType.text,
-    List<TextInputFormatter>? inputFormatters,
-    required CodeInputBuilder builder,
-    double spacing = 8,
-    void Function(String value)? onChanged,
-    void Function(String value)? onFilled,
-    void Function(String value)? onDone,
-  }) {
+  factory CodeInput(
+      {Key? key,
+      required int length,
+      FocusNode? focusNode,
+      TextInputType keyboardType = TextInputType.text,
+      List<TextInputFormatter>? inputFormatters,
+      required CodeInputBuilder builder,
+      double spacing = 8,
+      void Function(String value)? onChanged,
+      void Function(String value)? onFilled,
+      void Function(String value)? onDone,
+      bool clearOnDone = false}) {
     assert(length > 0, 'The length needs to be larger than zero.');
     assert(length.isFinite, 'The length needs to be finite.');
 
@@ -66,6 +67,7 @@ class CodeInput extends StatefulWidget {
       onChanged: onChanged,
       onFilled: onFilled,
       onDone: onDone,
+      clearOnDone: clearOnDone,
     );
   }
 
@@ -144,6 +146,9 @@ class CodeInput extends StatefulWidget {
   /// A callback for when the done button clicked
   final void Function(String value)? onDone;
 
+  /// Clear value when the done button clicked
+  final bool clearOnDone;
+
   /// A helping function that creates input formatters for a given [length] and
   /// [keyboardType].
   static List<TextInputFormatter> _createInputFormatters(
@@ -192,13 +197,14 @@ class _CodeInputState extends State<CodeInput> {
             cursorColor: Colors.black,
             // Doesn't really matter.
             onChanged: (value) => setState(() {
-                  widget.onChanged?.call(value);
-                  if (value.length == widget.length) {
-                    widget.onFilled?.call(value);
-                  }
-                }),
-            onEditingComplete: () => setState((){
+              widget.onChanged?.call(value);
+              if (value.length == widget.length) {
+                widget.onFilled?.call(value);
+              }
+            }),
+            onEditingComplete: () => setState(() {
               widget.onDone?.call(controller.text);
+              if (widget.clearOnDone) controller.clear();
             }),
           )),
       // These are the actual character widgets. A transparent container lies
