@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/widget/check_box.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
-import 'package:expense_tracker/widget/text_field.dart';
+import 'package:expense_tracker/widget/editText.dart';
 import 'package:flutter/material.dart';
 
 class SignUp extends StatelessWidget {
