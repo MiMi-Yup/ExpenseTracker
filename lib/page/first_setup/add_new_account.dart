@@ -3,17 +3,44 @@ import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/editText.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
-class AddNewAccount extends StatelessWidget {
+class AddNewAccount extends StatefulWidget {
   const AddNewAccount({Key? key}) : super(key: key);
 
+  @override
+  State<AddNewAccount> createState() => _AddNewAccountState();
+}
+
+class _AddNewAccountState extends State<AddNewAccount> {
+  bool setWallet = false;
+  String? _chosenValue;
+  int? _value;
+  final String _addWallet = "Wallet";
+  final List<String> _listBank = [
+    "asset/image/bank_of_america.png",
+    "asset/image/bca_bank.png",
+    "asset/image/chase_bank.png",
+    "asset/image/city_bank.png",
+    "asset/image/jago_bank.png",
+    "asset/image/mandiri_bank.png",
+    "asset/image/paypal_bank.png"
+  ];
+  final List<String> _listDropDown = [
+    'Android',
+    'IOS',
+    'Flutter',
+    'Node',
+    'Java',
+    'Python',
+    'PHP',
+    "Wallet"
+  ];
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add new account"),
+        title: Text(setWallet ? "Add new wallet" : "Add new account"),
         leading:
             IconButton(onPressed: () => null, icon: Icon(Icons.arrow_back_ios)),
       ),
@@ -63,18 +90,39 @@ class AddNewAccount extends StatelessWidget {
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.all(Radius.circular(4.0))),
                       child: dropDown(
-                        items: <String>[
-                          'Android',
-                          'IOS',
-                          'Flutter',
-                          'Node',
-                          'Java',
-                          'Python',
-                          'PHP',
-                        ],
-                        onChanged: (p0) => null,
+                        items: _listDropDown,
+                        chosenValue: _chosenValue,
+                        onChanged: (itemSelected) {
+                          _chosenValue = itemSelected;
+                          setState(() => itemSelected == _addWallet
+                              ? setWallet = true
+                              : setWallet = false);
+                        },
                       )),
-                      
+                  Visibility(
+                    visible: setWallet,
+                    child: Wrap(
+                      spacing: 8.0,
+                      children: List<Widget>.generate(
+                        _listBank.length,
+                        (int index) {
+                          return ChoiceChip(
+                            label: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Image.asset(_listBank[index]),
+                            ),
+                            selected: _value == index,
+                            onSelected: (selected) {
+                              setState(() {
+                                _value = selected ? index : null;
+                              });
+                            },
+                            selectedColor: Colors.white70,
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  ),
                   Container(
                       width: double.maxFinite,
                       child: largestButton(

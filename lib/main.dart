@@ -1,6 +1,7 @@
 import 'package:expense_tracker/page/first_setup/add_new_account.dart';
 import 'package:expense_tracker/page/first_setup/code_auth.dart';
 import 'package:expense_tracker/page/first_setup/introduction_setup.dart';
+import 'package:expense_tracker/page/first_setup/success.dart';
 import 'package:expense_tracker/page/introduction.dart';
 import 'package:expense_tracker/page/signup/signup.dart';
 import 'package:expense_tracker/page/signup/verify.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       darkTheme: ThemeData.dark(),
-      home: AddNewAccount(),
+      home: Success(),
     );
   }
 }
