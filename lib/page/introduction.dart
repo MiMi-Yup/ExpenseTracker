@@ -17,14 +17,30 @@ class Introduction extends StatefulWidget {
 }
 
 class _IntroductionState extends State<Introduction> {
-  final pages = 3;
-  int currentPosition = 0;
+  final _pages = 3;
+  int _currentPosition = 0;
+  late PageController _controller;
 
   List<IntroductionModel> introductions = [
-    IntroductionModel("asset/image/introduction_2.png", "Gain total control", "Become your own money manager"),
-    IntroductionModel("asset/image/introduction_3.png", "Know where your", "Track your transaction easily"),
-    IntroductionModel("asset/image/introduction_2.png", "Planing ahead", "Setup your budget for each category")
+    IntroductionModel("asset/image/introduction_2.png", "Gain total control",
+        "Become your own money manager"),
+    IntroductionModel("asset/image/introduction_3.png", "Know where your",
+        "Track your transaction easily"),
+    IntroductionModel("asset/image/introduction_2.png", "Planing ahead",
+        "Setup your budget for each category")
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(initialPage: _currentPosition);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,22 +72,23 @@ class _IntroductionState extends State<Introduction> {
                   )
                 ],
               ),
-              itemCount: pages,
-              controller: PageController(initialPage: currentPosition),
-              onPageChanged: (value) => setState(() => currentPosition = value),
+              itemCount: _pages,
+              controller: _controller,
+              onPageChanged: (value) =>
+                  setState(() => _currentPosition = value),
               allowImplicitScrolling: false,
             ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List<Container>.generate(
-                pages,
+                _pages,
                 (index) => Container(
-                      width: index == currentPosition ? 20 : 10,
-                      height: index == currentPosition ? 20 : 10,
+                      width: index == _currentPosition ? 20 : 10,
+                      height: index == _currentPosition ? 20 : 10,
                       margin: EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                          color: index == currentPosition
+                          color: index == _currentPosition
                               ? Colors.white
                               : Colors.grey,
                           shape: BoxShape.circle),

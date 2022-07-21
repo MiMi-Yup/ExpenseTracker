@@ -70,6 +70,8 @@ flutter:
     - asset/image/mandiri_bank.png
     - asset/image/paypal_bank.png
     - asset/image/success.png
+    - asset/image/income.png
+    - asset/image/expense.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
