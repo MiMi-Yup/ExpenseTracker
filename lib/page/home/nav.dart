@@ -49,7 +49,7 @@ class _NavigationState extends State<Navigation> {
           controller: _controller,
           onPageChanged: (value) => setState(() => _currentIndex = value),
           itemCount: _itemsNav.length,
-          itemBuilder: (context, index) => homePage()),
+          itemBuilder: (context, index) => HomePage()),
     );
   }
 }
