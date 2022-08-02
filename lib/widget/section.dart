@@ -13,7 +13,7 @@ class Section extends MultiSliver {
           pushPinnedChildren: true,
           children: [
             SliverPinnedHeader(
-                child: ColoredBox(
+                child: Container(
                     color: headerColor,
                     child: ListTile(
                       textColor: titleColor,

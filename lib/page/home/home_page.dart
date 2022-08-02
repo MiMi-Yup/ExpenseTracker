@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/page/home/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/item_transaction.dart';
 import 'package:expense_tracker/widget/overview_transaction.dart';
@@ -18,8 +19,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late PageController _controller;
 
-  final _charts = [Text("data"), Text("data"), Text("data"), Text("data")];
+  final List<Widget> _charts = [
+    LineChartSample1(),
+    Text("data"),
+    Text("data"),
+    Text("data")
+  ];
   int _currentIndex = 0;
+  late double height = MediaQuery.of(context).size.height;
 
   @override
   void initState() {
@@ -93,52 +100,54 @@ class _HomePageState extends State<HomePage> {
           child: CustomScrollView(slivers: [
             Section(
               title: "Spend Frequency",
-              headerColor: Colors.grey,
+              headerColor: MyColor.mainBackgroundColor,
               titleColor: Colors.white,
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    height: 50,
-                    child: PageView.builder(
-                      controller: _controller,
-                      itemCount: _charts.length,
-                      itemBuilder: (context, index) => _charts[index],
-                      onPageChanged: (value) =>
-                          setState(() => _currentIndex = value),
-                    ),
-                  ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List<GestureDetector>.generate(
-                          4,
-                          (index) => GestureDetector(
-                                child: Container(
-                                  padding: EdgeInsets.only(
-                                      top: 8.0,
-                                      bottom: 8.0,
-                                      left: 16.0,
-                                      right: 16.0),
-                                  decoration: BoxDecoration(
-                                      color: index == _currentIndex
-                                          ? Colors.amber
-                                          : Colors.grey,
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  child: Text(index.toString()),
-                                ),
-                                onTap: () {
-                                  _currentIndex = index;
-                                  setState(() =>
-                                      _controller.jumpToPage(_currentIndex));
-                                },
-                              )))
-                ],
+              content: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                        height: height / 4,
+                        child: PageView.builder(
+                          controller: _controller,
+                          itemCount: _charts.length,
+                          itemBuilder: (context, index) => _charts[index],
+                          onPageChanged: (value) =>
+                              setState(() => _currentIndex = value),
+                        )),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List<GestureDetector>.generate(
+                            4,
+                            (index) => GestureDetector(
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                        top: 8.0,
+                                        bottom: 8.0,
+                                        left: 16.0,
+                                        right: 16.0),
+                                    decoration: BoxDecoration(
+                                        color: index == _currentIndex
+                                            ? Colors.amber
+                                            : Colors.grey,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0)),
+                                    child: Text(index.toString()),
+                                  ),
+                                  onTap: () {
+                                    _currentIndex = index;
+                                    setState(() =>
+                                        _controller.jumpToPage(_currentIndex));
+                                  },
+                                )))
+                  ],
+                ),
               ),
             ),
             Section(
                 title: "Spend Frequency",
-                headerColor: Colors.grey,
+                headerColor: MyColor.mainBackgroundColor,
                 titleColor: Colors.white,
                 content: Column(
                   children: List<Widget>.generate(
