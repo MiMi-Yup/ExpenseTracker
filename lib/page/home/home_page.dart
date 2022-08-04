@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/page/home/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
@@ -7,7 +5,6 @@ import 'package:expense_tracker/widget/item_transaction.dart';
 import 'package:expense_tracker/widget/overview_transaction.dart';
 import 'package:expense_tracker/widget/section.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -27,6 +24,10 @@ class _HomePageState extends State<HomePage> {
   ];
   int _currentIndex = 0;
   late double height = MediaQuery.of(context).size.height;
+  final List<OverviewTransaction> overview_transaction = [
+    OverviewTransaction("income", currency: "\$", value: 5000),
+    OverviewTransaction("expense", currency: "\$", value: 3000)
+  ];
 
   @override
   void initState() {
@@ -89,9 +90,15 @@ class _HomePageState extends State<HomePage> {
                 "\$9400",
                 style: TextStyle(fontSize: 30.0),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [overviewTransaction(), overviewTransaction()],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: overview_transaction
+                      .map<GestureDetector>(
+                          (e) => overviewTransaction(typeTransaction: e))
+                      .toList(),
+                ),
               )
             ],
           ),
@@ -149,6 +156,7 @@ class _HomePageState extends State<HomePage> {
                 title: "Spend Frequency",
                 headerColor: MyColor.mainBackgroundColor,
                 titleColor: Colors.white,
+                titleButton: "See all",
                 content: Column(
                   children: List<Widget>.generate(
                       50,

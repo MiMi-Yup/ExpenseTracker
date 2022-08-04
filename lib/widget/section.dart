@@ -7,17 +7,32 @@ class Section extends MultiSliver {
       String? title,
       Color headerColor = Colors.white,
       Color titleColor = Colors.black,
+      String? titleButton,
+      void Function()? onPressed,
       required Widget content})
       : super(
           key: key,
           pushPinnedChildren: true,
           children: [
             SliverPinnedHeader(
-                child: Container(
+                child: ColoredBox(
                     color: headerColor,
                     child: ListTile(
                       textColor: titleColor,
-                      title: title != null ? Text(title) : null,
+                      title: title != null
+                          ? (titleButton == null
+                              ? Text(title)
+                              : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(title),
+                                    TextButton(
+                                        onPressed: onPressed,
+                                        child: Text(titleButton))
+                                  ],
+                                ))
+                          : null,
                     ))),
             content
           ],
