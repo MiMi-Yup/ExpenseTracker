@@ -5,6 +5,7 @@ DropdownButton<String> dropDown(
     required String? chosenValue,
     required void Function(String?) onChanged}) {
   return DropdownButton<String>(
+    isExpanded: true,
     focusColor: Colors.white,
     value: chosenValue,
     underline: SizedBox(),

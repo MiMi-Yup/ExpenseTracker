@@ -38,6 +38,8 @@ dependencies:
   sliver_tools: ^0.2.7
   collection: ^1.16.0
   fl_chart: ^0.55.0
+  dotted_border: ^2.0.0+2
+  file_picker: ^5.0.1
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +78,7 @@ flutter:
     - asset/image/success.png
     - asset/image/income.png
     - asset/image/expense.png
+    - asset/image/attachment.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

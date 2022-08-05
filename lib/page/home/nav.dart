@@ -47,6 +47,7 @@ class _NavigationState extends State<Navigation> {
       ),
       body: PageView.builder(
           controller: _controller,
+          physics: const NeverScrollableScrollPhysics(),
           onPageChanged: (value) => setState(() => _currentIndex = value),
           itemCount: _itemsNav.length,
           itemBuilder: (context, index) => HomePage()),

@@ -35,7 +35,7 @@ GestureDetector overviewTransaction({required OverviewTransaction typeTransactio
               padding: const EdgeInsets.all(8.0),
               margin: const EdgeInsets.only(right: 8.0),
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0), color: Colors.white),
+                  borderRadius: BorderRadius.circular(16.0), color: Colors.white),
               child: Image.asset(typeTransaction.assetImage!),
             ),
             Column(
