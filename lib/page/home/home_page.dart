@@ -117,6 +117,7 @@ class _HomePageState extends State<HomePage> {
                     Container(
                         height: height / 4,
                         child: PageView.builder(
+                          physics: BouncingScrollPhysics(),
                           controller: _controller,
                           itemCount: _charts.length,
                           itemBuilder: (context, index) => _charts[index],
