@@ -29,6 +29,110 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
   //demo attachment
   List<String>? itemAttachments;
 
+  Widget _frequencyRepeat(
+      {required String title,
+      String? subTitle,
+      Color? colorTitle,
+      Color? colorSubTitle}) {
+    List<Widget> items = [
+      Text(
+        title,
+        style: TextStyle(color: colorTitle),
+      )
+    ];
+    if (subTitle != null)
+      items.add(Text(
+        subTitle,
+        style: TextStyle(color: colorSubTitle),
+      ));
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: items,
+    );
+  }
+
+  Future<Object?> _setRepeat({required BuildContext context}) async {
+    String? selectedFrequency;
+    DateTime? startD, endD;
+    TimeOfDay? startT, endT;
+
+    await showModalBottomSheet(
+        context: context,
+        builder: (context) => StatefulBuilder(
+            builder: (BuildContext context, setState) => SingleChildScrollView(
+                  physics: NeverScrollableScrollPhysics(),
+                  reverse: true,
+                  child: Container(
+                    padding: MediaQuery.of(context).viewInsets,
+                    decoration: BoxDecoration(
+                        color: MyColor.mainBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Frequency",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            dropDown(
+                                items: ["Daily", "Monthly", "Yearly"],
+                                hintColor: Colors.cyan,
+                                chosenValue: selectedFrequency,
+                                onChanged: (value) =>
+                                    setState(() => selectedFrequency = value)),
+                            Text(
+                              "Start from",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            editDateTime(
+                                icon: Icons.calendar_month,
+                                value: DateTime.now().toString(),
+                                onPressed: () async => showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime.now(),
+                                        lastDate: DateTime.now())
+                                    .then((value) => startD = value)),
+                            editDateTime(
+                                icon: Icons.timer_sharp,
+                                value: TimeOfDay.now().toString(),
+                                onPressed: () async => showTimePicker(
+                                        context: context,
+                                        initialTime: TimeOfDay.now())
+                                    .then((value) => startT = value)),
+                            Text(
+                              "End after",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            editDateTime(
+                                icon: Icons.calendar_month,
+                                value: DateTime.now().toString(),
+                                onPressed: () async => showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime.now(),
+                                        lastDate: DateTime.now())
+                                    .then((value) => endD = value)),
+                            editDateTime(
+                                icon: Icons.timer_sharp,
+                                value: TimeOfDay.now().toString(),
+                                onPressed: () async => showTimePicker(
+                                        context: context,
+                                        initialTime: TimeOfDay.now())
+                                    .then((value) => endT = value))
+                          ]),
+                    ),
+                  ),
+                )));
+    return startD;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -157,143 +261,55 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                         Switch(
                             value: isRepeated,
                             onChanged: (value) async {
-                              String? selectedFrequency;
-
-                              await showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) => StatefulBuilder(
-                                      builder: (BuildContext context,
-                                              setState) =>
-                                          SingleChildScrollView(
-                                            physics: NeverScrollableScrollPhysics(),
-                                            reverse: true,
-                                            child: Container(
-                                              padding: MediaQuery.of(context)
-                                                  .viewInsets,
-                                              decoration: BoxDecoration(
-                                                  color:
-                                                      MyColor.mainBackgroundColor,
-                                                  borderRadius: BorderRadius.only(
-                                                      topLeft:
-                                                          Radius.circular(10),
-                                                      topRight:
-                                                          Radius.circular(10))),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(20.0),
-                                                child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        "Frequency",
-                                                        style: TextStyle(
-                                                            color: Colors.grey),
-                                                      ),
-                                                      dropDown(
-                                                          items: [
-                                                            "Daily",
-                                                            "Monthly",
-                                                            "Yearly"
-                                                          ],
-                                                          hintColor: Colors.cyan,
-                                                          chosenValue:
-                                                              selectedFrequency,
-                                                          onChanged: (value) =>
-                                                              setState(() =>
-                                                                  selectedFrequency =
-                                                                      value)),
-                                                      Text(
-                                                        "Start from",
-                                                        style: TextStyle(
-                                                            color: Colors.grey),
-                                                      ),
-                                                      editDateTime(
-                                                          icon: Icons
-                                                              .calendar_month,
-                                                          value: DateTime.now()
-                                                              .toString(),
-                                                          onPressed: () async =>
-                                                              showDatePicker(
-                                                                  context:
-                                                                      context,
-                                                                  initialDate:
-                                                                      DateTime
-                                                                          .now(),
-                                                                  firstDate:
-                                                                      DateTime
-                                                                          .now(),
-                                                                  lastDate:
-                                                                      DateTime
-                                                                          .now())),
-                                                      editDateTime(
-                                                          icon: Icons.timer_sharp,
-                                                          value: TimeOfDay.now()
-                                                              .toString(),
-                                                          onPressed: () async =>
-                                                              showTimePicker(
-                                                                  context:
-                                                                      context,
-                                                                  initialTime:
-                                                                      TimeOfDay
-                                                                          .now())),
-                                                      Text(
-                                                        "End after",
-                                                        style: TextStyle(
-                                                            color: Colors.grey),
-                                                      ),
-                                                      editDateTime(
-                                                          icon: Icons
-                                                              .calendar_month,
-                                                          value: DateTime.now()
-                                                              .toString(),
-                                                          onPressed: () async =>
-                                                              showDatePicker(
-                                                                  context:
-                                                                      context,
-                                                                  initialDate:
-                                                                      DateTime
-                                                                          .now(),
-                                                                  firstDate:
-                                                                      DateTime
-                                                                          .now(),
-                                                                  lastDate:
-                                                                      DateTime
-                                                                          .now())),
-                                                      editDateTime(
-                                                          icon: Icons.timer_sharp,
-                                                          value: TimeOfDay.now()
-                                                              .toString(),
-                                                          onPressed: () async =>
-                                                              showTimePicker(
-                                                                  context:
-                                                                      context,
-                                                                  initialTime:
-                                                                      TimeOfDay
-                                                                          .now()))
-                                                    ]),
-                                              ),
-                                            ),
-                                          )));
+                              await _setRepeat(context: context);
                               setState(() => isRepeated = value);
                             })
                       ],
                     ),
                     Visibility(
                         visible: isRepeated,
-                        child: Row(children: [
-                          Text(
-                            "Frequency",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ])),
-                    Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _frequencyRepeat(
+                                title: "Start from",
+                                subTitle: DateTime.now().toString()),
+                            _frequencyRepeat(
+                                title: "End after",
+                                subTitle: DateTime.now().toString()),
+                            TextButton(
+                                onPressed: () async =>
+                                    await _setRepeat(context: context),
+                                child: Text("Edit"))
+                          ],
+                        )),
+                    SizedBox(
                         width: double.maxFinite,
                         child: largestButton(
                             text: "Continue",
-                            onPressed: () => null,
+                            onPressed: () => showDialog(
+                                  builder: (context) => Dialog(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Image.asset(
+                                            "asset/image/success.png",
+                                            scale: 2,
+                                          ),
+                                          SizedBox(height: 16.0),
+                                          Text(
+                                              "Transaction has been successfully added")
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  context: context,
+                                ),
                             background: MyColor.purple()))
                   ],
                 ),

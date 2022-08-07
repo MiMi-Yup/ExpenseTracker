@@ -1,5 +1,6 @@
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/page/home/home_page.dart';
+import 'package:expense_tracker/page/transaction/transaction_page.dart';
 import 'package:expense_tracker/widget/bottom_nav.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:flutter/material.dart';
@@ -42,15 +43,15 @@ class _NavigationState extends State<Navigation> {
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() => _currentIndex = index);
-          _controller.jumpToPage(_currentIndex);
+          _controller.animateToPage(_currentIndex,
+              curve: Curves.linear, duration: Duration(milliseconds: 250));
         },
       ),
       body: PageView.builder(
           controller: _controller,
           physics: const NeverScrollableScrollPhysics(),
-          onPageChanged: (value) => setState(() => _currentIndex = value),
           itemCount: _itemsNav.length,
-          itemBuilder: (context, index) => HomePage()),
+          itemBuilder: (context, index) => TransactionPage()),
     );
   }
 }

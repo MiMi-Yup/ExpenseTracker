@@ -4,13 +4,14 @@ DropdownButton<String> dropDown(
     {required List<String> items,
     required String? chosenValue,
     required void Function(String?) onChanged,
+    bool isExpanded = true,
     Color hintColor = Colors.grey,
     Color itemColor = Colors.white,
     Color selectedColor = Colors.white,
     Color focusColor = Colors.white,
     Color arrowColor = Colors.white}) {
   return DropdownButton<String>(
-    isExpanded: true,
+    isExpanded: isExpanded,
     focusColor: focusColor,
     value: chosenValue,
     underline: const SizedBox(),

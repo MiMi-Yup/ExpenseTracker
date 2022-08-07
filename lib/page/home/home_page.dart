@@ -78,6 +78,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 title: dropDown(
+                  isExpanded: false,
                     items: ["1", "2", "3"],
                     chosenValue: null,
                     onChanged: (p0) => null),
