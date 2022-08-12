@@ -13,6 +13,7 @@ class DetailReport extends StatefulWidget {
 
 class _DetailReportState extends State<DetailReport> {
   int indexTypeTransaction = 0;
+  String? indexTypeCategory;
   int indexChart = 0;
 
   late Size size = MediaQuery.of(context).size;
@@ -46,7 +47,7 @@ class _DetailReportState extends State<DetailReport> {
               children: [
                 dropDown(
                     isExpanded: false,
-                    items: ["1", "2", "3"],
+                    items: ["Day", "Month", "Year"],
                     chosenValue: null,
                     onChanged: (value) => null),
                 Stack(
@@ -81,6 +82,15 @@ class _DetailReportState extends State<DetailReport> {
                                               topRight: Radius.circular(10.0),
                                               bottomRight:
                                                   Radius.circular(10.0))),
+                                  child: index == 0
+                                      ? Icon(Icons.show_chart,
+                                          color: index == indexChart
+                                              ? Colors.white
+                                              : Colors.black)
+                                      : Icon(Icons.pie_chart,
+                                          color: index == indexChart
+                                              ? Colors.white
+                                              : Colors.black),
                                 ),
                               )),
                     )
@@ -136,14 +146,19 @@ class _DetailReportState extends State<DetailReport> {
                 dropDown(
                     isExpanded: false,
                     items: ["Transaction", "Category"],
-                    chosenValue: null,
-                    onChanged: (value) => null),
+                    chosenValue: indexTypeCategory,
+                    onChanged: (value) =>
+                        setState(() => indexTypeCategory = value)),
                 IconButton(onPressed: null, icon: Icon(Icons.filter_list))
               ],
             ),
             Expanded(
               child: ListView(
-                children: List.generate(200, (index) => itemTransaction()),
+                children: List.generate(
+                    200,
+                    (index) => indexTypeCategory == "Category"
+                        ? itemCategoryPercent(width: size.width, percent: 0.1)
+                        : itemTransaction()),
               ),
             )
           ],

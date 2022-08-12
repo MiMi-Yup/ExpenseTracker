@@ -15,6 +15,7 @@ DropdownButton<String> dropDown(
     focusColor: focusColor,
     value: chosenValue,
     underline: const SizedBox(),
+    borderRadius: BorderRadius.circular(10.0),
     //elevation: 5,
     style: TextStyle(color: selectedColor),
     icon: Icon(Icons.keyboard_arrow_down, color: arrowColor),
