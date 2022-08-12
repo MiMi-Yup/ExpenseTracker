@@ -1,4 +1,5 @@
 import 'package:expense_tracker/page/add_edit_transaction/add_edit_transaction.dart';
+import 'package:expense_tracker/page/detail_transaction/detail_transaction.dart';
 import 'package:expense_tracker/page/first_setup/add_new_account.dart';
 import 'package:expense_tracker/page/first_setup/code_auth.dart';
 import 'package:expense_tracker/page/first_setup/introduction_setup.dart';
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       darkTheme: ThemeData.dark(),
-      home: DetailReport(),
+      home: DetailTransaction(),
     );
   }
 }
