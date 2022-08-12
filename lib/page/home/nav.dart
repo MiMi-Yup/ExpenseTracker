@@ -51,7 +51,8 @@ class _NavigationState extends State<Navigation> {
           controller: _controller,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _itemsNav.length,
-          itemBuilder: (context, index) => TransactionPage()),
+          itemBuilder: (context, index) =>
+              index == 0 ? HomePage() : TransactionPage()),
     );
   }
 }

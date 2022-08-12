@@ -54,6 +54,46 @@ class _NotificationPageState extends State<NotificationPage> {
         elevation: 0.0,
         backgroundColor: MyColor.mainBackgroundColor,
       ),
+      body: ListView(
+        children: List.generate(
+            30,
+            (index) => Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "dsafdsfdsfdsfdsfsdkfjsdlfjlkdsjfdjskfjldskjflksdjflksjdflksdflkjdsfklfdsffdsfd",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                              ),
+                              SizedBox(
+                                height: 10.0,
+                              ),
+                              Text(
+                                "fdsf",
+                                style: TextStyle(color: Colors.grey),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: 30.0,
+                        ),
+                        Text(index.toString(),
+                            style: TextStyle(color: Colors.grey))
+                      ]),
+                )),
+      ),
     );
   }
 }

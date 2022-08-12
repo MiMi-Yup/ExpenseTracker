@@ -29,6 +29,8 @@ class _TransactionPageState extends State<TransactionPage> {
     OverviewTransaction("expense", currency: "\$", value: 3000)
   ];
 
+  bool hasFilter = false;
+
   @override
   void initState() {
     super.initState();
@@ -95,7 +97,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                             child: Text("fsdf"),
                                           ),
                                           //selected: _value == index,
-                                          selected: true,
+                                          selected: false,
                                           onSelected: (selected) {
                                             // setState(() {
                                             //   _value = selected ? index : null;
@@ -121,7 +123,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                             child: Text("fsdf"),
                                           ),
                                           //selected: _value == index,
-                                          selected: true,
+                                          selected: false,
                                           onSelected: (selected) {
                                             // setState(() {
                                             //   _value = selected ? index : null;
@@ -133,10 +135,16 @@ class _TransactionPageState extends State<TransactionPage> {
                                     ).toList(),
                                   ),
                                 ),
+                                Text("Category"),
+                                Visibility(
+                                    child: Container(
+                                  color: Colors.yellow,
+                                )),
                               ]),
                         ),
                       ),
-                  icon: Icon(Icons.sort))
+                  icon: Icon(Icons.sort,
+                      color: hasFilter ? MyColor.purple() : null))
             ],
           ),
           GestureDetector(
