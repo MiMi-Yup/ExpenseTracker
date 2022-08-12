@@ -56,3 +56,24 @@ GestureDetector itemTransaction({void Function()? onTap}) {
         ),
       ));
 }
+
+Widget itemCategory() {
+  return Container(
+    padding: EdgeInsets.all(10.0),
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0), color: Colors.white),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: EdgeInsets.all(10.0),
+          margin: EdgeInsets.only(right: 10.0),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0), color: Colors.orange),
+          child: Image.asset("asset/image/city_bank.png"),
+        ),
+        Text("City Bank", style: TextStyle(color: Colors.black))
+      ],
+    ),
+  );
+}

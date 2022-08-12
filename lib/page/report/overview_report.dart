@@ -1,8 +1,7 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/widget/item_transaction.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class OverviewReport extends StatefulWidget {
   const OverviewReport({Key? key}) : super(key: key);
@@ -12,21 +11,35 @@ class OverviewReport extends StatefulWidget {
 }
 
 class _OverviewReportState extends State<OverviewReport> {
-  int? indexPage;
+  late PageController _controller;
+  int indexPage = 0;
+
+  @override
+  void initState() {
+    _controller = PageController(initialPage: indexPage);
+    super.initState();
+  }
+
   List<Widget Function(double)> pages = [
     (width) => ColoredBox(
           color: Colors.green,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text("You Spend 💸"),
-              Text("\$332"),
+              Expanded(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("You Earned 💰", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+                  Text("\$332", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+                ],
+              )),
               Padding(
                 padding:
                     EdgeInsets.only(top: width * 0.125, bottom: width * 0.125),
                 child: Container(
                   width: width * 0.75,
-                  height: width * 0.75,
+                  padding: EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
                       color: MyColor.purpleTranparent),
@@ -34,9 +47,10 @@ class _OverviewReportState extends State<OverviewReport> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("and your biggest"),
-                      Container(),
-                      Text("\$120")
+                      Text("and your biggest",
+                          style: TextStyle(color: Colors.black)),
+                      itemCategory(),
+                      Text("\$120", style: TextStyle(color: Colors.black))
                     ],
                   ),
                 ),
@@ -49,14 +63,20 @@ class _OverviewReportState extends State<OverviewReport> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text("You Spend 💸"),
-              Text("\$332"),
+              Expanded(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("You Spend 💸", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+                  Text("\$332", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+                ],
+              )),
               Padding(
                 padding:
                     EdgeInsets.only(top: width * 0.125, bottom: width * 0.125),
                 child: Container(
                   width: width * 0.75,
-                  height: width * 0.75,
+                  padding: EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
                       color: MyColor.purpleTranparent),
@@ -64,9 +84,10 @@ class _OverviewReportState extends State<OverviewReport> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("and your biggest"),
-                      Container(),
-                      Text("\$120")
+                      Text("and your biggest",
+                          style: TextStyle(color: Colors.black)),
+                      itemCategory(),
+                      Text("\$120", style: TextStyle(color: Colors.black))
                     ],
                   ),
                 ),
@@ -79,16 +100,26 @@ class _OverviewReportState extends State<OverviewReport> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text("quote"),
-              Text("auth"),
-              SizedBox(
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [Text("Quote"), Text("auth")],
+                    )),
+              )),
+              Container(
                   width: double.maxFinite,
+                  padding: EdgeInsets.all(10.0),
                   child: largestButton(
                       text: "See the full detail", onPressed: () => null))
             ],
           ),
         )
   ];
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -96,6 +127,7 @@ class _OverviewReportState extends State<OverviewReport> {
       body: Stack(
         children: [
           PageView(
+            controller: _controller,
             allowImplicitScrolling: true,
             children: pages.map((e) => e(width)).toList(),
             onPageChanged: (value) => setState(() => indexPage = value),
