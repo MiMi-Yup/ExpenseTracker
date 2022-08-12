@@ -77,3 +77,17 @@ Widget itemCategory() {
     ),
   );
 }
+
+Widget itemCategoryPercent() {
+  return Column(
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [],
+      ),
+      Stack(
+        children: [Container(), Container()],
+      )
+    ],
+  );
+}

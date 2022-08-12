@@ -1,5 +1,5 @@
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/page/home/transaction_chart.dart';
+import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/item_transaction.dart';
 import 'package:expense_tracker/widget/overview_transaction.dart';

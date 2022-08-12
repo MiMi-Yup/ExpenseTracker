@@ -1,4 +1,5 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/item_transaction.dart';
 import 'package:flutter/material.dart';
@@ -60,21 +61,27 @@ class _DetailReportState extends State<DetailReport> {
                     Row(
                       children: List.generate(
                           2,
-                          (index) => Container(
-                                height: 50,
-                                width: 50,
-                                decoration: BoxDecoration(
-                                    color: index == indexChart
-                                        ? MyColor.purple()
-                                        : Colors.grey,
-                                    borderRadius: index == 0
-                                        ? BorderRadius.only(
-                                            topLeft: Radius.circular(10.0),
-                                            bottomLeft: Radius.circular(10.0))
-                                        : BorderRadius.only(
-                                            topRight: Radius.circular(10.0),
-                                            bottomRight:
-                                                Radius.circular(10.0))),
+                          (index) => GestureDetector(
+                                onTap: () => _controllerChart.animateToPage(
+                                    index,
+                                    duration: Duration(milliseconds: 250),
+                                    curve: Curves.linear),
+                                child: Container(
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                      color: index == indexChart
+                                          ? MyColor.purple()
+                                          : Colors.grey,
+                                      borderRadius: index == 0
+                                          ? BorderRadius.only(
+                                              topLeft: Radius.circular(10.0),
+                                              bottomLeft: Radius.circular(10.0))
+                                          : BorderRadius.only(
+                                              topRight: Radius.circular(10.0),
+                                              bottomRight:
+                                                  Radius.circular(10.0))),
+                                ),
                               )),
                     )
                   ],
@@ -83,7 +90,12 @@ class _DetailReportState extends State<DetailReport> {
             ),
             SizedBox(
               height: size.height * 0.3,
-              child: PageView(),
+              child: PageView(
+                onPageChanged: (value) => setState(() => indexChart = value),
+                controller: _controllerChart,
+                physics: NeverScrollableScrollPhysics(),
+                children: [LineChartSample1(), PieChartImage()],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(
@@ -99,16 +111,20 @@ class _DetailReportState extends State<DetailReport> {
                   Row(
                     children: List.generate(
                         2,
-                        (index) => Container(
-                              alignment: Alignment.center,
-                              width: (size.width - 100) / 2,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  color: index == indexTypeTransaction
-                                      ? MyColor.purple()
-                                      : Colors.grey,
-                                  borderRadius: BorderRadius.circular(25.0)),
-                              child: Text("Page"),
+                        (index) => GestureDetector(
+                              onTap: () =>
+                                  setState(() => indexTypeTransaction = index),
+                              child: Container(
+                                alignment: Alignment.center,
+                                width: (size.width - 100) / 2,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                    color: index == indexTypeTransaction
+                                        ? MyColor.purple()
+                                        : Colors.grey,
+                                    borderRadius: BorderRadius.circular(25.0)),
+                                child: Text("Page"),
+                              ),
                             )),
                   ),
                 ],
@@ -119,7 +135,7 @@ class _DetailReportState extends State<DetailReport> {
               children: [
                 dropDown(
                     isExpanded: false,
-                    items: ["Transaction", "mondasd"],
+                    items: ["Transaction", "Category"],
                     chosenValue: null,
                     onChanged: (value) => null),
                 IconButton(onPressed: null, icon: Icon(Icons.filter_list))
