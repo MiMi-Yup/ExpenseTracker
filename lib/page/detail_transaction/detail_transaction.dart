@@ -35,7 +35,82 @@ class _DetailTransactionState extends State<DetailTransaction> {
               title: Text("Detail Transaction"),
               actions: [
                 IconButton(
-                    onPressed: null, icon: Icon(Icons.delete_forever_rounded))
+                    onPressed: () async {
+                      bool? isRemove;
+                      await showModalBottomSheet(
+                          context: context,
+                          builder: (context) => Container(
+                                padding: EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10.0),
+                                        topRight: Radius.circular(10.0))),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "Remove this transaction",
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(25.0),
+                                      child: Text(
+                                        "Are you sure do you wanna remove this transaction?",
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: largestButton(
+                                              background: Colors.grey,
+                                              text: "No",
+                                              onPressed: () =>
+                                                  Navigator.pop(context)),
+                                        ),
+                                        SizedBox(
+                                          width: 10.0,
+                                        ),
+                                        Expanded(
+                                          child: largestButton(
+                                              text: "Yes",
+                                              onPressed: () {
+                                                isRemove = true;
+                                                Navigator.pop(context);
+                                              }),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ));
+                      isRemove != null && isRemove == true
+                          ? await showDialog(
+                              builder: (context) => Dialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Image.asset(
+                                        "asset/image/success.png",
+                                        scale: 2,
+                                      ),
+                                      SizedBox(height: 16.0),
+                                      Text(
+                                          "Transaction has been completely removed")
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              context: context,
+                            )
+                          : null;
+                    },
+                    icon: Icon(Icons.delete_forever_rounded))
               ],
               centerTitle: true,
             ),

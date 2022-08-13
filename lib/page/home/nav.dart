@@ -1,4 +1,5 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/page/budget/budget_page.dart';
 import 'package:expense_tracker/page/home/home_page.dart';
 import 'package:expense_tracker/page/transaction/transaction_page.dart';
 import 'package:expense_tracker/widget/bottom_nav.dart';
@@ -51,8 +52,18 @@ class _NavigationState extends State<Navigation> {
           controller: _controller,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _itemsNav.length,
-          itemBuilder: (context, index) =>
-              index == 0 ? HomePage() : TransactionPage()),
+          itemBuilder: (context, index) {
+            switch (index) {
+              case 0:
+                return HomePage();
+              case 1:
+                return TransactionPage();
+              case 2:
+                return BudgetPage();
+              default:
+                return Container();
+            }
+          }),
     );
   }
 }
