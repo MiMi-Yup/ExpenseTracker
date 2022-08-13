@@ -1,5 +1,6 @@
 import 'package:expense_tracker/page/add_edit_transaction/add_edit_transaction.dart';
 import 'package:expense_tracker/page/budget/add_edit_budget.dart';
+import 'package:expense_tracker/page/budget/budget_page.dart';
 import 'package:expense_tracker/page/detail_transaction/detail_transaction.dart';
 import 'package:expense_tracker/page/first_setup/add_new_account.dart';
 import 'package:expense_tracker/page/first_setup/code_auth.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       darkTheme: ThemeData.dark(),
-      home: AddEditBudget(),
+      home: Navigation(),
     );
   }
 }
