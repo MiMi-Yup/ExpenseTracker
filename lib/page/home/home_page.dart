@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 title: dropDown(
-                  isExpanded: false,
+                    isExpanded: false,
                     items: ["1", "2", "3"],
                     chosenValue: null,
                     onChanged: (p0) => null),
@@ -105,68 +105,68 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         Expanded(
-          child: CustomScrollView(slivers: [
-            Section(
-              title: "Spend Frequency",
-              headerColor: MyColor.mainBackgroundColor,
-              titleColor: Colors.white,
-              content: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                        height: height / 4,
-                        child: PageView.builder(
-                          physics: BouncingScrollPhysics(),
-                          controller: _controller,
-                          itemCount: _charts.length,
-                          itemBuilder: (context, index) => _charts[index],
-                          onPageChanged: (value) =>
-                              setState(() => _currentIndex = value),
-                        )),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List<GestureDetector>.generate(
-                            4,
-                            (index) => GestureDetector(
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                        top: 8.0,
-                                        bottom: 8.0,
-                                        left: 16.0,
-                                        right: 16.0),
-                                    decoration: BoxDecoration(
-                                        color: index == _currentIndex
-                                            ? Colors.amber
-                                            : Colors.grey,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    child: Text(index.toString()),
-                                  ),
-                                  onTap: () {
-                                    _currentIndex = index;
-                                    setState(() =>
-                                        _controller.jumpToPage(_currentIndex));
-                                  },
-                                )))
-                  ],
-                ),
-              ),
-            ),
-            Section(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: CustomScrollView(physics: BouncingScrollPhysics(), slivers: [
+              Section(
                 title: "Spend Frequency",
                 headerColor: MyColor.mainBackgroundColor,
                 titleColor: Colors.white,
-                titleButton: "See all",
-                content: Column(
-                  children: List<Widget>.generate(
-                      50,
-                      (index) => Container(
-                          padding: EdgeInsets.all(20.0),
-                          child: itemTransaction())),
-                ))
-          ]),
+                content: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                          height: height / 4,
+                          child: PageView.builder(
+                            physics: BouncingScrollPhysics(),
+                            controller: _controller,
+                            itemCount: _charts.length,
+                            itemBuilder: (context, index) => _charts[index],
+                            onPageChanged: (value) =>
+                                setState(() => _currentIndex = value),
+                          )),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List<GestureDetector>.generate(
+                              4,
+                              (index) => GestureDetector(
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                          top: 8.0,
+                                          bottom: 8.0,
+                                          left: 16.0,
+                                          right: 16.0),
+                                      decoration: BoxDecoration(
+                                          color: index == _currentIndex
+                                              ? Colors.amber
+                                              : Colors.grey,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
+                                      child: Text(index.toString()),
+                                    ),
+                                    onTap: () {
+                                      _currentIndex = index;
+                                      setState(() => _controller
+                                          .jumpToPage(_currentIndex));
+                                    },
+                                  )))
+                    ],
+                  ),
+                ),
+              ),
+              Section(
+                  title: "Spend Frequency",
+                  headerColor: MyColor.mainBackgroundColor,
+                  titleColor: Colors.white,
+                  titleButton: "See all",
+                  content: Column(
+                    children:
+                        List<Widget>.generate(50, (index) => itemTransaction()),
+                  ))
+            ]),
+          ),
         )
       ],
     );

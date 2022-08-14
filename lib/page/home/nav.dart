@@ -1,6 +1,7 @@
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/page/budget/budget_page.dart';
 import 'package:expense_tracker/page/home/home_page.dart';
+import 'package:expense_tracker/page/profile/profile_page.dart';
 import 'package:expense_tracker/page/transaction/transaction_page.dart';
 import 'package:expense_tracker/widget/bottom_nav.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
@@ -24,6 +25,13 @@ class _NavigationState extends State<Navigation> {
   int _currentIndex = 0;
   late PageController _controller;
 
+  final List<Widget> pages = [
+    HomePage(),
+    TransactionPage(),
+    BudgetPage(),
+    ProfilePage()
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -43,27 +51,33 @@ class _NavigationState extends State<Navigation> {
         itemsNav: _itemsNav,
         currentIndex: _currentIndex,
         onTap: (index) {
-          setState(() => _currentIndex = index);
-          _controller.animateToPage(_currentIndex,
-              curve: Curves.linear, duration: Duration(milliseconds: 250));
+          setState(() {
+            _currentIndex = index;
+            _controller.animateToPage(_currentIndex,
+                curve: Curves.linear, duration: Duration(milliseconds: 250));
+          });
         },
       ),
       body: PageView.builder(
           controller: _controller,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _itemsNav.length,
-          itemBuilder: (context, index) {
-            switch (index) {
-              case 0:
-                return HomePage();
-              case 1:
-                return TransactionPage();
-              case 2:
-                return BudgetPage();
-              default:
-                return Container();
-            }
-          }),
+          itemBuilder: (context, index) => pages[index]
+          // {
+          //   switch (index) {
+          //     case 0:
+          //       return HomePage();
+          //     case 1:
+          //       return TransactionPage();
+          //     case 2:
+          //       return BudgetPage();
+          //     case 3:
+          //       return ProfilePage();
+          //     default:
+          //       return Container();
+          //   }
+          // }
+          ),
     );
   }
 }

@@ -8,6 +8,7 @@ class Section extends MultiSliver {
       Color headerColor = Colors.white,
       Color titleColor = Colors.black,
       String? titleButton,
+      double? height,
       void Function()? onPressed,
       required Widget content})
       : super(
@@ -15,25 +16,28 @@ class Section extends MultiSliver {
           pushPinnedChildren: true,
           children: [
             SliverPinnedHeader(
-                child: ColoredBox(
-                    color: headerColor,
-                    child: ListTile(
-                      textColor: titleColor,
-                      title: title != null
-                          ? (titleButton == null
-                              ? Text(title)
-                              : Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(title),
-                                    TextButton(
-                                        onPressed: onPressed,
-                                        child: Text(titleButton))
-                                  ],
-                                ))
-                          : null,
-                    ))),
+                child: Container(
+              color: headerColor,
+              height: height ?? 50,
+              alignment: Alignment.centerLeft,
+              child: title != null
+                  ? (titleButton == null
+                      ? Text(
+                          title,
+                          style: TextStyle(fontSize: 16, color: titleColor),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(title,
+                                style:
+                                    TextStyle(fontSize: 16, color: titleColor)),
+                            TextButton(
+                                onPressed: onPressed, child: Text(titleButton))
+                          ],
+                        ))
+                  : null,
+            )),
             content
           ],
         );

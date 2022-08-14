@@ -45,6 +45,7 @@ class _BudgetPageState extends State<BudgetPage> {
                           context: context,
                           removeTop: true,
                           child: ListView(
+                            physics: BouncingScrollPhysics(),
                             children: List.generate(
                                 20,
                                 (index) => itemBudget(

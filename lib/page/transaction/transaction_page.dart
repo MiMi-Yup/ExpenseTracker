@@ -171,47 +171,18 @@ class _TransactionPageState extends State<TransactionPage> {
           ),
           Expanded(
               child: CustomScrollView(
-            slivers: [
-              Section(
-                headerColor: MyColor.mainBackgroundColor,
-                titleColor: Colors.white,
-                content: Column(
-                  children: List.generate(
-                      5,
-                      (index) => Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: itemTransaction(),
-                          )),
-                ),
-                title: "fsdkjhf",
-              ),
-              Section(
-                headerColor: MyColor.mainBackgroundColor,
-                titleColor: Colors.white,
-                content: Column(
-                  children: List.generate(
-                      5,
-                      (index) => Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: itemTransaction(),
-                          )),
-                ),
-                title: "fsdkjhf",
-              ),
-              Section(
-                headerColor: MyColor.mainBackgroundColor,
-                titleColor: Colors.white,
-                content: Column(
-                  children: List.generate(
-                      5,
-                      (index) => Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: itemTransaction(),
-                          )),
-                ),
-                title: "fsdkjhf",
-              )
-            ],
+            physics: BouncingScrollPhysics(),
+            slivers: List.generate(
+                5,
+                (index) => Section(
+                      headerColor: MyColor.mainBackgroundColor,
+                      titleColor: Colors.white,
+                      content: Column(
+                        children:
+                            List.generate(5, (index) => itemTransaction()),
+                      ),
+                      title: "fsdkjhf",
+                    )),
           ))
         ],
       ),

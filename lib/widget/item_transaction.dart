@@ -4,11 +4,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 GestureDetector itemTransaction({void Function()? onTap}) {
   return GestureDetector(
       onTap: onTap,
-      child: Card(
-          elevation: 8.0,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          child: Slidable(
+      child: Container(
+      margin: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+      decoration: BoxDecoration(
+          color: Colors.white10, borderRadius: BorderRadius.circular(10.0)),
+      child: Slidable(
             endActionPane: ActionPane(
               motion: ScrollMotion(),
               children: [
@@ -34,7 +34,7 @@ GestureDetector itemTransaction({void Function()? onTap}) {
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
