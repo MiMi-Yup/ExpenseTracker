@@ -12,6 +12,7 @@ import 'package:expense_tracker/page/notification.dart';
 import 'package:expense_tracker/page/profile/wallet_page.dart';
 import 'package:expense_tracker/page/report/detail_report.dart';
 import 'package:expense_tracker/page/report/overview_report.dart';
+import 'package:expense_tracker/page/setting/setting_preference.dart';
 import 'package:expense_tracker/page/signup/signup.dart';
 import 'package:expense_tracker/page/signup/verify.dart';
 import 'package:expense_tracker/page/welcome_page.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       darkTheme: ThemeData.dark(),
-      home: WalletPage(),
+      home: SettingPreference(),
     );
   }
 }
