@@ -1,3 +1,4 @@
+import 'package:expense_tracker/constant/asset/background.dart';
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -22,11 +23,11 @@ class _IntroductionState extends State<Introduction> {
   late PageController _controller;
 
   List<IntroductionModel> introductions = [
-    IntroductionModel("asset/image/introduction_2.png", "Gain total control",
+    IntroductionModel(BackgroundAsset.introduction1, "Gain total control",
         "Become your own money manager"),
-    IntroductionModel("asset/image/introduction_3.png", "Know where your",
+    IntroductionModel(BackgroundAsset.introduction2, "Know where your",
         "Track your transaction easily"),
-    IntroductionModel("asset/image/introduction_2.png", "Planing ahead",
+    IntroductionModel(BackgroundAsset.introduction1, "Planing ahead",
         "Setup your budget for each category")
   ];
 

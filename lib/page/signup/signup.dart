@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/widget/check_box.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
@@ -65,7 +66,7 @@ class SignUp extends StatelessWidget {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset("asset/image/logo_google.png"),
+                          Image.asset(IconAsset.logoGoogle),
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Text(

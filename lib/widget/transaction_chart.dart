@@ -1,3 +1,4 @@
+import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -380,7 +381,7 @@ class PieChartImageState extends State {
                 fontWeight: FontWeight.bold,
                 color: const Color(0xffffffff)),
             badgeWidget: _Badge(
-              'asset/image/income.png',
+              IconAsset.income,
               size: widgetSize,
               borderColor: const Color(0xff0293ee),
             ),
@@ -397,7 +398,7 @@ class PieChartImageState extends State {
                 fontWeight: FontWeight.bold,
                 color: const Color(0xffffffff)),
             badgeWidget: _Badge(
-              'asset/image/income.png',
+              IconAsset.income,
               size: widgetSize,
               borderColor: const Color(0xfff8b250),
             ),
@@ -414,7 +415,7 @@ class PieChartImageState extends State {
                 fontWeight: FontWeight.bold,
                 color: const Color(0xffffffff)),
             badgeWidget: _Badge(
-              'asset/image/income.png',
+              IconAsset.income,
               size: widgetSize,
               borderColor: const Color(0xff845bef),
             ),
@@ -431,7 +432,7 @@ class PieChartImageState extends State {
                 fontWeight: FontWeight.bold,
                 color: const Color(0xffffffff)),
             badgeWidget: _Badge(
-              'asset/image/income.png',
+              IconAsset.income,
               size: widgetSize,
               borderColor: const Color(0xff13d38e),
             ),

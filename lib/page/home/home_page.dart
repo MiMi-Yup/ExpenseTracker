@@ -1,4 +1,6 @@
+import 'package:expense_tracker/constant/asset/category.dart';
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/instance/category_component.dart';
 import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/item_transaction.dart';
@@ -74,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                     child: CircleAvatar(
                         backgroundColor: MyColor.purple(),
                         foregroundImage:
-                            AssetImage("asset/image/paypal_bank.png")),
+                            AssetImage(CategoryAsset.moneyBag)),
                   ),
                 ),
                 title: dropDown(
@@ -165,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                     children: List<Widget>.generate(
                         50,
                         (index) => itemTransaction(
-                            category: "Shopping",
+                            category: ECategory.shopping,
                             money: index * 1.683,
                             timeTransaction: DateTime.now(),
                             isIncome: index % 2 == 0)),

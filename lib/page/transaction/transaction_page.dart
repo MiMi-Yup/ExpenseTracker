@@ -1,4 +1,5 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/instance/category_component.dart';
 import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/item_transaction.dart';
@@ -181,7 +182,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         children: List.generate(
                             5,
                             (index) => itemTransaction(
-                                category: "Shopping",
+                                category: ECategory.bill,
                                 money: index * 1.683,
                                 timeTransaction: DateTime.now(),
                                 isIncome: index % 2 == 0)),

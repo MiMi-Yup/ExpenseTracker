@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
+import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/editText.dart';
@@ -226,7 +227,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Image.asset(
-                                              "asset/image/attachment.png"),
+                                              IconAsset.attachment),
                                           Text("Add attachment")
                                         ]),
                                   )),
@@ -298,7 +299,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Image.asset(
-                                            "asset/image/success.png",
+                                            IconAsset.success,
                                             scale: 2,
                                           ),
                                           SizedBox(height: 16.0),

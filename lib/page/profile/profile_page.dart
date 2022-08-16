@@ -1,3 +1,4 @@
+import 'package:expense_tracker/constant/asset/category.dart';
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/page/export/export_page.dart';
 import 'package:expense_tracker/page/profile/wallet_page.dart';
@@ -31,7 +32,7 @@ class ProfilePage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CircleAvatar(
-                    backgroundImage: AssetImage("asset/image/income.png"),
+                    backgroundImage: AssetImage(CategoryAsset.moneyBag),
                   ),
                   SizedBox(
                     width: 16.0,

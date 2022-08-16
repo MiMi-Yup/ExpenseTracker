@@ -1,12 +1,14 @@
+import 'package:expense_tracker/constant/asset/category.dart';
+import 'package:expense_tracker/instance/category_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 String _convertTimeOfDay(DateTime date) {
-  return "${date.hour > 12 ? date.hour - 12 : date.hour}:${date.minute} ${date.hour >= 12 ? "PM" : "AM"}";
+  return "${date.hour > 12 ? "0${date.hour - 12}" : "0${date.hour}"}:${date.minute < 10 ? "0${date.minute}" : "${date.minute}"} ${date.hour >= 12 ? "PM" : "AM"}";
 }
 
 GestureDetector itemTransaction(
-    {required String category,
+    {required ECategory category,
     String? description,
     required double money,
     required DateTime timeTransaction,
@@ -52,26 +54,15 @@ GestureDetector itemTransaction(
                   children: [
                     Row(
                       children: [
-                        Container(
-                          width: 50.0,
-                          height: 50.0,
-                          padding: const EdgeInsets.all(8.0),
-                          margin: const EdgeInsets.only(right: 8.0),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
-                              color: Colors.white),
-                          child: AspectRatio(
-                            child: Image.asset("asset/image/salary.png"),
-                            aspectRatio: 1.0,
-                          ),
-                        ),
+                        CategoryInstance.instances[category]!()
+                            .getFullCategory(height: 50.0),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                category,
+                                CategoryInstance.instances[category]!().name,
                                 style: TextStyle(color: Colors.white),
                               ),
                               SizedBox(height: 10.0),

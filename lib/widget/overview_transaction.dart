@@ -1,3 +1,4 @@
+import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:flutter/material.dart';
 
 class OverviewTransaction {
@@ -9,11 +10,11 @@ class OverviewTransaction {
   OverviewTransaction(this.type, {this.value, this.currency}) {
     switch (type.toLowerCase()) {
       case "income":
-        assetImage = "asset/image/income.png";
+        assetImage = IconAsset.income;
         backgroundColor = const Color.fromARGB(255, 0, 168, 106);
         break;
       case "expense":
-        assetImage = "asset/image/expense.png";
+        assetImage = IconAsset.expense;
         backgroundColor = const Color.fromARGB(255, 253, 60, 73);
         break;
     }

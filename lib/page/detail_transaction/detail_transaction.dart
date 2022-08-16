@@ -1,3 +1,4 @@
+import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -96,7 +97,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Image.asset(
-                                        "asset/image/success.png",
+                                        IconAsset.success,
                                         scale: 2,
                                       ),
                                       SizedBox(height: 16.0),
@@ -208,7 +209,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
               alignment: Alignment.center,
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(10.0)),
-              child: Image.asset("asset/image/success.png", fit: BoxFit.fill),
+              child: Image.asset(IconAsset.success, fit: BoxFit.fill),
             ),
             Expanded(
               child: Align(

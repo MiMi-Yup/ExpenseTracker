@@ -1,4 +1,5 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/instance/category_component.dart';
 import 'package:expense_tracker/widget/item_category.dart';
 import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
@@ -158,9 +159,12 @@ class _DetailReportState extends State<DetailReport> {
                 children: List.generate(
                     200,
                     (index) => indexTypeCategory == "Category"
-                        ? itemCategoryPercent(width: size.width, percent: 0.1)
+                        ? itemCategoryPercent(
+                            width: size.width,
+                            percent: 0.1,
+                            category: ECategory.shopping)
                         : itemTransaction(
-                            category: "Shopping",
+                            category: ECategory.shopping,
                             money: index * 1.683,
                             timeTransaction: DateTime.now(),
                             isIncome: index % 2 == 0)),

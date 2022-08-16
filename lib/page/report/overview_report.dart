@@ -1,4 +1,5 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/instance/category_component.dart';
 import 'package:expense_tracker/widget/item_category.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,7 @@ class _OverviewReportState extends State<OverviewReport> {
                     children: [
                       Text("and your biggest",
                           style: TextStyle(color: Colors.black)),
-                      itemCategory(),
+                      itemCategory(category: ECategory.shopping),
                       Text("\$120", style: TextStyle(color: Colors.black))
                     ],
                   ),
@@ -86,7 +87,7 @@ class _OverviewReportState extends State<OverviewReport> {
                     children: [
                       Text("and your biggest",
                           style: TextStyle(color: Colors.black)),
-                      itemCategory(),
+                      itemCategory(category: ECategory.shopping),
                       Text("\$120", style: TextStyle(color: Colors.black))
                     ],
                   ),

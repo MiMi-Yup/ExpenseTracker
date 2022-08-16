@@ -1,3 +1,4 @@
+import 'package:expense_tracker/constant/asset/bank.dart';
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/editText.dart';
@@ -17,13 +18,13 @@ class _AddNewAccountState extends State<AddNewAccount> {
   int? _value;
   final String _addWallet = "Wallet";
   final List<String> _listBank = [
-    "asset/image/bank_of_america.png",
-    "asset/image/bca_bank.png",
-    "asset/image/chase_bank.png",
-    "asset/image/city_bank.png",
-    "asset/image/jago_bank.png",
-    "asset/image/mandiri_bank.png",
-    "asset/image/paypal_bank.png"
+    BankAsset.bankOfAmerica,
+    BankAsset.bcaBank,
+    BankAsset.chaseBank,
+    BankAsset.cityBank,
+    BankAsset.jagoBank,
+    BankAsset.mandiriBank,
+    BankAsset.paypalBank
   ];
   final List<String> _listDropDown = [
     'Android',
@@ -35,7 +36,7 @@ class _AddNewAccountState extends State<AddNewAccount> {
     'PHP',
     "Wallet"
   ];
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
