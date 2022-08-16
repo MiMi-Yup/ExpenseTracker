@@ -1,9 +1,19 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/page/export/export_page.dart';
+import 'package:expense_tracker/page/profile/wallet_page.dart';
+import 'package:expense_tracker/page/setting/setting_preference.dart';
+import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({Key? key}) : super(key: key);
+
+  final _actions = <String, Object?>{
+    "Wallet": const WalletPage(),
+    "Settings": const SettingPreference(),
+    "Export": const ExportPage(),
+    "Logout": null
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +64,68 @@ class ProfilePage extends StatelessWidget {
                 color: Colors.black26,
                 borderRadius: BorderRadius.circular(16.0)),
             child: Column(
-              children: List.generate(
-                  4,
-                  (index) => GestureDetector(
-                        onTap: null,
-                        child: Padding(
+              children: _actions.entries
+                  .map((e) => GestureDetector(
+                        onTap: e.value == null
+                            ? () async {
+                                await showModalBottomSheet(
+                                    context: context,
+                                    builder: (context) => Container(
+                                          padding: EdgeInsets.all(10.0),
+                                          decoration: BoxDecoration(
+                                              color: Colors.white70,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft:
+                                                      Radius.circular(10.0),
+                                                  topRight:
+                                                      Radius.circular(10.0))),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text("Logout?",
+                                                  style: TextStyle(
+                                                      color: Colors.black)),
+                                              Padding(
+                                                padding: EdgeInsets.all(25.0),
+                                                child: Text(
+                                                  "Are you sure do you wanna logout?",
+                                                  style: TextStyle(
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                      child: largestButton(
+                                                          text: "No",
+                                                          onPressed: () => null,
+                                                          background:
+                                                              Colors.grey)),
+                                                  SizedBox(
+                                                    width: 10.0,
+                                                  ),
+                                                  Expanded(
+                                                      child: largestButton(
+                                                          text: "Yes",
+                                                          onPressed: () => null,
+                                                          background:
+                                                              MyColor.purple()))
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ));
+                              }
+                            : (e.value is Widget
+                                ? () => Navigator.push<void>(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (context) => e.value as Widget,
+                                    ))
+                                : null),
+                        child: Container(
                           padding: EdgeInsets.all(16.0),
+                          color: Colors.transparent,
                           child: Row(
                             children: [
                               Container(
@@ -76,11 +142,12 @@ class ProfilePage extends StatelessWidget {
                               SizedBox(
                                 width: 16.0,
                               ),
-                              Text("Wallet")
+                              Text(e.key)
                             ],
                           ),
                         ),
-                      )),
+                      ))
+                  .toList(),
             ),
           )
         ],

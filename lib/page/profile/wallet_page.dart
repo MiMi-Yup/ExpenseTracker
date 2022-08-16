@@ -19,7 +19,8 @@ class WalletPage extends StatelessWidget {
                   pinned: true,
                   expandedHeight: MediaQuery.of(context).size.height * 0.3,
                   leading: IconButton(
-                      onPressed: null, icon: Icon(Icons.arrow_back_ios)),
+                      onPressed: () => Navigator.pop<void>(context),
+                      icon: Icon(Icons.arrow_back_ios)),
                   centerTitle: true,
                   backgroundColor: MyColor.mainBackgroundColor,
                   elevation: 0.0,

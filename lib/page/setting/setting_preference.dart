@@ -50,8 +50,8 @@ class _SettingPreferenceState extends State<SettingPreference> {
     List<String>? localAuth = await getLocalAuth();
 
     setState(() {
+      //share preference has default values
       _map.addAll({
-        //share preference has default values
         SharedPreferencesKey.prefCurrencies:
             _prefs.getStringList(SharedPreferencesKey.prefCurrencies) ??
                 ["USD", "VNĐ"]
@@ -96,7 +96,7 @@ class _SettingPreferenceState extends State<SettingPreference> {
       });
       _map.addAll({
         SharedPreferencesKey.prefAlert:
-            _prefs.getString(SharedPreferencesKey.prefAlert) ?? false
+            _prefs.getBool(SharedPreferencesKey.prefAlert) ?? false
       });
       _map.addAll({
         SharedPreferencesKey.prefTip:
@@ -313,7 +313,9 @@ class _SettingPreferenceState extends State<SettingPreference> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(onPressed: null, icon: Icon(Icons.arrow_back_ios)),
+        leading: IconButton(
+            onPressed: () => Navigator.pop<void>(context),
+            icon: Icon(Icons.arrow_back_ios)),
         title: Text("Setting"),
         centerTitle: true,
         elevation: 0.0,
