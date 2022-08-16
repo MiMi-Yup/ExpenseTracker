@@ -1,5 +1,52 @@
 import 'package:flutter/material.dart';
 
+class CategoryWidget {
+  String name;
+  Color backgroundColor;
+  String assetContainer;
+  double heightForFull;
+  double heightForMin;
+  CategoryWidget(
+      {required this.name,
+      required this.backgroundColor,
+      required this.assetContainer,
+      this.heightForFull = 50.0,
+      this.heightForMin = 10.0});
+
+  Widget getFullCategory() => Container(
+        width: heightForFull,
+        height: heightForFull,
+        padding: const EdgeInsets.all(8.0),
+        margin: const EdgeInsets.only(right: 8.0),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.0), color: backgroundColor),
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: Image.asset(assetContainer),
+        ),
+      );
+
+  Widget getMinCategory() => Container(
+        padding: EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(heightForMin * 2),
+            border: Border.all(color: backgroundColor)),
+        child: Row(
+          children: [
+            Container(
+              height: heightForMin,
+              width: heightForMin,
+              margin: EdgeInsets.only(right: 10.0),
+              decoration: BoxDecoration(
+                  color: backgroundColor.withAlpha(255),
+                  shape: BoxShape.circle),
+            ),
+            Text(name)
+          ],
+        ),
+      );
+}
+
 Widget itemCategory() {
   return Container(
     padding: EdgeInsets.all(10.0),

@@ -68,21 +68,29 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - asset/image/introduction_2.png
-    - asset/image/introduction_3.png
-    - asset/image/logo_google.png
-    - asset/image/bank_of_america.png
-    - asset/image/bca_bank.png
-    - asset/image/chase_bank.png
-    - asset/image/city_bank.png
-    - asset/image/jago_bank.png
-    - asset/image/mandiri_bank.png
-    - asset/image/paypal_bank.png
-    - asset/image/success.png
-    - asset/image/income.png
-    - asset/image/expense.png
-    - asset/image/attachment.png
-    - asset/image/background_wallet_page.png
+    - asset/image/background/introduction_2.png
+    - asset/image/background/introduction_3.png
+    - asset/image/background/background_wallet_page.png
+
+    - asset/image/bank/bank_of_america.png
+    - asset/image/bank/bca_bank.png
+    - asset/image/bank/chase_bank.png
+    - asset/image/bank/city_bank.png
+    - asset/image/bank/jago_bank.png
+    - asset/image/bank/mandiri_bank.png
+    - asset/image/bank/paypal_bank.png
+
+    - asset/image/icon/success.png
+    - asset/image/icon/income.png
+    - asset/image/icon/expense.png
+    - asset/image/icon/attachment.png
+    - asset/image/icon/logo_google.png
+    
+    - asset/image/category/money_bag.png
+    - asset/image/category/shopping_bag.png
+    - asset/image/category/bill.png
+    - asset/image/category/food.png
+    - asset/image/category/transportation.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

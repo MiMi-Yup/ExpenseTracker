@@ -178,8 +178,13 @@ class _TransactionPageState extends State<TransactionPage> {
                       headerColor: MyColor.mainBackgroundColor,
                       titleColor: Colors.white,
                       content: Column(
-                        children:
-                            List.generate(5, (index) => itemTransaction()),
+                        children: List.generate(
+                            5,
+                            (index) => itemTransaction(
+                                category: "Shopping",
+                                money: index * 1.683,
+                                timeTransaction: DateTime.now(),
+                                isIncome: index % 2 == 0)),
                       ),
                       title: "fsdkjhf",
                     )),

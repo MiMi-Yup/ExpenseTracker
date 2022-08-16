@@ -98,7 +98,9 @@ class ProfilePage extends StatelessWidget {
                                                   Expanded(
                                                       child: largestButton(
                                                           text: "No",
-                                                          onPressed: () => null,
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                  context),
                                                           background:
                                                               Colors.grey)),
                                                   SizedBox(

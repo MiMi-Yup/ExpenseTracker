@@ -162,8 +162,13 @@ class _HomePageState extends State<HomePage> {
                   titleColor: Colors.white,
                   titleButton: "See all",
                   content: Column(
-                    children:
-                        List<Widget>.generate(50, (index) => itemTransaction()),
+                    children: List<Widget>.generate(
+                        50,
+                        (index) => itemTransaction(
+                            category: "Shopping",
+                            money: index * 1.683,
+                            timeTransaction: DateTime.now(),
+                            isIncome: index % 2 == 0)),
                   ))
             ]),
           ),

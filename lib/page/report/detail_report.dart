@@ -159,7 +159,11 @@ class _DetailReportState extends State<DetailReport> {
                     200,
                     (index) => indexTypeCategory == "Category"
                         ? itemCategoryPercent(width: size.width, percent: 0.1)
-                        : itemTransaction()),
+                        : itemTransaction(
+                            category: "Shopping",
+                            money: index * 1.683,
+                            timeTransaction: DateTime.now(),
+                            isIncome: index % 2 == 0)),
               ),
             )
           ],
