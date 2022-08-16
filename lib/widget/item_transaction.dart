@@ -1,10 +1,14 @@
-import 'package:expense_tracker/constant/asset/category.dart';
 import 'package:expense_tracker/instance/category_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 String _convertTimeOfDay(DateTime date) {
-  return "${date.hour > 12 ? "0${date.hour - 12}" : "0${date.hour}"}:${date.minute < 10 ? "0${date.minute}" : "${date.minute}"} ${date.hour >= 12 ? "PM" : "AM"}";
+  int hour = date.hour;
+  int minute = date.minute;
+  bool isPM = hour >= 12;
+  hour = hour > 12 ? hour - 12 : hour;
+
+  return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute} ${isPM ? "PM" : "AM"}";
 }
 
 GestureDetector itemTransaction(
