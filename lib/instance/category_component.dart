@@ -41,7 +41,7 @@ class _ShoppingCategory extends CategoryComponent {
 
 class _BillCategory extends CategoryComponent {
   static CategoryComponent? _instance;
-  static final Color _backgroundColor = Color(0xFFEEE5FF);
+  static const Color _backgroundColor = Color(0xFFEEE5FF);
   static const String _name = "Bill";
   static const String _assetName = CategoryAsset.bill;
   static const Color _assetColor = Color(0xFF7F3DFF);
@@ -65,7 +65,7 @@ class _BillCategory extends CategoryComponent {
 
 class _FoodCategory extends CategoryComponent {
   static CategoryComponent? _instance;
-  static final Color _backgroundColor = Color(0xFFFDD5D7);
+  static const Color _backgroundColor = Color(0xFFFDD5D7);
   static const String _name = "Food";
   static const String _assetName = CategoryAsset.food;
   static const Color _assetColor = Color(0xFFFD3C4A);
@@ -89,7 +89,7 @@ class _FoodCategory extends CategoryComponent {
 
 class _TransportationCategory extends CategoryComponent {
   static CategoryComponent? _instance;
-  static final Color _backgroundColor = Color(0xFFBDDCFF);
+  static const Color _backgroundColor = Color(0xFFBDDCFF);
   static const String _name = "Transportation";
   static const String _assetName = CategoryAsset.transportation;
   static const Color _assetColor = Color(0xFF0077FF);
@@ -113,7 +113,7 @@ class _TransportationCategory extends CategoryComponent {
 
 class _MoneyCategory extends CategoryComponent {
   static CategoryComponent? _instance;
-  static final Color _backgroundColor = Color(0xFFCFFAEA);
+  static const Color _backgroundColor = Color(0xFFCFFAEA);
   static const String _name = "Money";
   static const String _assetName = CategoryAsset.moneyBag;
   static const Color _assetColor = Color(0xFF00A86B);

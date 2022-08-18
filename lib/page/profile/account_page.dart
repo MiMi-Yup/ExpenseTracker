@@ -2,8 +2,8 @@ import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
 
-class WalletPage extends StatelessWidget {
-  const WalletPage({Key? key}) : super(key: key);
+class AccountPage extends StatelessWidget {
+  const AccountPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

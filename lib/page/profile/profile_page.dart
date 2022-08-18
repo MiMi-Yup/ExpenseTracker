@@ -1,7 +1,7 @@
 import 'package:expense_tracker/constant/asset/category.dart';
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/page/export/export_page.dart';
-import 'package:expense_tracker/page/profile/wallet_page.dart';
+import 'package:expense_tracker/page/profile/account_page.dart';
 import 'package:expense_tracker/page/setting/setting_preference.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,7 @@ class ProfilePage extends StatelessWidget {
   ProfilePage({Key? key}) : super(key: key);
 
   final _actions = <String, Object?>{
-    "Wallet": const WalletPage(),
+    "Wallet": const AccountPage(),
     "Settings": const SettingPreference(),
     "Export": const ExportPage(),
     "Logout": null

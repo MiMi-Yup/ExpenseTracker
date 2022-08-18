@@ -1,0 +1,22 @@
+enum ERoute {
+  welcome,
+  introduction,
+  login,
+  signUp,
+  verify,
+  authGoogle,
+  emailRecovery,
+  pin,
+  main,
+  notification,
+  overviewReport,
+  detailReport,
+  addEditBudget,
+  setting,
+  overviewAccount,
+  detailAccount,
+  export,
+  addEditAccount,
+  addEditTransaction,
+  detailTransaction
+}
