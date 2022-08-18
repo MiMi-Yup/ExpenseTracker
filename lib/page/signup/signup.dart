@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/check_box.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:expense_tracker/widget/editText.dart';
@@ -16,7 +18,8 @@ class SignUp extends StatelessWidget {
       appBar: AppBar(
         title: Text("Sign Up"),
         leading: IconButton(
-            onPressed: () => null, icon: Icon(Icons.arrow_back_ios_new)),
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back_ios_new)),
         elevation: 0.0,
       ),
       body: SingleChildScrollView(
@@ -42,7 +45,8 @@ class SignUp extends StatelessWidget {
                 onChanged: (value) => log(value.toString()),
                 text: "Bạn chấp nhận với những ",
                 action: GestureDetector(
-                    onTap: () => log("term of"),
+                    onTap: () => Navigator.pushNamed(context,
+                        RouteApplication.getRoute(ERoute.termOfCondition)),
                     child: Text("Điều khoản",
                         style: TextStyle(color: MyColor.purple(alpha: 255))))),
             Container(
@@ -50,7 +54,8 @@ class SignUp extends StatelessWidget {
                 margin: EdgeInsets.all(16.0),
                 child: largestButton(
                     text: "Sign Up",
-                    onPressed: () => log("sign up"),
+                    onPressed: () => Navigator.pushNamed(
+                        context, RouteApplication.getRoute(ERoute.verify)),
                     background: MyColor.purple(alpha: 255))),
             Align(
                 alignment: Alignment.center,
@@ -62,7 +67,8 @@ class SignUp extends StatelessWidget {
             Container(
                 padding: EdgeInsets.all(8.0),
                 child: GestureDetector(
-                    onTap: () => log("login by google"),
+                    onTap: () => Navigator.pushNamed(
+                        context, RouteApplication.getRoute(ERoute.authGoogle)),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -85,7 +91,8 @@ class SignUp extends StatelessWidget {
                     style: TextStyle(color: Colors.grey, fontSize: 15),
                   ),
                   GestureDetector(
-                      onTap: () => log("have an account"),
+                      onTap: () => Navigator.pushNamed(
+                          context, RouteApplication.getRoute(ERoute.login)),
                       child: Text("Login",
                           style: TextStyle(color: MyColor.purple(alpha: 255))))
                 ],

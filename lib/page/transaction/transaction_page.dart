@@ -1,5 +1,7 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/route.dart';
 import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/item_transaction.dart';
@@ -182,6 +184,11 @@ class _TransactionPageState extends State<TransactionPage> {
                         children: List.generate(
                             5,
                             (index) => itemTransaction(
+                                onTap: () => Navigator.pushNamed(
+                                    context,
+                                    RouteApplication.getRoute(
+                                        ERoute.detailTransaction),
+                                    arguments: null),
                                 category: ECategory.bill,
                                 money: index * 1.683,
                                 timeTransaction: DateTime.now(),

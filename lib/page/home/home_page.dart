@@ -1,6 +1,9 @@
 import 'package:expense_tracker/constant/asset/category.dart';
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/route.dart';
 import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/page/home/nav.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/item_transaction.dart';
@@ -9,7 +12,8 @@ import 'package:expense_tracker/widget/section.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  void Function(EPage)? toPage;
+  HomePage({Key? key, this.toPage}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -70,13 +74,12 @@ class _HomePageState extends State<HomePage> {
                 elevation: 0,
                 centerTitle: true,
                 leading: GestureDetector(
-                  onTap: null,
+                  onTap: () => widget.toPage!(EPage.profile),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CircleAvatar(
                         backgroundColor: MyColor.purple(),
-                        foregroundImage:
-                            AssetImage(CategoryAsset.moneyBag)),
+                        foregroundImage: AssetImage(CategoryAsset.moneyBag)),
                   ),
                 ),
                 title: dropDown(
@@ -85,7 +88,10 @@ class _HomePageState extends State<HomePage> {
                     chosenValue: null,
                     onChanged: (p0) => null),
                 actions: [
-                  IconButton(onPressed: null, icon: Icon(Icons.notifications))
+                  IconButton(
+                      onPressed: () => Navigator.pushNamed(context,
+                          RouteApplication.getRoute(ERoute.notification)),
+                      icon: Icon(Icons.notifications))
                 ],
               ),
               Text("Account balance"),
@@ -163,10 +169,16 @@ class _HomePageState extends State<HomePage> {
                   headerColor: MyColor.mainBackgroundColor,
                   titleColor: Colors.white,
                   titleButton: "See all",
+                  onPressed: () => widget.toPage!(EPage.transaction),
                   content: Column(
                     children: List<Widget>.generate(
                         50,
                         (index) => itemTransaction(
+                            onTap: () => Navigator.pushNamed(
+                                context,
+                                RouteApplication.getRoute(
+                                    ERoute.detailTransaction),
+                                arguments: null),
                             category: ECategory.shopping,
                             money: index * 1.683,
                             timeTransaction: DateTime.now(),

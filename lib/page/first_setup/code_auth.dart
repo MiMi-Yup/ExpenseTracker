@@ -1,9 +1,10 @@
+import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/input_otp.dart';
 import 'package:flutter/material.dart';
 
 class CodeAuth extends StatefulWidget {
-  bool initCode;
-  CodeAuth({Key? key, required this.initCode}) : super(key: key);
+  CodeAuth({Key? key}) : super(key: key);
 
   @override
   State<CodeAuth> createState() => _CodeAuthState();
@@ -12,8 +13,12 @@ class CodeAuth extends StatefulWidget {
 class _CodeAuthState extends State<CodeAuth>
     with SingleTickerProviderStateMixin {
   late bool _confirm;
+  late bool _initCode;
   String _code = "";
   String _reCode = "";
+
+  late bool firstLoad;
+
   late AnimationController controller;
   final Map<String, String?> message = <String, String?>{
     "setup": "Let’s setup your PIN",
@@ -21,6 +26,8 @@ class _CodeAuthState extends State<CodeAuth>
     "enter": "Enter your PIN",
     "wrong": "Incorrect PIN, please try again"
   };
+  late Animation<double> _offsetAnimation;
+
   String title = "";
 
   @override
@@ -28,7 +35,17 @@ class _CodeAuthState extends State<CodeAuth>
     controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: this);
     super.initState();
-    _confirm = !widget.initCode;
+
+    _offsetAnimation = Tween(begin: 0.0, end: 24.0)
+        .chain(CurveTween(curve: Curves.elasticIn))
+        .animate(controller)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          controller.reverse();
+        }
+      });
+
+    firstLoad = true;
   }
 
   @override
@@ -45,7 +62,7 @@ class _CodeAuthState extends State<CodeAuth>
       controller.forward(from: 0.0);
     } else {
       setState(() {
-        title = widget.initCode
+        title = _initCode
             ? (_confirm ? message["confirm"]! : message["setup"]!)
             : message["enter"]!;
       });
@@ -54,33 +71,41 @@ class _CodeAuthState extends State<CodeAuth>
 
   void _onDone(String value) {
     bool wrong = false;
-    if (widget.initCode) {
+    if (_initCode) {
       //confirm code
       _confirm ? _reCode = value : _code = value;
       if (_confirm) {
         if (_reCode != _code) {
           wrong = true;
-          _confirm = false;
-        } else
-          widget.initCode = false;
+        } else {
+          //add pin completed. go to next
+          _initCode = false;
+        }
       }
       _confirm = !_confirm;
     } else {
       //do something after enter code
+      //check account has been setup yet
+      if (true) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.pushNamed(context,
+            RouteApplication.getRoute(ERoute.introductionSetupAccount));
+      } else {
+        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.pushNamed(context, RouteApplication.getRoute(ERoute.main));
+      }
     }
     _changedTitle(wrongPIN: wrong);
   }
 
   @override
   Widget build(BuildContext context) {
-    final Animation<double> offsetAnimation = Tween(begin: 0.0, end: 24.0)
-        .chain(CurveTween(curve: Curves.elasticIn))
-        .animate(controller)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          controller.reverse();
-        }
-      });
+    if (firstLoad) {
+      _initCode = ModalRoute.of(context)?.settings.arguments as bool;
+      _confirm = !_initCode;
+      firstLoad = false;
+    }
+
     return Scaffold(
       appBar: null,
       body: Center(
@@ -90,17 +115,21 @@ class _CodeAuthState extends State<CodeAuth>
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: Text(
-                title.isEmpty ? message["setup"]! : title,
+                title.isEmpty
+                    ? _initCode
+                        ? message["setup"]!
+                        : message["enter"]!
+                    : title,
                 style: TextStyle(fontSize: 30.0),
               ),
             ),
             AnimatedBuilder(
-              animation: offsetAnimation,
+              animation: _offsetAnimation,
               builder: (context, child) => Container(
                 margin: EdgeInsets.symmetric(horizontal: 24.0),
                 padding: EdgeInsets.only(
-                    left: offsetAnimation.value + 24.0,
-                    right: 24.0 - offsetAnimation.value),
+                    left: _offsetAnimation.value + 24.0,
+                    right: 24.0 - _offsetAnimation.value),
                 child: CodeInput(
                   length: 4,
                   builder: CodeInputBuilders.circle(

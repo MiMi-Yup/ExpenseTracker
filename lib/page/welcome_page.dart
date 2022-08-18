@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -18,10 +20,19 @@ class _WelcomePageState extends State<WelcomePage> {
     setState(() => opacityLevel = opacityLevel == 0 ? 1.0 : 0.0);
   }
 
+  Future<void> initApplication() async {
+    Timer(
+        const Duration(seconds: 5),
+        () => Navigator.popAndPushNamed(
+            context, RouteApplication.getRoute(ERoute.introduction)));
+  }
+
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(Duration(seconds: 2), (timer) => _changeOpacity());
+    _timer =
+        Timer.periodic(const Duration(seconds: 2), (timer) => _changeOpacity());
+    initApplication();
   }
 
   @override

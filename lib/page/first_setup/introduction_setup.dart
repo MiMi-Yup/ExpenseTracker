@@ -1,7 +1,7 @@
+import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class IntroductionSetup extends StatelessWidget {
   const IntroductionSetup({Key? key}) : super(key: key);
@@ -36,7 +36,10 @@ class IntroductionSetup extends StatelessWidget {
           Container(
             width: double.maxFinite,
             margin: EdgeInsets.all(25.0),
-            child: largestButton(text: "Let’s go", onPressed: () => null),
+            child: largestButton(
+                text: "Let’s go",
+                onPressed: () => Navigator.pushNamed(
+                    context, RouteApplication.getRoute(ERoute.addEditAccount))),
           )
         ],
       ),

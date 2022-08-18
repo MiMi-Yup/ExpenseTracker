@@ -5,6 +5,7 @@ import 'package:expense_tracker/page/budget/add_edit_budget.dart';
 import 'package:expense_tracker/page/detail_transaction/detail_transaction.dart';
 import 'package:expense_tracker/page/export/export_page.dart';
 import 'package:expense_tracker/page/first_setup/code_auth.dart';
+import 'package:expense_tracker/page/first_setup/introduction_setup.dart';
 import 'package:expense_tracker/page/home/nav.dart';
 import 'package:expense_tracker/page/introduction.dart';
 import 'package:expense_tracker/page/notification.dart';
@@ -27,7 +28,8 @@ class RouteApplication {
     getRoute(ERoute.verify): (context) => OTPVerify(),
     getRoute(ERoute.authGoogle): (context) => Container(),
     getRoute(ERoute.emailRecovery): (context) => Container(),
-    getRoute(ERoute.pin): (context) => CodeAuth(initCode: true),
+    getRoute(ERoute.pin): (context) => CodeAuth(),
+    getRoute(ERoute.introductionSetupAccount): (context) => IntroductionSetup(),
     getRoute(ERoute.main): (context) => Navigation(),
     getRoute(ERoute.notification): (context) => NotificationPage(),
     getRoute(ERoute.overviewReport): (context) => OverviewReport(),
@@ -39,7 +41,8 @@ class RouteApplication {
     getRoute(ERoute.setting): (context) => SettingPreference(),
     getRoute(ERoute.addEditAccount): (context) => AddNewAccount(),
     getRoute(ERoute.addEditTransaction): (context) => AddEditTransaction(),
-    getRoute(ERoute.detailTransaction): (context) => DetailTransaction()
+    getRoute(ERoute.detailTransaction): (context) => DetailTransaction(),
+    getRoute(ERoute.termOfCondition): (context) => Container()
   };
 
   static String getRoute(ERoute route) => "/${route.name}";

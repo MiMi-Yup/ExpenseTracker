@@ -1,4 +1,6 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/item_budget.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +51,11 @@ class _BudgetPageState extends State<BudgetPage> {
                             children: List.generate(
                                 20,
                                 (index) => itemBudget(
+                                    onTap: () => Navigator.pushNamed(
+                                        context,
+                                        RouteApplication.getRoute(
+                                            ERoute.addEditBudget),
+                                        arguments: null),
                                     width: MediaQuery.of(context).size.width,
                                     percent: 0.45)),
                           ))

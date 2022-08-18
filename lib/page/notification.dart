@@ -46,7 +46,7 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ],
         leading: IconButton(
-          onPressed: null,
+          onPressed: () => Navigator.pop(context),
           icon: Icon(Icons.arrow_back_ios),
         ),
         centerTitle: true,

@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:expense_tracker/constant/asset/bank.dart';
+import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/editText.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
@@ -37,10 +42,21 @@ class _AddNewAccountState extends State<AddNewAccount> {
     "Wallet"
   ];
 
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0.0,
+        centerTitle: true,
+        backgroundColor: MyColor.mainBackgroundColor,
         title: Text(setWallet ? "Add new wallet" : "Add new account"),
         leading:
             IconButton(onPressed: () => null, icon: Icon(Icons.arrow_back_ios)),
@@ -86,6 +102,7 @@ class _AddNewAccountState extends State<AddNewAccount> {
                   Container(
                       alignment: Alignment.center,
                       margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                      padding: EdgeInsets.only(left: 10.0, right: 10.0),
                       width: double.maxFinite,
                       decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey),
@@ -128,7 +145,37 @@ class _AddNewAccountState extends State<AddNewAccount> {
                       width: double.maxFinite,
                       child: largestButton(
                           text: "Continue",
-                          onPressed: () => null,
+                          onPressed: () {
+                            showDialog(
+                              builder: (context) => Dialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Image.asset(
+                                        IconAsset.success,
+                                        scale: 2,
+                                      ),
+                                      SizedBox(height: 16.0),
+                                      Text(
+                                          "Transaction has been successfully added")
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              context: context,
+                            );
+
+                            _timer = Timer(const Duration(seconds: 2), () {
+                              Navigator.popUntil(
+                                  context, (route) => route.isFirst);
+                              Navigator.pushNamed(context,
+                                  RouteApplication.getRoute(ERoute.main));
+                            });
+                          },
                           background: MyColor.purple()))
                 ],
               ),

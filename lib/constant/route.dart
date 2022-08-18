@@ -7,6 +7,7 @@ enum ERoute {
   authGoogle,
   emailRecovery,
   pin,
+  introductionSetupAccount,
   main,
   notification,
   overviewReport,
@@ -18,5 +19,7 @@ enum ERoute {
   export,
   addEditAccount,
   addEditTransaction,
-  detailTransaction
+  detailTransaction,
+
+  termOfCondition
 }
