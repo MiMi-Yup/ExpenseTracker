@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/page/budget/budget_page.dart';
 import 'package:expense_tracker/page/home/home_page.dart';
 import 'package:expense_tracker/page/profile/profile_page.dart';
@@ -34,7 +35,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
   late PageController _controller;
   late AnimationController _controllerAnimation;
 
-  final List<IconData> icons = [Icons.sms, Icons.mail, Icons.phone];
+  final List<String> _floatingActions = [IconAsset.income, IconAsset.expense];
 
   @override
   void initState() {
@@ -66,7 +67,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
-        children: List.generate(icons.length, (int index) {
+        children: List.generate(_floatingActions.length, (int index) {
           Widget child = Container(
             height: 70.0,
             width: 56.0,
@@ -74,15 +75,17 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
             child: ScaleTransition(
               scale: CurvedAnimation(
                 parent: _controllerAnimation,
-                curve: Interval(0.0, 1.0 - index / icons.length / 2.0,
+                curve: Interval(
+                    0.0, 1.0 - index / _floatingActions.length / 2.0,
                     curve: Curves.easeOut),
               ),
               child: FloatingActionButton(
                 heroTag: null,
                 //backgroundColor: backgroundColor,
                 mini: true,
-                child: Icon(
-                  icons[index], /*color: foregroundColor*/
+                child: Image.asset(
+                  _floatingActions[index],
+                  fit: BoxFit.contain,
                 ),
                 onPressed: () {},
               ),
@@ -100,7 +103,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                             _controllerAnimation.value * 0.5 * math.pi),
                         alignment: FractionalOffset.center,
                         child: Icon(_controllerAnimation.isDismissed
-                            ? Icons.share
+                            ? Icons.add
                             : Icons.close),
                       )),
               onPressed: () {

@@ -1,5 +1,8 @@
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/route.dart';
 import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/route.dart';
+import 'package:expense_tracker/widget/item_budget.dart';
 import 'package:expense_tracker/widget/item_category.dart';
 import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
@@ -159,15 +162,26 @@ class _DetailReportState extends State<DetailReport> {
                 children: List.generate(
                     200,
                     (index) => indexTypeCategory == "Category"
-                        ? itemCategoryPercent(
-                            width: size.width,
-                            percent: 0.1,
-                            category: ECategory.shopping)
-                        : itemTransaction(
-                            category: ECategory.shopping,
-                            money: index * 1.683,
-                            timeTransaction: DateTime.now(),
-                            isIncome: index % 2 == 0)),
+                        ? ItemCategory(
+                                modal: ModalItemBudget(
+                                    budgetMoney: 0.0,
+                                    nowMoney: 0.0,
+                                    isLimited: false,
+                                    category: ECategory.shopping))
+                            .percentCategoryBuilder(width: size.width)
+                        : ItemTransaction(
+                                modal: ModalItemTransaction(
+                                    category: ECategory.bill,
+                                    money: index * 1.683,
+                                    timeTransaction: DateTime.now(),
+                                    isIncome: index % 2 == 0))
+                            .builder(
+                            onTap: () => Navigator.pushNamed(
+                                context,
+                                RouteApplication.getRoute(
+                                    ERoute.detailTransaction),
+                                arguments: null),
+                          )),
               ),
             )
           ],

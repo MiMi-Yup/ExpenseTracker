@@ -37,7 +37,8 @@ class CodeInput extends StatefulWidget {
       this.onChanged,
       this.onFilled,
       this.onDone,
-      required this.clearOnDone})
+      required this.clearOnDone,
+      this.autofocus = false})
       : super(key: key);
 
   factory CodeInput(
@@ -51,7 +52,8 @@ class CodeInput extends StatefulWidget {
       void Function(String value)? onChanged,
       void Function(String value)? onFilled,
       void Function(String value)? onDone,
-      bool clearOnDone = false}) {
+      bool clearOnDone = false,
+      bool autofocus = false}) {
     assert(length > 0, 'The length needs to be larger than zero.');
     assert(length.isFinite, 'The length needs to be finite.');
 
@@ -68,6 +70,7 @@ class CodeInput extends StatefulWidget {
       onFilled: onFilled,
       onDone: onDone,
       clearOnDone: clearOnDone,
+      autofocus: autofocus,
     );
   }
 
@@ -149,6 +152,8 @@ class CodeInput extends StatefulWidget {
   /// Clear value when the done button clicked
   final bool clearOnDone;
 
+  final bool autofocus;
+
   /// A helping function that creates input formatters for a given [length] and
   /// [keyboardType].
   static List<TextInputFormatter> _createInputFormatters(
@@ -191,6 +196,7 @@ class _CodeInputState extends State<CodeInput> {
             focusNode: widget.focusNode,
             inputFormatters: widget.inputFormatters,
             keyboardType: widget.keyboardType,
+            autofocus: widget.autofocus,
             backgroundCursorColor: Colors.black,
             style: TextStyle(),
             // Doesn't really matter.

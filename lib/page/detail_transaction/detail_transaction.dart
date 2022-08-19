@@ -1,5 +1,7 @@
 import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +14,7 @@ class DetailTransaction extends StatefulWidget {
 
 class _DetailTransactionState extends State<DetailTransaction> {
   final heightAnchor = 75.0;
+  bool isEditable = true;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -31,88 +34,94 @@ class _DetailTransactionState extends State<DetailTransaction> {
             AppBar(
               elevation: 0,
               backgroundColor: Colors.transparent,
-              leading:
-                  IconButton(onPressed: null, icon: Icon(Icons.arrow_back_ios)),
+              leading: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.arrow_back_ios)),
               title: Text("Detail Transaction"),
-              actions: [
-                IconButton(
-                    onPressed: () async {
-                      bool? isRemove;
-                      await showModalBottomSheet(
-                          context: context,
-                          builder: (context) => Container(
-                                padding: EdgeInsets.all(10.0),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10.0),
-                                        topRight: Radius.circular(10.0))),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "Remove this transaction",
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(25.0),
-                                      child: Text(
-                                        "Are you sure do you wanna remove this transaction?",
-                                        style: TextStyle(color: Colors.grey),
+              actions: isEditable
+                  ? [
+                      IconButton(
+                          onPressed: () async {
+                            bool? isRemove;
+                            await showModalBottomSheet(
+                                context: context,
+                                builder: (context) => Container(
+                                      padding: EdgeInsets.all(10.0),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10.0),
+                                              topRight: Radius.circular(10.0))),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            "Remove this transaction",
+                                            style:
+                                                TextStyle(color: Colors.black),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.all(25.0),
+                                            child: Text(
+                                              "Are you sure do you wanna remove this transaction?",
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: largestButton(
+                                                    background: Colors.grey,
+                                                    text: "No",
+                                                    onPressed: () =>
+                                                        Navigator.pop(context)),
+                                              ),
+                                              SizedBox(
+                                                width: 10.0,
+                                              ),
+                                              Expanded(
+                                                child: largestButton(
+                                                    text: "Yes",
+                                                    onPressed: () {
+                                                      isRemove = true;
+                                                      Navigator.pop(context);
+                                                    }),
+                                              )
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ));
+                            isRemove != null && isRemove == true
+                                ? await showDialog(
+                                    builder: (context) => Dialog(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Image.asset(
+                                              IconAsset.success,
+                                              scale: 2,
+                                            ),
+                                            SizedBox(height: 16.0),
+                                            Text(
+                                                "Transaction has been completely removed")
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: largestButton(
-                                              background: Colors.grey,
-                                              text: "No",
-                                              onPressed: () =>
-                                                  Navigator.pop(context)),
-                                        ),
-                                        SizedBox(
-                                          width: 10.0,
-                                        ),
-                                        Expanded(
-                                          child: largestButton(
-                                              text: "Yes",
-                                              onPressed: () {
-                                                isRemove = true;
-                                                Navigator.pop(context);
-                                              }),
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ));
-                      isRemove != null && isRemove == true
-                          ? await showDialog(
-                              builder: (context) => Dialog(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Image.asset(
-                                        IconAsset.success,
-                                        scale: 2,
-                                      ),
-                                      SizedBox(height: 16.0),
-                                      Text(
-                                          "Transaction has been completely removed")
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              context: context,
-                            )
-                          : null;
-                    },
-                    icon: Icon(Icons.delete_forever_rounded))
-              ],
+                                    context: context,
+                                  )
+                                : null;
+                          },
+                          icon: Icon(Icons.delete_forever_rounded))
+                    ]
+                  : null,
               centerTitle: true,
             ),
             Text(
@@ -211,14 +220,20 @@ class _DetailTransactionState extends State<DetailTransaction> {
                   BoxDecoration(borderRadius: BorderRadius.circular(10.0)),
               child: Image.asset(IconAsset.success, fit: BoxFit.fill),
             ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: SizedBox(
-                    width: double.maxFinite,
-                    child: largestButton(text: "Edit", onPressed: () => null)),
-              ),
-            )
+            if (isEditable)
+              Expanded(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SizedBox(
+                      width: double.maxFinite,
+                      child: largestButton(
+                          text: "Edit",
+                          onPressed: () => Navigator.pushNamed(
+                              context,
+                              RouteApplication.getRoute(
+                                  ERoute.addEditTransaction)))),
+                ),
+              )
           ],
         ),
       )

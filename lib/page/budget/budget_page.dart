@@ -1,5 +1,6 @@
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/instance/category_component.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/item_budget.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
@@ -50,14 +51,20 @@ class _BudgetPageState extends State<BudgetPage> {
                             physics: BouncingScrollPhysics(),
                             children: List.generate(
                                 20,
-                                (index) => itemBudget(
-                                    onTap: () => Navigator.pushNamed(
-                                        context,
-                                        RouteApplication.getRoute(
-                                            ERoute.addEditBudget),
-                                        arguments: null),
-                                    width: MediaQuery.of(context).size.width,
-                                    percent: 0.45)),
+                                (index) => ItemBudget(
+                                            modal: ModalItemBudget(
+                                                budgetMoney: 0.0,
+                                                nowMoney: 0.0,
+                                                isLimited: false,
+                                                category: ECategory.shopping))
+                                        .builder(
+                                      onTap: () => Navigator.pushNamed(
+                                          context,
+                                          RouteApplication.getRoute(
+                                              ERoute.addEditBudget),
+                                          arguments: null),
+                                      width: MediaQuery.of(context).size.width,
+                                    )),
                           ))
                       : Center(
                           child: Text(

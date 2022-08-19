@@ -169,7 +169,7 @@ class _AddNewAccountState extends State<AddNewAccount> {
                               context: context,
                             );
 
-                            _timer = Timer(const Duration(seconds: 2), () {
+                            _timer = Timer(const Duration(seconds: 1), () {
                               Navigator.popUntil(
                                   context, (route) => route.isFirst);
                               Navigator.pushNamed(context,

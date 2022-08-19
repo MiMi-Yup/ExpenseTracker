@@ -141,6 +141,7 @@ class _CodeAuthState extends State<CodeAuth>
                   keyboardType: TextInputType.number,
                   onDone: (value) => _onDone(value),
                   clearOnDone: true,
+                  autofocus: true,
                 ),
               ),
             )

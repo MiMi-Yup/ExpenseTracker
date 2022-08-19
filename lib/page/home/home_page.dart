@@ -173,16 +173,19 @@ class _HomePageState extends State<HomePage> {
                   content: Column(
                     children: List<Widget>.generate(
                         50,
-                        (index) => itemTransaction(
-                            onTap: () => Navigator.pushNamed(
-                                context,
-                                RouteApplication.getRoute(
-                                    ERoute.detailTransaction),
-                                arguments: null),
-                            category: ECategory.shopping,
-                            money: index * 1.683,
-                            timeTransaction: DateTime.now(),
-                            isIncome: index % 2 == 0)),
+                        (index) => ItemTransaction(
+                                    modal: ModalItemTransaction(
+                                        category: ECategory.bill,
+                                        money: index * 1.683,
+                                        timeTransaction: DateTime.now(),
+                                        isIncome: index % 2 == 0))
+                                .builder(
+                              onTap: () => Navigator.pushNamed(
+                                  context,
+                                  RouteApplication.getRoute(
+                                      ERoute.detailTransaction),
+                                  arguments: null),
+                            )),
                   ))
             ]),
           ),

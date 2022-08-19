@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/editText.dart';
 import 'package:expense_tracker/widget/edit_date_time.dart';
@@ -26,6 +29,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
   String? selectedWallet;
   String? description;
   bool isRepeated = false;
+  late Timer _timer;
 
   //demo attachment
   List<String>? itemAttachments;
@@ -51,6 +55,12 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: items,
     );
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   Future<Object?> _setRepeat({required BuildContext context}) async {
@@ -138,7 +148,9 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(onPressed: null, icon: Icon(Icons.arrow_back_ios)),
+        leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back_ios)),
         title: Text("Expense"),
         centerTitle: true,
         elevation: 0,
@@ -226,8 +238,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Image.asset(
-                                              IconAsset.attachment),
+                                          Image.asset(IconAsset.attachment),
                                           Text("Add attachment")
                                         ]),
                                   )),
@@ -288,29 +299,39 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                         width: double.maxFinite,
                         child: largestButton(
                             text: "Continue",
-                            onPressed: () => showDialog(
-                                  builder: (context) => Dialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Image.asset(
-                                            IconAsset.success,
-                                            scale: 2,
-                                          ),
-                                          SizedBox(height: 16.0),
-                                          Text(
-                                              "Transaction has been successfully added")
-                                        ],
-                                      ),
+                            onPressed: () {
+                              showDialog(
+                                builder: (context) => Dialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
+                                          IconAsset.success,
+                                          scale: 2,
+                                        ),
+                                        SizedBox(height: 16.0),
+                                        Text(
+                                            "Transaction has been successfully added")
+                                      ],
                                     ),
                                   ),
-                                  context: context,
                                 ),
+                                context: context,
+                              );
+
+                              _timer = Timer(
+                                  const Duration(seconds: 1),
+                                  () => Navigator.popUntil(
+                                      context,
+                                      ModalRoute.withName(
+                                          RouteApplication.getRoute(
+                                              ERoute.detailTransaction))));
+                            },
                             background: MyColor.purple()))
                   ],
                 ),

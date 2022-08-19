@@ -1,5 +1,6 @@
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/widget/item_budget.dart';
 import 'package:expense_tracker/widget/item_category.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +32,12 @@ class _OverviewReportState extends State<OverviewReport> {
                   child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("You Earned 💰", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
-                  Text("\$332", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+                  Text("You Earned 💰",
+                      style:
+                          TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+                  Text("\$332",
+                      style:
+                          TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
                 ],
               )),
               Padding(
@@ -50,7 +55,13 @@ class _OverviewReportState extends State<OverviewReport> {
                     children: [
                       Text("and your biggest",
                           style: TextStyle(color: Colors.black)),
-                      itemCategory(category: ECategory.shopping),
+                      ItemCategory(
+                              modal: ModalItemBudget(
+                                  budgetMoney: 0.0,
+                                  nowMoney: 0.0,
+                                  isLimited: false,
+                                  category: ECategory.shopping))
+                          .nameCategoryBuilder(),
                       Text("\$120", style: TextStyle(color: Colors.black))
                     ],
                   ),
@@ -68,8 +79,12 @@ class _OverviewReportState extends State<OverviewReport> {
                   child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("You Spend 💸", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
-                  Text("\$332", style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+                  Text("You Spend 💸",
+                      style:
+                          TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+                  Text("\$332",
+                      style:
+                          TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
                 ],
               )),
               Padding(
@@ -87,7 +102,13 @@ class _OverviewReportState extends State<OverviewReport> {
                     children: [
                       Text("and your biggest",
                           style: TextStyle(color: Colors.black)),
-                      itemCategory(category: ECategory.shopping),
+                      ItemCategory(
+                              modal: ModalItemBudget(
+                                  budgetMoney: 0.0,
+                                  nowMoney: 0.0,
+                                  isLimited: false,
+                                  category: ECategory.shopping))
+                          .nameCategoryBuilder(),
                       Text("\$120", style: TextStyle(color: Colors.black))
                     ],
                   ),

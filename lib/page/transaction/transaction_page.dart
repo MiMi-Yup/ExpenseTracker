@@ -183,16 +183,19 @@ class _TransactionPageState extends State<TransactionPage> {
                       content: Column(
                         children: List.generate(
                             5,
-                            (index) => itemTransaction(
-                                onTap: () => Navigator.pushNamed(
-                                    context,
-                                    RouteApplication.getRoute(
-                                        ERoute.detailTransaction),
-                                    arguments: null),
-                                category: ECategory.bill,
-                                money: index * 1.683,
-                                timeTransaction: DateTime.now(),
-                                isIncome: index % 2 == 0)),
+                            (index) => ItemTransaction(
+                                        modal: ModalItemTransaction(
+                                            category: ECategory.bill,
+                                            money: index * 1.683,
+                                            timeTransaction: DateTime.now(),
+                                            isIncome: index % 2 == 0))
+                                    .builder(
+                                  onTap: () => Navigator.pushNamed(
+                                      context,
+                                      RouteApplication.getRoute(
+                                          ERoute.detailTransaction),
+                                      arguments: null),
+                                )),
                       ),
                       title: "fsdkjhf",
                     )),
