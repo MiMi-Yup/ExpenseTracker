@@ -1,6 +1,8 @@
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/route.dart';
-import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/constant/enum/enum_category.dart';
+import 'package:expense_tracker/constant/enum/enum_route.dart';
+import 'package:expense_tracker/constant/enum/enum_transaction.dart';
+import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
@@ -184,11 +186,17 @@ class _TransactionPageState extends State<TransactionPage> {
                         children: List.generate(
                             5,
                             (index) => ItemTransaction(
-                                        modal: ModalItemTransaction(
+                                        modal: ModalTransaction(
                                             category: ECategory.bill,
                                             money: index * 1.683,
                                             timeTransaction: DateTime.now(),
-                                            isIncome: index % 2 == 0))
+                                            typeTransaction: index % 2 == 0
+                                                ? ETypeTransaction.income
+                                                : ETypeTransaction.expense,
+                                            account: "Paypal",
+                                            isRepeat: false,
+                                            purpose: 'Buy electronic',
+                                            currency: '\$'))
                                     .builder(
                                   onTap: () => Navigator.pushNamed(
                                       context,

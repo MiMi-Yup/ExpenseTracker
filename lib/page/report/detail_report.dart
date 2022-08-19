@@ -1,6 +1,8 @@
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/route.dart';
-import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/constant/enum/enum_category.dart';
+import 'package:expense_tracker/constant/enum/enum_route.dart';
+import 'package:expense_tracker/constant/enum/enum_transaction.dart';
+import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/item_budget.dart';
 import 'package:expense_tracker/widget/item_category.dart';
@@ -167,14 +169,21 @@ class _DetailReportState extends State<DetailReport> {
                                     budgetMoney: 0.0,
                                     nowMoney: 0.0,
                                     isLimited: false,
-                                    category: ECategory.shopping))
+                                    category: ECategory.shopping,
+                                    currency: '\$'))
                             .percentCategoryBuilder(width: size.width)
                         : ItemTransaction(
-                                modal: ModalItemTransaction(
+                                modal: ModalTransaction(
                                     category: ECategory.bill,
                                     money: index * 1.683,
                                     timeTransaction: DateTime.now(),
-                                    isIncome: index % 2 == 0))
+                                    typeTransaction: index % 2 == 0
+                                        ? ETypeTransaction.income
+                                        : ETypeTransaction.expense,
+                                    account: "Paypal",
+                                    isRepeat: false,
+                                    purpose: 'Buy electronic',
+                                    currency: '\$'))
                             .builder(
                             onTap: () => Navigator.pushNamed(
                                 context,

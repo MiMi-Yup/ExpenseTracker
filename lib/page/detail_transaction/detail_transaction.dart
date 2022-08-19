@@ -1,6 +1,7 @@
 import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/constant/enum/enum_route.dart';
+import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,12 @@ class DetailTransaction extends StatefulWidget {
 }
 
 class _DetailTransactionState extends State<DetailTransaction> {
+  late List<Object>? arguments =
+      ModalRoute.of(context)?.settings.arguments as List<Object>?;
+  late ModalTransaction? modal = arguments?[0] as ModalTransaction?;
+  late bool isEditable = (arguments?[1] as bool?) ?? false;
+
   final heightAnchor = 75.0;
-  bool isEditable = true;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -24,7 +29,8 @@ class _DetailTransactionState extends State<DetailTransaction> {
         width: double.maxFinite,
         height: size.height / 3,
         decoration: BoxDecoration(
-            color: Colors.red,
+            color: MyColor.colorTransaction[modal?.typeTransaction] ??
+                Colors.white70,
             borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(10.0),
                 bottomRight: Radius.circular(10.0))),
@@ -125,15 +131,15 @@ class _DetailTransactionState extends State<DetailTransaction> {
               centerTitle: true,
             ),
             Text(
-              "\$5000",
+              "${modal?.getMoney}",
               style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
             ),
             Text(
-              "Purpose",
+              "${modal?.purpose}",
               style: TextStyle(fontSize: 18),
             ),
             Text(
-              DateTime.now().toString(),
+              "${modal?.getDateTransaction} ${modal?.getTimeTransaction}",
               style: TextStyle(fontSize: 16, color: Colors.white70),
             )
           ],
@@ -155,27 +161,31 @@ class _DetailTransactionState extends State<DetailTransaction> {
                 SizedBox(
                   height: 20.0,
                 ),
-                Text("Expense", style: TextStyle(color: Colors.black))
+                Text(
+                    "${modal?.typeTransaction.name[0].toUpperCase()}${modal?.typeTransaction.name.substring(1).toLowerCase()}",
+                    style: TextStyle(color: Colors.black))
               ],
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Type", style: TextStyle(color: Colors.grey)),
+                Text("Category", style: TextStyle(color: Colors.grey)),
                 SizedBox(
                   height: 20.0,
                 ),
-                Text("Expense", style: TextStyle(color: Colors.black))
+                Text(
+                    "${modal?.category.name[0].toUpperCase()}${modal?.category.name.substring(1).toLowerCase()}",
+                    style: TextStyle(color: Colors.black))
               ],
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Type", style: TextStyle(color: Colors.grey)),
+                Text("Account", style: TextStyle(color: Colors.grey)),
                 SizedBox(
                   height: 20.0,
                 ),
-                Text("Expense", style: TextStyle(color: Colors.black))
+                Text("${modal?.account}", style: TextStyle(color: Colors.black))
               ],
             )
           ],
@@ -207,7 +217,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
               style: TextStyle(color: Colors.white70),
             ),
             Text(
-              "Amet minim mollit non deserunt ullamco est sit aliqua dhfkadhfkdskjfhkdshfkjsdhkfhskdasjd,mas,dm sadksalkdj aslkdjsak dlsakdjldkjfhksdfhkdshfkdjshfkdsjhfalduowqiuroiwqruqwoiruwqrkasjflkasjolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
+              "${modal?.description}",
               maxLines: 5,
               style: TextStyle(fontSize: 18),
               softWrap: true,
@@ -218,7 +228,9 @@ class _DetailTransactionState extends State<DetailTransaction> {
               alignment: Alignment.center,
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(10.0)),
-              child: Image.asset(IconAsset.success, fit: BoxFit.fill),
+              child: modal?.attachment != null
+                  ? Image.asset(IconAsset.success, fit: BoxFit.fill)
+                  : null,
             ),
             if (isEditable)
               Expanded(

@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/constant/enum/enum_route.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/editText.dart';
@@ -28,8 +28,9 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
   String? selectedCategory;
   String? selectedWallet;
   String? description;
+  String? purpose;
   bool isRepeated = false;
-  late Timer _timer;
+  Timer? _timer;
 
   //demo attachment
   List<String>? itemAttachments;
@@ -59,7 +60,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -198,6 +199,11 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                         chosenValue: selectedCategory,
                         onChanged: (value) =>
                             setState(() => selectedCategory = value)),
+                    editText(
+                        onChanged: (value) => purpose = value,
+                        fillText: purpose,
+                        labelText: "Purpose",
+                        hintText: "Purpose"),
                     editText(
                         onChanged: (value) => description = value,
                         fillText: description,

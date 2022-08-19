@@ -1,35 +1,14 @@
+import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-class ModalItemTransaction {
-  ECategory category;
-  String? description;
-  double money;
-  DateTime timeTransaction;
-  bool isIncome;
-
-  ModalItemTransaction(
-      {required this.category,
-      required this.money,
-      required this.timeTransaction,
-      required this.isIncome,
-      this.description});
-}
-
 class ItemTransaction {
-  ModalItemTransaction modal;
+  ModalTransaction modal;
 
   ItemTransaction({required this.modal});
-
-  String _convertTimeOfDay(DateTime date) {
-    int hour = date.hour;
-    int minute = date.minute;
-    bool isPM = hour >= 12;
-    hour = hour > 12 ? hour - 12 : hour;
-
-    return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute} ${isPM ? "PM" : "AM"}";
-  }
 
   GestureDetector builder(
       {void Function()? onTap,
@@ -100,14 +79,14 @@ class ItemTransaction {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            "\${currency}${modal.money.toStringAsFixed(3)}",
+                            modal.getMoney,
                             style: TextStyle(
-                                color:
-                                    modal.isIncome ? Colors.green : Colors.red),
+                                color: MyColor
+                                    .colorTransaction[modal.typeTransaction]),
                           ),
                           SizedBox(height: 10.0),
                           Text(
-                            _convertTimeOfDay(modal.timeTransaction),
+                            modal.getTimeTransaction,
                             style: TextStyle(color: Colors.grey),
                           )
                         ],

@@ -1,6 +1,6 @@
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/route.dart';
-import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/constant/enum/enum_category.dart';
+import 'package:expense_tracker/constant/enum/enum_route.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/item_budget.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
@@ -56,7 +56,8 @@ class _BudgetPageState extends State<BudgetPage> {
                                                 budgetMoney: 0.0,
                                                 nowMoney: 0.0,
                                                 isLimited: false,
-                                                category: ECategory.shopping))
+                                                category: ECategory.shopping,
+                                                currency: '\$'))
                                         .builder(
                                       onTap: () => Navigator.pushNamed(
                                           context,

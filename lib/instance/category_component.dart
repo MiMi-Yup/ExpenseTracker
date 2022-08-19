@@ -1,8 +1,7 @@
 import 'package:expense_tracker/constant/asset/category.dart';
+import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/widget/component/category_component.dart';
 import 'package:flutter/material.dart';
-
-enum ECategory { shopping, bill, food, transportation, money }
 
 class CategoryInstance {
   static const Map<ECategory, CategoryComponent Function()> instances =

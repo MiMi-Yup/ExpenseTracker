@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:expense_tracker/constant/asset/background.dart';
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/constant/enum/enum_route.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -143,7 +143,7 @@ class _IntroductionState extends State<Introduction> {
                 text: "Login",
                 onPressed: () => Navigator.pushNamed(
                     context, RouteApplication.getRoute(ERoute.pin),
-                    arguments: false),
+                    arguments: true),
                 textColor: MyColor.purple(alpha: 255),
                 background: Colors.grey),
           )

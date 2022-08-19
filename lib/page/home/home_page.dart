@@ -1,7 +1,9 @@
 import 'package:expense_tracker/constant/asset/category.dart';
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/route.dart';
-import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/constant/enum/enum_category.dart';
+import 'package:expense_tracker/constant/enum/enum_route.dart';
+import 'package:expense_tracker/constant/enum/enum_transaction.dart';
+import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
 import 'package:expense_tracker/page/home/nav.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/transaction_chart.dart';
@@ -171,21 +173,24 @@ class _HomePageState extends State<HomePage> {
                   titleButton: "See all",
                   onPressed: () => widget.toPage!(EPage.transaction),
                   content: Column(
-                    children: List<Widget>.generate(
-                        50,
-                        (index) => ItemTransaction(
-                                    modal: ModalItemTransaction(
-                                        category: ECategory.bill,
-                                        money: index * 1.683,
-                                        timeTransaction: DateTime.now(),
-                                        isIncome: index % 2 == 0))
-                                .builder(
-                              onTap: () => Navigator.pushNamed(
-                                  context,
-                                  RouteApplication.getRoute(
-                                      ERoute.detailTransaction),
-                                  arguments: null),
-                            )),
+                    children: List<Widget>.generate(50, (index) {
+                      ModalTransaction modal = ModalTransaction(
+                          category: ECategory.bill,
+                          money: index * 1.683,
+                          timeTransaction: DateTime.now(),
+                          typeTransaction: index % 2 == 0
+                              ? ETypeTransaction.income
+                              : ETypeTransaction.expense,
+                          account: "Paypal",
+                          isRepeat: false,
+                          purpose: 'Buy electronic',
+                          currency: '\$');
+                      return ItemTransaction(modal: modal).builder(
+                        onTap: () => Navigator.pushNamed(context,
+                            RouteApplication.getRoute(ERoute.detailTransaction),
+                            arguments: [modal, true]),
+                      );
+                    }),
                   ))
             ]),
           ),

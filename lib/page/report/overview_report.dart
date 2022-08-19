@@ -1,5 +1,5 @@
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/widget/item_budget.dart';
 import 'package:expense_tracker/widget/item_category.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
@@ -60,7 +60,8 @@ class _OverviewReportState extends State<OverviewReport> {
                                   budgetMoney: 0.0,
                                   nowMoney: 0.0,
                                   isLimited: false,
-                                  category: ECategory.shopping))
+                                  category: ECategory.shopping,
+                                  currency: '\$'))
                           .nameCategoryBuilder(),
                       Text("\$120", style: TextStyle(color: Colors.black))
                     ],
@@ -107,7 +108,8 @@ class _OverviewReportState extends State<OverviewReport> {
                                   budgetMoney: 0.0,
                                   nowMoney: 0.0,
                                   isLimited: false,
-                                  category: ECategory.shopping))
+                                  category: ECategory.shopping,
+                                  currency: '\$'))
                           .nameCategoryBuilder(),
                       Text("\$120", style: TextStyle(color: Colors.black))
                     ],

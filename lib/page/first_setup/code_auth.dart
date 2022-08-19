@@ -1,4 +1,4 @@
-import 'package:expense_tracker/constant/route.dart';
+import 'package:expense_tracker/constant/enum/enum_route.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/input_otp.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +12,11 @@ class CodeAuth extends StatefulWidget {
 
 class _CodeAuthState extends State<CodeAuth>
     with SingleTickerProviderStateMixin {
-  late bool _confirm;
-  late bool _initCode;
+  
+  late bool _initCode = ModalRoute.of(context)?.settings.arguments as bool;
+  late bool _confirm = !_initCode;
   String _code = "";
   String _reCode = "";
-
-  late bool firstLoad;
 
   late AnimationController controller;
   final Map<String, String?> message = <String, String?>{
@@ -44,8 +43,6 @@ class _CodeAuthState extends State<CodeAuth>
           controller.reverse();
         }
       });
-
-    firstLoad = true;
   }
 
   @override
@@ -100,12 +97,6 @@ class _CodeAuthState extends State<CodeAuth>
 
   @override
   Widget build(BuildContext context) {
-    if (firstLoad) {
-      _initCode = ModalRoute.of(context)?.settings.arguments as bool;
-      _confirm = !_initCode;
-      firstLoad = false;
-    }
-
     return Scaffold(
       appBar: null,
       body: Center(

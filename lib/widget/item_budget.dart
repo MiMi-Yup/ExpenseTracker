@@ -1,3 +1,4 @@
+import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/instance/category_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -7,6 +8,7 @@ class ModalItemBudget {
   double nowMoney;
   bool isLimited;
   ECategory category;
+  String currency;
 
   double get remainMoney {
     double _sub = budgetMoney - nowMoney;
@@ -25,7 +27,8 @@ class ModalItemBudget {
       {required this.budgetMoney,
       required this.nowMoney,
       this.isLimited = false,
-      required this.category});
+      required this.category,
+      required this.currency});
 }
 
 class ItemBudget {
@@ -93,7 +96,7 @@ class ItemBudget {
                         ],
                       ),
                       SizedBox(height: 10.0),
-                      Text("Remaining \${currency}${modal.remainMoney}"),
+                      Text("Remaining ${modal.currency}${modal.remainMoney}"),
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                         child: Stack(
@@ -118,7 +121,7 @@ class ItemBudget {
                         ),
                       ),
                       Text(
-                        "\${currency}${modal.nowMoney} of \${currency}${modal.budgetMoney}",
+                        "${modal.currency}${modal.nowMoney} ${modal.isLimited ? "of ${modal.currency}${modal.budgetMoney}" : ""}",
                         style: TextStyle(color: Colors.grey),
                       ),
                       SizedBox(height: 10.0),
