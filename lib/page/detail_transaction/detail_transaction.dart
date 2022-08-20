@@ -162,7 +162,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
                   height: 20.0,
                 ),
                 Text(
-                    "${modal?.typeTransaction.name[0].toUpperCase()}${modal?.typeTransaction.name.substring(1).toLowerCase()}",
+                    "${modal?.typeTransaction?.name[0].toUpperCase()}${modal?.typeTransaction?.name.substring(1).toLowerCase()}",
                     style: TextStyle(color: Colors.black))
               ],
             ),
@@ -174,7 +174,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
                   height: 20.0,
                 ),
                 Text(
-                    "${modal?.category.name[0].toUpperCase()}${modal?.category.name.substring(1).toLowerCase()}",
+                    "${modal?.category?.name[0].toUpperCase()}${modal?.category?.name.substring(1).toLowerCase()}",
                     style: TextStyle(color: Colors.black))
               ],
             ),
@@ -243,7 +243,8 @@ class _DetailTransactionState extends State<DetailTransaction> {
                           onPressed: () => Navigator.pushNamed(
                               context,
                               RouteApplication.getRoute(
-                                  ERoute.addEditTransaction)))),
+                                  ERoute.addEditTransaction),
+                              arguments: modal))),
                 ),
               )
           ],

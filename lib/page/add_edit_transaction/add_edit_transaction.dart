@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
+import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/constant/enum/enum_route.dart';
+import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
 import 'package:expense_tracker/widget/editText.dart';
@@ -22,9 +24,14 @@ class AddEditTransaction extends StatefulWidget {
 }
 
 class _AddEditTransactionState extends State<AddEditTransaction> {
-  final itemCategorys = ["Food", "Drink", "Skin care"];
   final itemWallets = ["MoMo", "Vietinbank", "Vietcombank"];
+
   late double height = MediaQuery.of(context).size.height;
+  late ModalTransaction modal = (ModalRoute.of(context)?.settings.arguments
+          as ModalTransaction?) ??
+      ModalTransaction.minInit(
+          category: ModalRoute.of(context)?.settings.arguments as ECategory?);
+
   String? selectedCategory;
   String? selectedWallet;
   String? description;
@@ -93,6 +100,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                               style: TextStyle(color: Colors.grey),
                             ),
                             dropDown(
+                                hintText: "Frequency repeat",
                                 items: ["Daily", "Monthly", "Yearly"],
                                 hintColor: Colors.cyan,
                                 chosenValue: selectedFrequency,
@@ -152,7 +160,8 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
         leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: Icon(Icons.arrow_back_ios)),
-        title: Text("Expense"),
+        title: Text(
+            "${modal.category?.name[0].toUpperCase()}${modal.category?.name.substring(1).toLowerCase()}"),
         centerTitle: true,
         elevation: 0,
         backgroundColor: MyColor.mainBackgroundColor,
@@ -181,6 +190,8 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                     isCollapsed: true,
                     hintText: "\0.00",
                     border: InputBorder.none),
+                onChanged: (value) => modal.money = double.tryParse(value),
+                controller: TextEditingController(text: "${modal.money ?? ""}"),
               ),
             ),
             Container(
@@ -195,26 +206,36 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     dropDown(
-                        items: itemCategorys,
-                        chosenValue: selectedCategory,
-                        onChanged: (value) =>
-                            setState(() => selectedCategory = value)),
+                        hintText: "Choose category",
+                        items: ECategory.values
+                            .map((e) =>
+                                "${e.name[0].toUpperCase()}${e.name.substring(1).toLowerCase()}")
+                            .toList(),
+                        chosenValue: modal.category != null
+                            ? "${modal.category?.name[0].toUpperCase()}${modal.category?.name.substring(1).toLowerCase()}"
+                            : null,
+                        onChanged: (value) => setState(() => modal.category =
+                            value != null
+                                ? ECategory.values.firstWhere((element) =>
+                                    element.name == value.toLowerCase())
+                                : null)),
                     editText(
-                        onChanged: (value) => purpose = value,
-                        fillText: purpose,
+                        onChanged: (value) => modal.purpose = value,
+                        fillText: modal.purpose,
                         labelText: "Purpose",
                         hintText: "Purpose"),
                     editText(
-                        onChanged: (value) => description = value,
-                        fillText: description,
+                        onChanged: (value) => modal.description = value,
+                        fillText: modal.description,
                         labelText: "Description",
                         hintText: "Description"),
                     dropDown(
+                        hintText: "Choose account",
                         items: itemWallets,
                         chosenValue: selectedWallet,
                         onChanged: (value) =>
                             setState(() => selectedWallet = value)),
-                    (itemAttachments == null || itemAttachments!.isEmpty)
+                    (modal.attachment == null || modal.attachment!.isEmpty)
                         ? Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: GestureDetector(
@@ -226,7 +247,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                   List<File> files = result.paths
                                       .map((path) => File(path!))
                                       .toList();
-                                  setState(() => itemAttachments =
+                                  setState(() => modal.attachment =
                                       files.map((e) => e.path).toList());
                                 } else {
                                   // User canceled the picker
@@ -254,7 +275,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                             height: height / 5,
                             child: ListView(
                               scrollDirection: Axis.horizontal,
-                              children: itemAttachments!
+                              children: modal.attachment!
                                   .map((e) => Text(
                                         e.substring(0, 5),
                                         style: TextStyle(color: Colors.white),
@@ -277,10 +298,10 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                           ],
                         ),
                         Switch(
-                            value: isRepeated,
+                            value: modal.isRepeat ?? false,
                             onChanged: (value) async {
                               await _setRepeat(context: context);
-                              setState(() => isRepeated = value);
+                              setState(() => modal.isRepeat = value);
                             })
                       ],
                     ),

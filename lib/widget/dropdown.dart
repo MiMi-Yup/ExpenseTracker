@@ -4,6 +4,7 @@ DropdownButton<String> dropDown(
     {required List<String> items,
     required String? chosenValue,
     required void Function(String?) onChanged,
+    required String hintText,
     bool isExpanded = true,
     Color hintColor = Colors.grey,
     Color itemColor = Colors.white,
@@ -29,7 +30,7 @@ DropdownButton<String> dropDown(
             ))
         .toList(),
     hint: Text(
-      "Please choose",
+      hintText,
       style: TextStyle(
           color: hintColor, fontSize: 14, fontWeight: FontWeight.w500),
     ),

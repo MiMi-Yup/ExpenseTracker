@@ -35,6 +35,7 @@ class ExportPage extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(10.0)),
               child: dropDown(
+                  hintText: "Type transaction export",
                   items: ["All", "Income", "Expense"],
                   chosenValue: "All",
                   onChanged: (value) => null),
@@ -48,11 +49,15 @@ class ExportPage extends StatelessWidget {
                       color: Colors.white70,
                     ),
                     borderRadius: BorderRadius.circular(10.0)),
-                child: dropDown(items: [
-                  "Last 30 days",
-                  "Last 3 months",
-                  "Last nearly year"
-                ], chosenValue: "Last 30 days", onChanged: (value) => null)),
+                child: dropDown(
+                    hintText: "During time export",
+                    items: [
+                      "Last 30 days",
+                      "Last 3 months",
+                      "Last nearly year"
+                    ],
+                    chosenValue: "Last 30 days",
+                    onChanged: (value) => null)),
             Text("What format do you want to export?"),
             Container(
                 margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -63,6 +68,7 @@ class ExportPage extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(10.0)),
                 child: dropDown(
+                    hintText: "Extension files export",
                     items: ["CSV", "Excel", "SpreadSheet"],
                     chosenValue: "CSV",
                     onChanged: (value) => null)),

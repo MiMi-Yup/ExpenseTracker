@@ -2,6 +2,7 @@ import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/constant/enum/enum_route.dart';
 import 'package:expense_tracker/constant/enum/enum_transaction.dart';
+import 'package:expense_tracker/instance/data.dart';
 import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/transaction_chart.dart';
@@ -62,6 +63,7 @@ class _TransactionPageState extends State<TransactionPage> {
             children: [
               dropDown(
                 isExpanded: false,
+                hintText: "Time",
                 items: ["1", "2"],
                 chosenValue: null,
                 onChanged: (p0) => null,
@@ -153,7 +155,8 @@ class _TransactionPageState extends State<TransactionPage> {
             ],
           ),
           GestureDetector(
-            onTap: null,
+            onTap: () => Navigator.pushNamed(
+                context, RouteApplication.getRoute(ERoute.overviewReport)),
             child: Container(
               padding: EdgeInsets.all(10.0),
               decoration: BoxDecoration(
@@ -176,38 +179,53 @@ class _TransactionPageState extends State<TransactionPage> {
           ),
           Expanded(
               child: CustomScrollView(
-            physics: BouncingScrollPhysics(),
-            slivers: List.generate(
-                5,
-                (index) => Section(
-                      headerColor: MyColor.mainBackgroundColor,
-                      titleColor: Colors.white,
-                      content: Column(
-                        children: List.generate(
-                            5,
-                            (index) => ItemTransaction(
-                                        modal: ModalTransaction(
-                                            category: ECategory.bill,
-                                            money: index * 1.683,
-                                            timeTransaction: DateTime.now(),
-                                            typeTransaction: index % 2 == 0
-                                                ? ETypeTransaction.income
-                                                : ETypeTransaction.expense,
-                                            account: "Paypal",
-                                            isRepeat: false,
-                                            purpose: 'Buy electronic',
-                                            currency: '\$'))
-                                    .builder(
-                                  onTap: () => Navigator.pushNamed(
-                                      context,
-                                      RouteApplication.getRoute(
-                                          ERoute.detailTransaction),
-                                      arguments: null),
-                                )),
-                      ),
-                      title: "fsdkjhf",
-                    )),
-          ))
+                  physics: BouncingScrollPhysics(),
+                  slivers: DataSample.sample.entries
+                      .map((group) => Section(
+                          headerColor: MyColor.mainBackgroundColor,
+                          titleColor: Colors.white,
+                          title: group.key.toString(),
+                          content: AnimatedList(
+                              shrinkWrap: true,
+                              initialItemCount: group.value!.length,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index, animation) =>
+                                  SizeTransition(
+                                    sizeFactor: animation,
+                                    child: ItemTransaction(
+                                            modal: group.value![index])
+                                        .builder(
+                                      isEditable: true,
+                                      onTap: () async {
+                                        await Navigator.pushNamed(
+                                            context,
+                                            RouteApplication.getRoute(
+                                                ERoute.detailTransaction),
+                                            arguments: [
+                                              group.value![index],
+                                              true
+                                            ]);
+                                        setState(() {});
+                                      },
+                                      editSlidableAction: (context) async {
+                                        await Navigator.pushNamed(
+                                            context,
+                                            RouteApplication.getRoute(
+                                                ERoute.addEditTransaction),
+                                            arguments: group.value![index]);
+                                        setState(() {});
+                                      },
+                                      deleteSlidableAction: (context) {
+                                        AnimatedList.of(context).removeItem(
+                                            index,
+                                            (context, animation) =>
+                                                SizeTransition(
+                                                    sizeFactor: animation));
+                                        group.value!.removeAt(index);
+                                      },
+                                    ),
+                                  ))))
+                      .toList()))
         ],
       ),
     );

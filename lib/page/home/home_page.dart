@@ -3,6 +3,7 @@ import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/constant/enum/enum_route.dart';
 import 'package:expense_tracker/constant/enum/enum_transaction.dart';
+import 'package:expense_tracker/instance/data.dart';
 import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
 import 'package:expense_tracker/page/home/nav.dart';
 import 'package:expense_tracker/route.dart';
@@ -85,6 +86,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 title: dropDown(
+                    hintText: "Time",
                     isExpanded: false,
                     items: ["1", "2", "3"],
                     chosenValue: null,
@@ -173,24 +175,28 @@ class _HomePageState extends State<HomePage> {
                   titleButton: "See all",
                   onPressed: () => widget.toPage!(EPage.transaction),
                   content: Column(
-                    children: List<Widget>.generate(50, (index) {
-                      ModalTransaction modal = ModalTransaction(
-                          category: ECategory.bill,
-                          money: index * 1.683,
-                          timeTransaction: DateTime.now(),
-                          typeTransaction: index % 2 == 0
-                              ? ETypeTransaction.income
-                              : ETypeTransaction.expense,
-                          account: "Paypal",
-                          isRepeat: false,
-                          purpose: 'Buy electronic',
-                          currency: '\$');
-                      return ItemTransaction(modal: modal).builder(
-                        onTap: () => Navigator.pushNamed(context,
-                            RouteApplication.getRoute(ERoute.detailTransaction),
-                            arguments: [modal, true]),
-                      );
-                    }),
+                    children: DataSample.convertToList()
+                        .map((e) => ItemTransaction(modal: e).builder(
+                              isEditable: true,
+                              onTap: () async {
+                                await Navigator.pushNamed(
+                                    context,
+                                    RouteApplication.getRoute(
+                                        ERoute.detailTransaction),
+                                    arguments: [e, true]);
+                                setState(() {});
+                              },
+                              editSlidableAction: (context) async {
+                                await Navigator.pushNamed(
+                                    context,
+                                    RouteApplication.getRoute(
+                                        ERoute.addEditTransaction),
+                                    arguments: e);
+                                setState(() {});
+                              },
+                              deleteSlidableAction: (context) => null,
+                            ))
+                        .toList(),
                   ))
             ]),
           ),

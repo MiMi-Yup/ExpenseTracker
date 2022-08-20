@@ -89,6 +89,7 @@ class _AddEditBudgetState extends State<AddEditBudget> {
                   children: [
                     dropDown(
                         isExpanded: true,
+                        hintText: "Category",
                         items: ["Shopping", "Eat"],
                         chosenValue: null,
                         onChanged: (value) => null),

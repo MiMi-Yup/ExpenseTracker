@@ -39,7 +39,7 @@ class ItemCategory {
               CategoryInstance.instances[modal.category]!()
                   .getMinCategory(height: 10.0),
               Text(
-                "\${currency}${modal.nowMoney}",
+                "${modal.currency}${modal.nowMoney}",
                 style: TextStyle(color: valueColor),
               )
             ],

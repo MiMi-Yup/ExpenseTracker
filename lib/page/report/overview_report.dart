@@ -1,5 +1,7 @@
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/constant/enum/enum_category.dart';
+import 'package:expense_tracker/constant/enum/enum_route.dart';
+import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/item_budget.dart';
 import 'package:expense_tracker/widget/item_category.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
@@ -22,7 +24,7 @@ class _OverviewReportState extends State<OverviewReport> {
     super.initState();
   }
 
-  List<Widget Function(double)> pages = [
+  late List<Widget Function(double)> pages = [
     (width) => ColoredBox(
           color: Colors.green,
           child: Column(
@@ -138,7 +140,9 @@ class _OverviewReportState extends State<OverviewReport> {
                   width: double.maxFinite,
                   padding: EdgeInsets.all(10.0),
                   child: largestButton(
-                      text: "See the full detail", onPressed: () => null))
+                      text: "See the full detail",
+                      onPressed: () => Navigator.pushNamed(context,
+                          RouteApplication.getRoute(ERoute.detailReport))))
             ],
           ),
         )

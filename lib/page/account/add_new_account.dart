@@ -108,6 +108,7 @@ class _AddNewAccountState extends State<AddNewAccount> {
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.all(Radius.circular(4.0))),
                       child: dropDown(
+                        hintText: "Choose account type",
                         items: _listDropDown,
                         chosenValue: _chosenValue,
                         onChanged: (itemSelected) {

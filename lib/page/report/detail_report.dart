@@ -39,7 +39,10 @@ class _DetailReportState extends State<DetailReport> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(onPressed: null, icon: Icon(Icons.arrow_back_ios)),
+        leading: IconButton(
+            onPressed: () => Navigator.popUntil(context,
+                ModalRoute.withName(RouteApplication.getRoute(ERoute.main))),
+            icon: Icon(Icons.arrow_back_ios)),
         title: Text("Financial Report"),
         centerTitle: true,
         elevation: 0,
@@ -54,6 +57,7 @@ class _DetailReportState extends State<DetailReport> {
               children: [
                 dropDown(
                     isExpanded: false,
+                    hintText: "Time",
                     items: ["Day", "Month", "Year"],
                     chosenValue: null,
                     onChanged: (value) => null),
@@ -152,6 +156,7 @@ class _DetailReportState extends State<DetailReport> {
               children: [
                 dropDown(
                     isExpanded: false,
+                    hintText: "View",
                     items: ["Transaction", "Category"],
                     chosenValue: indexTypeCategory,
                     onChanged: (value) =>
@@ -185,6 +190,7 @@ class _DetailReportState extends State<DetailReport> {
                                     purpose: 'Buy electronic',
                                     currency: '\$'))
                             .builder(
+                            isEditable: false,
                             onTap: () => Navigator.pushNamed(
                                 context,
                                 RouteApplication.getRoute(

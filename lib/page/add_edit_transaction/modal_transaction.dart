@@ -3,18 +3,18 @@ import 'package:expense_tracker/constant/enum/enum_frequency.dart';
 import 'package:expense_tracker/constant/enum/enum_transaction.dart';
 
 class ModalTransaction {
-  ECategory category;
+  ECategory? category;
   String? description;
-  String purpose;
-  double money;
-  DateTime timeTransaction;
-  ETypeTransaction typeTransaction;
-  String? attachment;
-  String account;
-  bool isRepeat;
+  String? purpose;
+  double? money;
+  DateTime? timeTransaction;
+  ETypeTransaction? typeTransaction;
+  List<String>? attachment;
+  String? account;
+  bool? isRepeat;
   EFrequency? frequency;
   DateTime? endAfter;
-  String currency;
+  String? currency;
 
   ModalTransaction({
     required this.category,
@@ -31,17 +31,24 @@ class ModalTransaction {
     this.endAfter,
   });
 
-  String get getTimeTransaction {
-    int hour = timeTransaction.hour;
-    int minute = timeTransaction.minute;
-    bool isPM = hour >= 12;
-    hour = hour > 12 ? hour - 12 : hour;
+  ModalTransaction.minInit({required this.category});
 
-    return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute} ${isPM ? "PM" : "AM"}";
+  String get getTimeTransaction {
+    if (timeTransaction != null) {
+      int hour = timeTransaction!.hour;
+      int minute = timeTransaction!.minute;
+      bool isPM = hour >= 12;
+      hour = hour > 12 ? hour - 12 : hour;
+
+      return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute} ${isPM ? "PM" : "AM"}";
+    }
+    return "";
   }
 
-  String get getDateTransaction =>
-      "${timeTransaction.day}/${timeTransaction.month}/${timeTransaction.year}";
+  String get getDateTransaction => timeTransaction != null
+      ? "${timeTransaction!.day}/${timeTransaction!.month}/${timeTransaction!.year}"
+      : "";
 
-  String get getMoney => "$currency${money.toStringAsFixed(3)}";
+  String get getMoney =>
+      money != null ? "$currency${money!.toStringAsFixed(3)}" : "";
 }
