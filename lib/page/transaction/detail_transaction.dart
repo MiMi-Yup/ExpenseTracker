@@ -1,7 +1,7 @@
 import 'package:expense_tracker/constant/asset/icon.dart';
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/constant/enum/enum_route.dart';
-import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
+import 'package:expense_tracker/page/modal/modal_transaction.dart';
 import 'package:expense_tracker/route.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';

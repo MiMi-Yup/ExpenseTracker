@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'package:expense_tracker/constant/asset/icon.dart';
-import 'package:expense_tracker/page/budget/budget_page.dart';
-import 'package:expense_tracker/page/home/home_page.dart';
-import 'package:expense_tracker/page/profile/profile_page.dart';
-import 'package:expense_tracker/page/transaction/transaction_page.dart';
+import 'package:expense_tracker/page/tab/budget_page.dart';
+import 'package:expense_tracker/page/tab/home_page.dart';
+import 'package:expense_tracker/page/tab/profile/profile_page.dart';
+import 'package:expense_tracker/page/tab/transaction/transaction_page.dart';
 import 'package:expense_tracker/widget/bottom_nav.dart';
 import 'package:flutter/material.dart';
 

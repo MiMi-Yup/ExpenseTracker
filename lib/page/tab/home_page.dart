@@ -1,17 +1,15 @@
 import 'package:expense_tracker/constant/asset/category.dart';
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/constant/enum/enum_route.dart';
-import 'package:expense_tracker/constant/enum/enum_transaction.dart';
 import 'package:expense_tracker/instance/data.dart';
-import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
-import 'package:expense_tracker/page/home/nav.dart';
+import 'package:expense_tracker/page/modal/modal_transaction.dart';
+import 'package:expense_tracker/page/tab/nav.dart';
 import 'package:expense_tracker/route.dart';
-import 'package:expense_tracker/widget/transaction_chart.dart';
+import 'package:expense_tracker/widget/component/transaction_component.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
-import 'package:expense_tracker/widget/item_transaction.dart';
 import 'package:expense_tracker/widget/overview_transaction.dart';
 import 'package:expense_tracker/widget/section.dart';
+import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -174,30 +172,48 @@ class _HomePageState extends State<HomePage> {
                   titleColor: Colors.white,
                   titleButton: "See all",
                   onPressed: () => widget.toPage!(EPage.transaction),
-                  content: Column(
-                    children: DataSample.convertToList()
-                        .map((e) => ItemTransaction(modal: e).builder(
-                              isEditable: true,
-                              onTap: () async {
-                                await Navigator.pushNamed(
-                                    context,
-                                    RouteApplication.getRoute(
-                                        ERoute.detailTransaction),
-                                    arguments: [e, true]);
-                                setState(() {});
-                              },
-                              editSlidableAction: (context) async {
-                                await Navigator.pushNamed(
-                                    context,
-                                    RouteApplication.getRoute(
-                                        ERoute.addEditTransaction),
-                                    arguments: e);
-                                setState(() {});
-                              },
-                              deleteSlidableAction: (context) => null,
-                            ))
-                        .toList(),
-                  ))
+                  content: AnimatedList(
+                      shrinkWrap: true,
+                      initialItemCount: DataSample.convertToList().length,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index, animation) {
+                        ModalTransaction modal =
+                            DataSample.convertToList()[index];
+                        return SizeTransition(
+                          sizeFactor: animation,
+                          child: TransactionComponent(modal: modal).builder(
+                            isEditable: true,
+                            onTap: () async {
+                              await Navigator.pushNamed(
+                                  context,
+                                  RouteApplication.getRoute(
+                                      ERoute.detailTransaction),
+                                  arguments: [modal, true]);
+                              setState(() {});
+                            },
+                            editSlidableAction: (context) async {
+                              await Navigator.pushNamed(
+                                  context,
+                                  RouteApplication.getRoute(
+                                      ERoute.addEditTransaction),
+                                  arguments: modal);
+                              setState(() {});
+                            },
+                            deleteSlidableAction: (context) {
+                              AnimatedList.of(context).removeItem(
+                                  index,
+                                  (_, animation) => SizeTransition(
+                                        sizeFactor: animation,
+                                        child:
+                                            TransactionComponent(modal: modal)
+                                                .builder(isEditable: false),
+                                      ),
+                                  duration: const Duration(seconds: 1));
+                              DataSample.convertToList().remove(modal);
+                            },
+                          ),
+                        );
+                      }))
             ]),
           ),
         )

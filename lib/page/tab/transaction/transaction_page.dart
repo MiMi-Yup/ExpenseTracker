@@ -1,15 +1,13 @@
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/constant/enum/enum_route.dart';
-import 'package:expense_tracker/constant/enum/enum_transaction.dart';
 import 'package:expense_tracker/instance/data.dart';
-import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
+import 'package:expense_tracker/page/modal/modal_transaction.dart';
 import 'package:expense_tracker/route.dart';
-import 'package:expense_tracker/widget/transaction_chart.dart';
+import 'package:expense_tracker/widget/component/transaction_component.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
-import 'package:expense_tracker/widget/item_transaction.dart';
 import 'package:expense_tracker/widget/overview_transaction.dart';
 import 'package:expense_tracker/widget/section.dart';
+import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:flutter/material.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -181,50 +179,57 @@ class _TransactionPageState extends State<TransactionPage> {
               child: CustomScrollView(
                   physics: BouncingScrollPhysics(),
                   slivers: DataSample.sample.entries
-                      .map((group) => Section(
-                          headerColor: MyColor.mainBackgroundColor,
-                          titleColor: Colors.white,
-                          title: group.key.toString(),
-                          content: AnimatedList(
-                              shrinkWrap: true,
-                              initialItemCount: group.value!.length,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index, animation) =>
-                                  SizeTransition(
-                                    sizeFactor: animation,
-                                    child: ItemTransaction(
-                                            modal: group.value![index])
-                                        .builder(
-                                      isEditable: true,
-                                      onTap: () async {
-                                        await Navigator.pushNamed(
-                                            context,
-                                            RouteApplication.getRoute(
-                                                ERoute.detailTransaction),
-                                            arguments: [
-                                              group.value![index],
-                                              true
-                                            ]);
-                                        setState(() {});
-                                      },
-                                      editSlidableAction: (context) async {
-                                        await Navigator.pushNamed(
-                                            context,
-                                            RouteApplication.getRoute(
-                                                ERoute.addEditTransaction),
-                                            arguments: group.value![index]);
-                                        setState(() {});
-                                      },
-                                      deleteSlidableAction: (context) {
-                                        AnimatedList.of(context).removeItem(
-                                            index,
-                                            (context, animation) =>
-                                                SizeTransition(
-                                                    sizeFactor: animation));
-                                        group.value!.removeAt(index);
-                                      },
-                                    ),
-                                  ))))
+                      .map((group) => group.value!.isNotEmpty
+                          ? Section(
+                              headerColor: MyColor.mainBackgroundColor,
+                              titleColor: Colors.white,
+                              title: group.key.toString(),
+                              content: AnimatedList(
+                                  shrinkWrap: true,
+                                  initialItemCount: group.value!.length,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index, animation) {
+                                    ModalTransaction modal =
+                                        group.value![index];
+                                    return SizeTransition(
+                                      sizeFactor: animation,
+                                      child: TransactionComponent(modal: modal)
+                                          .builder(
+                                        isEditable: true,
+                                        onTap: () async {
+                                          await Navigator.pushNamed(
+                                              context,
+                                              RouteApplication.getRoute(
+                                                  ERoute.detailTransaction),
+                                              arguments: [modal, true]);
+                                          setState(() {});
+                                        },
+                                        editSlidableAction: (context) async {
+                                          await Navigator.pushNamed(
+                                              context,
+                                              RouteApplication.getRoute(
+                                                  ERoute.addEditTransaction),
+                                              arguments: modal);
+                                          setState(() {});
+                                        },
+                                        deleteSlidableAction: (context) {
+                                          AnimatedList.of(context).removeItem(
+                                              index,
+                                              (_, animation) => SizeTransition(
+                                                    sizeFactor: animation,
+                                                    child: TransactionComponent(
+                                                            modal: modal)
+                                                        .builder(
+                                                            isEditable: false),
+                                                  ),
+                                              duration:
+                                                  const Duration(seconds: 1));
+                                          group.value!.removeAt(index);
+                                        },
+                                      ),
+                                    );
+                                  }))
+                          : SliverPadding(padding: EdgeInsets.all(0)))
                       .toList()))
         ],
       ),

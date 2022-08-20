@@ -1,8 +1,8 @@
 import 'package:expense_tracker/constant/asset/category.dart';
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/page/export/export_page.dart';
-import 'package:expense_tracker/page/profile/account_page.dart';
-import 'package:expense_tracker/page/setting/setting_preference.dart';
+import 'package:expense_tracker/page/tab/profile/account_page.dart';
+import 'package:expense_tracker/page/tab/profile/export_page.dart';
+import 'package:expense_tracker/page/tab/profile/setting_preference.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
 

@@ -1,6 +1,6 @@
 import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/constant/enum/enum_transaction.dart';
-import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
+import 'package:expense_tracker/page/modal/modal_transaction.dart';
 
 class DataSample {
   static Map<DateTime, List<ModalTransaction>?> sample =
@@ -85,11 +85,17 @@ class DataSample {
             currency: '\$'))
   };
 
+  static List<ModalTransaction>? _allItem;
+
   static List<ModalTransaction> convertToList() {
-    List<ModalTransaction> list = List<ModalTransaction>.empty(growable: true);
-    sample.forEach((key, value) {
-      list.addAll(value!);
-    });
-    return list;
+    if (_allItem == null) {
+      _allItem ??= List<ModalTransaction>.empty(growable: true);
+      sample.forEach((key, value) {
+        _allItem!.addAll(value!);
+      });
+    }
+    return _allItem!;
   }
+
+  
 }

@@ -1,46 +1,18 @@
-import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/instance/category_component.dart';
+import 'package:expense_tracker/page/modal/modal_budget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-class ModalItemBudget {
-  double budgetMoney;
-  double nowMoney;
-  bool isLimited;
-  ECategory category;
-  String currency;
+class BudgetComponent {
+  ModalBudget modal;
 
-  double get remainMoney {
-    double _sub = budgetMoney - nowMoney;
-    return _sub < 0 ? 0 : _sub;
-  }
-
-  double get percent {
-    if (budgetMoney == 0) return 1;
-    double _percent = nowMoney / budgetMoney;
-    return _percent > 1 ? 1 : _percent;
-  }
-
-  bool get isExceedLimit => isLimited && (nowMoney - budgetMoney) > 0;
-
-  ModalItemBudget(
-      {required this.budgetMoney,
-      required this.nowMoney,
-      this.isLimited = false,
-      required this.category,
-      required this.currency});
-}
-
-class ItemBudget {
-  ModalItemBudget modal;
-
-  ItemBudget({required this.modal});
+  BudgetComponent({required this.modal});
 
   Widget builder({
     required double width,
     void Function()? onTap,
-    void Function()? editSlidableAction,
-    void Function()? deleteSlidableAction,
+    void Function(BuildContext)? editSlidableAction,
+    void Function(BuildContext)? deleteSlidableAction,
     Color backgroundIndicatorColor = Colors.grey,
     Color indicatorColor = Colors.orange,
     Color valueColor = Colors.red,
@@ -59,7 +31,7 @@ class ItemBudget {
                   children: [
                     SlidableAction(
                         // An action can be bigger than the others.
-                        onPressed: (context) => editSlidableAction,
+                        onPressed: editSlidableAction,
                         backgroundColor: Color(0xFF7BC043),
                         foregroundColor: Colors.white,
                         icon: Icons.edit,
@@ -68,7 +40,7 @@ class ItemBudget {
                             topLeft: Radius.circular(10),
                             bottomLeft: Radius.circular(10))),
                     SlidableAction(
-                        onPressed: (context) => deleteSlidableAction,
+                        onPressed: deleteSlidableAction,
                         backgroundColor: Color(0xFF0392CF),
                         foregroundColor: Colors.white,
                         icon: Icons.delete_forever,

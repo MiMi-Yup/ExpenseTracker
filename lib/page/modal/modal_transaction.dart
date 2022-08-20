@@ -33,6 +33,22 @@ class ModalTransaction {
 
   ModalTransaction.minInit({required this.category});
 
+  ModalTransaction.clone(ModalTransaction clone) {
+    category = clone.category;
+    money = clone.money;
+    timeTransaction = clone.timeTransaction;
+    typeTransaction = clone.typeTransaction;
+    isRepeat = clone.isRepeat;
+    account = clone.account;
+    purpose = clone.purpose;
+    currency = clone.currency;
+    description = clone.description;
+    attachment = clone.attachment;
+    frequency = clone.frequency;
+    endAfter = clone.endAfter;
+    category = clone.category;
+  }
+
   String get getTimeTransaction {
     if (timeTransaction != null) {
       int hour = timeTransaction!.hour;

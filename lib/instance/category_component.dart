@@ -1,11 +1,12 @@
+import 'dart:ui';
+
 import 'package:expense_tracker/constant/asset/category.dart';
 import 'package:expense_tracker/constant/enum/enum_category.dart';
-import 'package:expense_tracker/widget/component/category_component.dart';
-import 'package:flutter/material.dart';
+import 'package:expense_tracker/widget/component/hint_category_component.dart';
 
 class CategoryInstance {
-  static const Map<ECategory, CategoryComponent Function()> instances =
-      <ECategory, CategoryComponent Function()>{
+  static const Map<ECategory, HintCategoryComponent Function()> instances =
+      <ECategory, HintCategoryComponent Function()>{
     ECategory.shopping: _ShoppingCategory.instance,
     ECategory.bill: _BillCategory.instance,
     ECategory.food: _FoodCategory.instance,
@@ -14,8 +15,8 @@ class CategoryInstance {
   };
 }
 
-class _ShoppingCategory extends CategoryComponent {
-  static CategoryComponent? _instance;
+class _ShoppingCategory extends HintCategoryComponent {
+  static HintCategoryComponent? _instance;
   static const Color _backgroundColor = Color(0xFFFCEED4);
   static const String _name = "Shopping";
   static const String _assetName = CategoryAsset.shoppingBag;
@@ -28,8 +29,8 @@ class _ShoppingCategory extends CategoryComponent {
             assetName: _assetName,
             assetColor: _assetColor);
 
-  static CategoryComponent instance() {
-    _instance ??= CategoryComponent(
+  static HintCategoryComponent instance() {
+    _instance ??= HintCategoryComponent(
         backgroundColor: _backgroundColor,
         name: _name,
         assetName: _assetName,
@@ -38,8 +39,8 @@ class _ShoppingCategory extends CategoryComponent {
   }
 }
 
-class _BillCategory extends CategoryComponent {
-  static CategoryComponent? _instance;
+class _BillCategory extends HintCategoryComponent {
+  static HintCategoryComponent? _instance;
   static const Color _backgroundColor = Color(0xFFEEE5FF);
   static const String _name = "Bill";
   static const String _assetName = CategoryAsset.bill;
@@ -52,8 +53,8 @@ class _BillCategory extends CategoryComponent {
             assetName: _assetName,
             assetColor: _assetColor);
 
-  static CategoryComponent instance() {
-    _instance ??= CategoryComponent(
+  static HintCategoryComponent instance() {
+    _instance ??= HintCategoryComponent(
         backgroundColor: _backgroundColor,
         name: _name,
         assetName: _assetName,
@@ -62,8 +63,8 @@ class _BillCategory extends CategoryComponent {
   }
 }
 
-class _FoodCategory extends CategoryComponent {
-  static CategoryComponent? _instance;
+class _FoodCategory extends HintCategoryComponent {
+  static HintCategoryComponent? _instance;
   static const Color _backgroundColor = Color(0xFFFDD5D7);
   static const String _name = "Food";
   static const String _assetName = CategoryAsset.food;
@@ -76,8 +77,8 @@ class _FoodCategory extends CategoryComponent {
             assetName: _assetName,
             assetColor: _assetColor);
 
-  static CategoryComponent instance() {
-    _instance ??= CategoryComponent(
+  static HintCategoryComponent instance() {
+    _instance ??= HintCategoryComponent(
         backgroundColor: _backgroundColor,
         name: _name,
         assetName: _assetName,
@@ -86,8 +87,8 @@ class _FoodCategory extends CategoryComponent {
   }
 }
 
-class _TransportationCategory extends CategoryComponent {
-  static CategoryComponent? _instance;
+class _TransportationCategory extends HintCategoryComponent {
+  static HintCategoryComponent? _instance;
   static const Color _backgroundColor = Color(0xFFBDDCFF);
   static const String _name = "Transportation";
   static const String _assetName = CategoryAsset.transportation;
@@ -100,8 +101,8 @@ class _TransportationCategory extends CategoryComponent {
             assetName: _assetName,
             assetColor: _assetColor);
 
-  static CategoryComponent instance() {
-    _instance ??= CategoryComponent(
+  static HintCategoryComponent instance() {
+    _instance ??= HintCategoryComponent(
         backgroundColor: _backgroundColor,
         name: _name,
         assetName: _assetName,
@@ -110,8 +111,8 @@ class _TransportationCategory extends CategoryComponent {
   }
 }
 
-class _MoneyCategory extends CategoryComponent {
-  static CategoryComponent? _instance;
+class _MoneyCategory extends HintCategoryComponent {
+  static HintCategoryComponent? _instance;
   static const Color _backgroundColor = Color(0xFFCFFAEA);
   static const String _name = "Money";
   static const String _assetName = CategoryAsset.moneyBag;
@@ -124,8 +125,8 @@ class _MoneyCategory extends CategoryComponent {
             assetName: _assetName,
             assetColor: _assetColor);
 
-  static CategoryComponent instance() {
-    _instance ??= CategoryComponent(
+  static HintCategoryComponent instance() {
+    _instance ??= HintCategoryComponent(
         backgroundColor: _backgroundColor,
         name: _name,
         assetName: _assetName,

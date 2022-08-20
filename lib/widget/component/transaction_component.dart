@@ -1,14 +1,13 @@
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/instance/category_component.dart';
-import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
+import 'package:expense_tracker/page/modal/modal_transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-class ItemTransaction {
+class TransactionComponent {
   ModalTransaction modal;
 
-  ItemTransaction({required this.modal});
+  TransactionComponent({required this.modal});
 
   GestureDetector builder(
       {required bool isEditable,

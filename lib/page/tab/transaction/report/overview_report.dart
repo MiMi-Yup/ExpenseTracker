@@ -1,9 +1,9 @@
 import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/constant/enum/enum_route.dart';
+import 'package:expense_tracker/page/modal/modal_budget.dart';
 import 'package:expense_tracker/route.dart';
-import 'package:expense_tracker/widget/item_budget.dart';
-import 'package:expense_tracker/widget/item_category.dart';
+import 'package:expense_tracker/widget/component/category_component.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
 
@@ -57,8 +57,8 @@ class _OverviewReportState extends State<OverviewReport> {
                     children: [
                       Text("and your biggest",
                           style: TextStyle(color: Colors.black)),
-                      ItemCategory(
-                              modal: ModalItemBudget(
+                      CategoryComponent(
+                              modal: ModalBudget(
                                   budgetMoney: 0.0,
                                   nowMoney: 0.0,
                                   isLimited: false,
@@ -105,8 +105,8 @@ class _OverviewReportState extends State<OverviewReport> {
                     children: [
                       Text("and your biggest",
                           style: TextStyle(color: Colors.black)),
-                      ItemCategory(
-                              modal: ModalItemBudget(
+                      CategoryComponent(
+                              modal: ModalBudget(
                                   budgetMoney: 0.0,
                                   nowMoney: 0.0,
                                   isLimited: false,

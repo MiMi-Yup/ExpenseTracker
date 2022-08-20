@@ -2,13 +2,13 @@ import 'package:expense_tracker/constant/color.dart';
 import 'package:expense_tracker/constant/enum/enum_category.dart';
 import 'package:expense_tracker/constant/enum/enum_route.dart';
 import 'package:expense_tracker/constant/enum/enum_transaction.dart';
-import 'package:expense_tracker/page/add_edit_transaction/modal_transaction.dart';
+import 'package:expense_tracker/page/modal/modal_budget.dart';
+import 'package:expense_tracker/page/modal/modal_transaction.dart';
 import 'package:expense_tracker/route.dart';
-import 'package:expense_tracker/widget/item_budget.dart';
-import 'package:expense_tracker/widget/item_category.dart';
-import 'package:expense_tracker/widget/transaction_chart.dart';
+import 'package:expense_tracker/widget/component/category_component.dart';
+import 'package:expense_tracker/widget/component/transaction_component.dart';
 import 'package:expense_tracker/widget/dropdown.dart';
-import 'package:expense_tracker/widget/item_transaction.dart';
+import 'package:expense_tracker/widget/transaction_chart.dart';
 import 'package:flutter/material.dart';
 
 class DetailReport extends StatefulWidget {
@@ -169,15 +169,15 @@ class _DetailReportState extends State<DetailReport> {
                 children: List.generate(
                     200,
                     (index) => indexTypeCategory == "Category"
-                        ? ItemCategory(
-                                modal: ModalItemBudget(
+                        ? CategoryComponent(
+                                modal: ModalBudget(
                                     budgetMoney: 0.0,
                                     nowMoney: 0.0,
                                     isLimited: false,
                                     category: ECategory.shopping,
                                     currency: '\$'))
                             .percentCategoryBuilder(width: size.width)
-                        : ItemTransaction(
+                        : TransactionComponent(
                                 modal: ModalTransaction(
                                     category: ECategory.bill,
                                     money: index * 1.683,
