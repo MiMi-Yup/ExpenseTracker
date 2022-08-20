@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:expense_tracker/constant/color.dart';
-import 'package:expense_tracker/widget/countdown.dart';
 import 'package:expense_tracker/widget/input_otp.dart';
 import 'package:expense_tracker/widget/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +15,27 @@ class OTPVerify extends StatefulWidget {
 
 class _OTPVerifyState extends State<OTPVerify> {
   String email = "dsfsd@gmail.com";
+  Duration _timeCountDown = Duration(seconds: 5);
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      setState(() =>
+          _timeCountDown = Duration(seconds: _timeCountDown.inSeconds - 1));
+      if (_timeCountDown.inSeconds == 0) {
+        timer.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,9 +52,10 @@ class _OTPVerifyState extends State<OTPVerify> {
             "Enter your Code",
             style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
           ),
-          countdown(
-              time: Duration(minutes: 0, seconds: 5),
-              finished: () => log("finished")),
+          Text(
+            "${_timeCountDown.inMinutes}:${_timeCountDown.inSeconds - _timeCountDown.inMinutes * 60}",
+            style: TextStyle(fontSize: 20, color: Colors.amber),
+          ),
           CodeInput(
               length: 5,
               builder: CodeInputBuilders.lightCircle(),
