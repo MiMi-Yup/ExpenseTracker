@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:expense_tracker/constants/asset/icon.dart';
+import 'package:expense_tracker/constants/enum/enum_transaction.dart';
 import 'package:expense_tracker/screens/tab/budget_page.dart';
 import 'package:expense_tracker/screens/tab/home_page.dart';
 import 'package:expense_tracker/screens/tab/profile/profile_page.dart';
@@ -8,6 +9,12 @@ import 'package:expense_tracker/widgets/bottom_nav.dart';
 import 'package:flutter/material.dart';
 
 enum EPage { home, transaction, budget, profile }
+
+class _FloatingActionData {
+  String asset;
+  ETypeTransaction type;
+  _FloatingActionData({required this.asset, required this.type});
+}
 
 class Navigation extends StatefulWidget {
   const Navigation({Key? key}) : super(key: key);
@@ -31,11 +38,15 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
     EPage.profile: 3
   };
 
+  final List<_FloatingActionData> _floatingActions = [
+    _FloatingActionData(asset: IconAsset.income, type: ETypeTransaction.income),
+    _FloatingActionData(
+        asset: IconAsset.expense, type: ETypeTransaction.expense)
+  ];
+
   int _currentIndex = 0;
   late PageController _controller;
   late AnimationController _controllerAnimation;
-
-  final List<String> _floatingActions = [IconAsset.income, IconAsset.expense];
 
   @override
   void initState() {
@@ -67,32 +78,31 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
-        children: List.generate(_floatingActions.length, (int index) {
-          Widget child = Container(
-            height: 70.0,
-            width: 56.0,
-            alignment: FractionalOffset.topCenter,
-            child: ScaleTransition(
-              scale: CurvedAnimation(
-                parent: _controllerAnimation,
-                curve: Interval(
-                    0.0, 1.0 - index / _floatingActions.length / 2.0,
-                    curve: Curves.easeOut),
-              ),
-              child: FloatingActionButton(
-                heroTag: null,
-                //backgroundColor: backgroundColor,
-                mini: true,
-                child: Image.asset(
-                  _floatingActions[index],
-                  fit: BoxFit.contain,
-                ),
-                onPressed: () {},
-              ),
-            ),
-          );
-          return child;
-        }).toList()
+        children: List<Widget>.generate(
+            _floatingActions.length,
+            (index) => Container(
+                  height: 70.0,
+                  width: 56.0,
+                  alignment: FractionalOffset.topCenter,
+                  child: ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _controllerAnimation,
+                      curve: Interval(
+                          0.0, 1.0 - index / _floatingActions.length / 2.0,
+                          curve: Curves.easeOut),
+                    ),
+                    child: FloatingActionButton(
+                      heroTag: null,
+                      backgroundColor: Colors.black,
+                      mini: true,
+                      child: Image.asset(
+                        _floatingActions[index].asset,
+                        fit: BoxFit.contain,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ),
+                )).toList()
           ..add(
             FloatingActionButton(
               heroTag: null,

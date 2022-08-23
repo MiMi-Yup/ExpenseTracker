@@ -6,7 +6,8 @@ import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_category.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/screens/modal/modal_transaction.dart';
+import 'package:expense_tracker/constants/enum/enum_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/editText.dart';
@@ -27,10 +28,11 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
   final itemWallets = ["MoMo", "Vietinbank", "Vietcombank"];
 
   late double height = MediaQuery.of(context).size.height;
-  late ModalTransaction modal = (ModalRoute.of(context)?.settings.arguments
-          as ModalTransaction?) ??
-      ModalTransaction.minInit(
-          category: ModalRoute.of(context)?.settings.arguments as ECategory?);
+  late final Object? _argument = ModalRoute.of(context)?.settings.arguments;
+  late ModalTransaction modal = _argument is ModalTransaction
+      ? ModalTransaction.clone(_argument as ModalTransaction)
+      : ModalTransaction.minInit(
+          typeTransaction: _argument as ETypeTransaction);
 
   String? selectedCategory;
   String? selectedWallet;
@@ -161,7 +163,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
             onPressed: () => Navigator.pop(context),
             icon: Icon(Icons.arrow_back_ios)),
         title: Text(
-            "${modal.category?.name[0].toUpperCase()}${modal.category?.name.substring(1).toLowerCase()}"),
+            "${modal.typeTransaction?.name[0].toUpperCase()}${modal.typeTransaction?.name.substring(1).toLowerCase()}"),
         centerTitle: true,
         elevation: 0,
         backgroundColor: MyColor.mainBackgroundColor,
@@ -356,8 +358,11 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                   () => Navigator.popUntil(
                                       context,
                                       ModalRoute.withName(
-                                          RouteApplication.getRoute(
-                                              ERoute.detailTransaction))));
+                                          _argument is ModalTransaction
+                                              ? RouteApplication.getRoute(
+                                                  ERoute.detailTransaction)
+                                              : RouteApplication.getRoute(
+                                                  ERoute.main))));
                             },
                             background: MyColor.purple()))
                   ],

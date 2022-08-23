@@ -31,7 +31,7 @@ class ModalTransaction {
     this.endAfter,
   });
 
-  ModalTransaction.minInit({required this.category});
+  ModalTransaction.minInit({required this.typeTransaction});
 
   ModalTransaction.clone(ModalTransaction clone) {
     category = clone.category;
@@ -46,7 +46,38 @@ class ModalTransaction {
     attachment = clone.attachment;
     frequency = clone.frequency;
     endAfter = clone.endAfter;
-    category = clone.category;
+  }
+
+  ModalTransaction copyWith(ModalTransaction source) {
+    category = source.category ?? category;
+    money = source.money ?? money;
+    timeTransaction = source.timeTransaction ?? timeTransaction;
+    typeTransaction = source.typeTransaction ?? typeTransaction;
+    isRepeat = source.isRepeat ?? isRepeat;
+    account = source.account ?? account;
+    purpose = source.purpose ?? purpose;
+    currency = source.currency ?? currency;
+    description = source.description ?? description;
+    attachment = source.attachment ?? attachment;
+    frequency = source.frequency ?? frequency;
+    endAfter = source.endAfter ?? endAfter;
+    return this;
+  }
+
+  ModalTransaction override(ModalTransaction source) {
+    category = source.category;
+    money = source.money;
+    timeTransaction = source.timeTransaction;
+    typeTransaction = source.typeTransaction;
+    isRepeat = source.isRepeat;
+    account = source.account;
+    purpose = source.purpose;
+    currency = source.currency;
+    description = source.description;
+    attachment = source.attachment;
+    frequency = source.frequency;
+    endAfter = source.endAfter;
+    return this;
   }
 
   String get getTimeTransaction {

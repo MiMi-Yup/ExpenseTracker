@@ -1,10 +1,12 @@
 import 'package:expense_tracker/constants/asset/category.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
+import 'package:expense_tracker/constants/enum/enum_transaction.dart';
 import 'package:expense_tracker/instances/data.dart';
-import 'package:expense_tracker/screens/modal/modal_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/widgets/component/overview_transaction_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/overview_transaction.dart';
@@ -31,9 +33,11 @@ class _HomePageState extends State<HomePage> {
   ];
   int _currentIndex = 0;
   late double height = MediaQuery.of(context).size.height;
-  final List<OverviewTransaction> overview_transaction = [
-    OverviewTransaction("income", currency: "\$", value: 5000),
-    OverviewTransaction("expense", currency: "\$", value: 3000)
+  final List<OverviewTransactionComponent> overview_transaction = [
+    OverviewTransactionComponent(
+        typeTransaction: ETypeTransaction.income, currency: "\$", money: 5000),
+    OverviewTransactionComponent(
+        typeTransaction: ETypeTransaction.expense, currency: "\$", money: 3000)
   ];
 
   @override
@@ -105,10 +109,8 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: overview_transaction
-                      .map<GestureDetector>(
-                          (e) => overviewTransaction(typeTransaction: e))
-                      .toList(),
+                  children:
+                      overview_transaction.map((e) => e.builder()).toList(),
                 ),
               )
             ],

@@ -10,7 +10,7 @@ class MyColor {
 
   static const Map<ETypeTransaction, Color?> colorTransaction =
       <ETypeTransaction, Color?>{
-    ETypeTransaction.income: Colors.red,
-    ETypeTransaction.expense: Colors.green
+    ETypeTransaction.income: Colors.green,
+    ETypeTransaction.expense: Colors.red
   };
 }

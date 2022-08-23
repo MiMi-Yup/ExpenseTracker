@@ -1,6 +1,6 @@
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/instances/category_component.dart';
-import 'package:expense_tracker/screens/modal/modal_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 

@@ -1,6 +1,6 @@
 import 'package:expense_tracker/constants/enum/enum_category.dart';
 import 'package:expense_tracker/constants/enum/enum_transaction.dart';
-import 'package:expense_tracker/screens/modal/modal_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction.dart';
 
 class DataSample {
   static Map<DateTime, List<ModalTransaction>?> sample =
