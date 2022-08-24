@@ -240,11 +240,14 @@ class _DetailTransactionState extends State<DetailTransaction> {
                       width: double.maxFinite,
                       child: largestButton(
                           text: "Edit",
-                          onPressed: () => Navigator.pushNamed(
-                              context,
-                              RouteApplication.getRoute(
-                                  ERoute.addEditTransaction),
-                              arguments: modal))),
+                          onPressed: () async {
+                            await Navigator.pushNamed(
+                                context,
+                                RouteApplication.getRoute(
+                                    ERoute.addEditTransaction),
+                                arguments: modal);
+                            setState(() {});
+                          })),
                 ),
               )
           ],

@@ -15,6 +15,7 @@ class ModalTransaction {
   EFrequency? frequency;
   DateTime? endAfter;
   String? currency;
+  DateTime? lastModified;
 
   ModalTransaction({
     required this.category,
@@ -69,6 +70,20 @@ class ModalTransaction {
     money = source.money;
     timeTransaction = source.timeTransaction;
     typeTransaction = source.typeTransaction;
+    isRepeat = source.isRepeat;
+    account = source.account;
+    purpose = source.purpose;
+    currency = source.currency;
+    description = source.description;
+    attachment = source.attachment;
+    frequency = source.frequency;
+    endAfter = source.endAfter;
+    return this;
+  }
+
+  ModalTransaction update(ModalTransaction source) {
+    category = source.category;
+    money = source.money;
     isRepeat = source.isRepeat;
     account = source.account;
     purpose = source.purpose;

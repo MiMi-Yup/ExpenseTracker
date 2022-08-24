@@ -12,7 +12,8 @@ class BudgetPage extends StatefulWidget {
   State<BudgetPage> createState() => _BudgetPageState();
 }
 
-class _BudgetPageState extends State<BudgetPage> {
+class _BudgetPageState extends State<BudgetPage>
+    with AutomaticKeepAliveClientMixin {
   bool hasData = true;
   int lengthListView = 20;
 
@@ -98,4 +99,7 @@ class _BudgetPageState extends State<BudgetPage> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

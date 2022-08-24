@@ -5,7 +5,7 @@ enum ERoute {
   signUp,
   verify,
   authGoogle,
-  emailRecovery,
+  forgotPassword,
   pin,
   introductionSetupAccount,
   main,

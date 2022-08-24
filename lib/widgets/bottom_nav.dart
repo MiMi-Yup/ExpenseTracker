@@ -1,24 +1,55 @@
 import 'package:flutter/material.dart';
 
-class ItemNavModel {
-  String label;
-  Icon icon;
-  ItemNavModel({required this.icon, required this.label});
+class ItemNavModal {
+  int index;
+  String? label;
+  IconData? icon;
+  void Function(int)? toPage;
+  ItemNavModal({required this.index, this.label, this.icon, this.toPage});
 }
 
-BottomNavigationBar bottomNavBar(
-    {required Map<int, ItemNavModel?> itemsNav,
-    required int currentIndex,
-    required void Function(int index) onTap}) {
-  return BottomNavigationBar(
-    type: BottomNavigationBarType.shifting,
-    onTap: onTap,
-    currentIndex: currentIndex,
-    selectedItemColor: Colors.white,
-    unselectedItemColor: Colors.grey,
-    items: List<BottomNavigationBarItem>.generate(
-        itemsNav.length,
-        (index) => BottomNavigationBarItem(
-            icon: itemsNav[index]!.icon, label: itemsNav[index]!.label)),
-  );
+class BottomAppBarComponent {
+  Map<int, ItemNavModal?> navActions;
+  int currentIndex;
+  BottomAppBarComponent({required this.navActions, required this.currentIndex});
+
+  Widget builder() {
+    return StatefulBuilder(builder: (context, setState) {
+      return BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        notchMargin: 28,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: navActions.entries
+              .map((e) => TextButton(
+                    onPressed: () {
+                      setState(() => currentIndex = e.value!.index);
+                      if (e.value?.toPage != null) {
+                        e.value!.toPage!(e.value!.index);
+                      }
+                    },
+                    child: SizedBox(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            e.value?.icon,
+                            color: currentIndex == e.value!.index
+                                ? Colors.white
+                                : Colors.grey,
+                          ),
+                          Visibility(
+                            child: Text(e.value?.label ?? "", style: TextStyle(color: Colors.white),),
+                            visible: currentIndex == e.value!.index,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ))
+              .toList(),
+        ),
+      );
+    });
+  }
 }

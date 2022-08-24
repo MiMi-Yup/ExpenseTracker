@@ -22,7 +22,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   late PageController _controller;
 
   final List<Widget> _charts = [
@@ -174,52 +175,101 @@ class _HomePageState extends State<HomePage> {
                   titleColor: Colors.white,
                   titleButton: "See all",
                   onPressed: () => widget.toPage!(EPage.transaction),
-                  content: AnimatedList(
-                      shrinkWrap: true,
-                      initialItemCount: DataSample.convertToList().length,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index, animation) {
-                        ModalTransaction modal =
-                            DataSample.convertToList()[index];
-                        return SizeTransition(
-                          sizeFactor: animation,
-                          child: TransactionComponent(modal: modal).builder(
-                            isEditable: true,
-                            onTap: () async {
-                              await Navigator.pushNamed(
-                                  context,
-                                  RouteApplication.getRoute(
-                                      ERoute.detailTransaction),
-                                  arguments: [modal, true]);
-                              setState(() {});
-                            },
-                            editSlidableAction: (context) async {
-                              await Navigator.pushNamed(
-                                  context,
-                                  RouteApplication.getRoute(
-                                      ERoute.addEditTransaction),
-                                  arguments: modal);
-                              setState(() {});
-                            },
-                            deleteSlidableAction: (context) {
-                              AnimatedList.of(context).removeItem(
-                                  index,
-                                  (_, animation) => SizeTransition(
-                                        sizeFactor: animation,
-                                        child:
-                                            TransactionComponent(modal: modal)
-                                                .builder(isEditable: false),
-                                      ),
-                                  duration: const Duration(seconds: 1));
-                              DataSample.convertToList().remove(modal);
-                            },
-                          ),
-                        );
-                      }))
+                  content: StreamBuilder<List<ModalTransaction>>(
+                    initialData: DataSample.instanceSample(),
+                    stream: DataSample.instance().stateStream,
+                    builder: (context, snapshot) {
+                      List<ModalTransaction>? modals = snapshot.data;
+                      return modals == null
+                          ? const Center(child: Text("Wait for loading"))
+                          : MediaQuery.removePadding(
+                              context: context,
+                              removeTop: true,
+                              child: ListView(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                children: modals
+                                    .map((modal) =>
+                                        TransactionComponent(modal: modal)
+                                            .builder(
+                                          isEditable: true,
+                                          onTap: () async {
+                                            await Navigator.pushNamed(
+                                                context,
+                                                RouteApplication.getRoute(
+                                                    ERoute.detailTransaction),
+                                                arguments: [modal, true]);
+                                            setState(() {});
+                                          },
+                                          editSlidableAction: (context) async {
+                                            await Navigator.pushNamed(
+                                                context,
+                                                RouteApplication.getRoute(
+                                                    ERoute.addEditTransaction),
+                                                arguments: modal);
+                                            setState(() {});
+                                          },
+                                          deleteSlidableAction: (context) {
+                                            DataSample.instance()
+                                                .removeTransaction(modal);
+                                            setState(() {});
+                                          },
+                                        ))
+                                    .toList(),
+                              ));
+                      // AnimatedList(
+                      //     shrinkWrap: true,
+                      //     initialItemCount: modals.length,
+                      //     physics: NeverScrollableScrollPhysics(),
+                      //     itemBuilder: (context, index, animation) {
+                      //       ModalTransaction modal = modals[index];
+                      //       return SizeTransition(
+                      //         sizeFactor: animation,
+                      //         child: TransactionComponent(modal: modal)
+                      //             .builder(
+                      //           isEditable: true,
+                      //           onTap: () async {
+                      //             await Navigator.pushNamed(
+                      //                 context,
+                      //                 RouteApplication.getRoute(
+                      //                     ERoute.detailTransaction),
+                      //                 arguments: [modal, true]);
+                      //             setState(() {});
+                      //           },
+                      //           editSlidableAction: (context) async {
+                      //             await Navigator.pushNamed(
+                      //                 context,
+                      //                 RouteApplication.getRoute(
+                      //                     ERoute.addEditTransaction),
+                      //                 arguments: modal);
+                      //             setState(() {});
+                      //           },
+                      //           deleteSlidableAction: (context) {
+                      //             AnimatedList.of(context).removeItem(
+                      //                 index,
+                      //                 (_, animation) => SizeTransition(
+                      //                       sizeFactor: animation,
+                      //                       child: TransactionComponent(
+                      //                               modal: modal)
+                      //                           .builder(isEditable: false),
+                      //                     ),
+                      //                 duration: const Duration(seconds: 1));
+                      //             DataSample.instance()
+                      //                 .removeTransaction(modal);
+                      //             setState(() {});
+                      //           },
+                      //         ),
+                      //       );
+                      //     });
+                    },
+                  ))
             ]),
           ),
         )
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

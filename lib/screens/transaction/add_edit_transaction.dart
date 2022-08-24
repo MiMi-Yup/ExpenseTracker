@@ -7,6 +7,7 @@ import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_category.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/constants/enum/enum_transaction.dart';
+import 'package:expense_tracker/instances/data.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
@@ -39,7 +40,6 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
   String? description;
   String? purpose;
   bool isRepeated = false;
-  Timer? _timer;
 
   //demo attachment
   List<String>? itemAttachments;
@@ -69,7 +69,6 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
 
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
@@ -353,7 +352,15 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                 context: context,
                               );
 
-                              _timer = Timer(
+                              if (_argument is ETypeTransaction) {
+                                modal.timeTransaction = DateTime.now();
+                                DataSample.instance().addTransaction(modal);
+                              } else {
+                                DataSample.instance().updateTransaction(
+                                    _argument as ModalTransaction, modal);
+                              }
+
+                              Future.delayed(
                                   const Duration(seconds: 1),
                                   () => Navigator.popUntil(
                                       context,

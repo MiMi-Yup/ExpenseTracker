@@ -18,9 +18,14 @@ class SignUp extends StatelessWidget {
       appBar: AppBar(
         title: Text("Sign Up"),
         leading: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.popUntil(
+                context,
+                ModalRoute.withName(
+                    RouteApplication.getRoute(ERoute.introduction))),
             icon: Icon(Icons.arrow_back_ios_new)),
         elevation: 0.0,
+        centerTitle: true,
+        backgroundColor: MyColor.mainBackgroundColor,
       ),
       body: SingleChildScrollView(
         child: Column(

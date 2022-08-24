@@ -42,11 +42,8 @@ class _AddNewAccountState extends State<AddNewAccount> {
     "Wallet"
   ];
 
-  Timer? _timer;
-
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
@@ -170,7 +167,7 @@ class _AddNewAccountState extends State<AddNewAccount> {
                               context: context,
                             );
 
-                            _timer = Timer(const Duration(seconds: 1), () {
+                            Future.delayed(const Duration(seconds: 1), () {
                               Navigator.popUntil(
                                   context, (route) => route.isFirst);
                               Navigator.pushNamed(context,

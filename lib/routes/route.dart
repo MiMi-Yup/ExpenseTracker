@@ -4,6 +4,8 @@ import 'package:expense_tracker/screens/budget/add_edit_budget.dart';
 import 'package:expense_tracker/screens/first_setup/code_auth.dart';
 import 'package:expense_tracker/screens/first_setup/introduction_setup.dart';
 import 'package:expense_tracker/screens/introduction.dart';
+import 'package:expense_tracker/screens/login/forgot_password.dart';
+import 'package:expense_tracker/screens/login/login.dart';
 import 'package:expense_tracker/screens/notification.dart';
 import 'package:expense_tracker/screens/signup/signup.dart';
 import 'package:expense_tracker/screens/signup/verify.dart';
@@ -23,11 +25,11 @@ class RouteApplication {
       <String, Widget Function(BuildContext)>{
     getRoute(ERoute.welcome): (context) => WelcomePage(),
     getRoute(ERoute.introduction): (context) => Introduction(),
-    getRoute(ERoute.login): (context) => Container(),
+    getRoute(ERoute.login): (context) => Login(),
     getRoute(ERoute.signUp): (context) => SignUp(),
     getRoute(ERoute.verify): (context) => OTPVerify(),
     getRoute(ERoute.authGoogle): (context) => Container(),
-    getRoute(ERoute.emailRecovery): (context) => Container(),
+    getRoute(ERoute.forgotPassword): (context) => ForgotPassword(),
     getRoute(ERoute.pin): (context) => CodeAuth(),
     getRoute(ERoute.introductionSetupAccount): (context) => IntroductionSetup(),
     getRoute(ERoute.main): (context) => Navigation(),

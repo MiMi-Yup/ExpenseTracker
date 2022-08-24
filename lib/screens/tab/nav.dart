@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:expense_tracker/constants/asset/icon.dart';
+import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/constants/enum/enum_transaction.dart';
+import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/screens/tab/budget_page.dart';
 import 'package:expense_tracker/screens/tab/home_page.dart';
 import 'package:expense_tracker/screens/tab/profile/profile_page.dart';
@@ -24,13 +26,6 @@ class Navigation extends StatefulWidget {
 }
 
 class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
-  final Map<int, ItemNavModel?> _itemsNav = <int, ItemNavModel?>{
-    0: ItemNavModel(icon: Icon(Icons.home), label: "Home"),
-    1: ItemNavModel(icon: Icon(Icons.sync_alt), label: "Transaction"),
-    2: ItemNavModel(icon: Icon(Icons.pie_chart), label: "Budget"),
-    3: ItemNavModel(icon: Icon(Icons.person), label: "Profile"),
-  };
-
   final Map<EPage, int?> _mapPage = <EPage, int?>{
     EPage.home: 0,
     EPage.transaction: 1,
@@ -46,13 +41,13 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
 
   int _currentIndex = 0;
   late PageController _controller;
-  late AnimationController _controllerAnimation;
+  late AnimationController _fabController;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController(initialPage: _currentIndex);
-    _controllerAnimation = AnimationController(
+    _fabController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
@@ -61,21 +56,34 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
   @override
   void dispose() {
     _controller.dispose();
-    _controllerAnimation.dispose();
+    _fabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final void Function(EPage) toPage = (page) => setState(() {
-          _currentIndex = _mapPage[page]!;
-          _controller.animateToPage(_currentIndex,
-              curve: Curves.linear,
-              duration: const Duration(milliseconds: 250));
-        });
+    final void Function(int) toPage = (page) {
+      if (_mapPage.containsValue(page)) {
+        _controller.animateToPage(page,
+            curve: Curves.linear, duration: const Duration(milliseconds: 250));
+      }
+    };
+
+    final Map<int, ItemNavModal?> _navActions = <int, ItemNavModal?>{
+      0: ItemNavModal(
+          icon: Icons.home, label: "Home", index: 0, toPage: toPage),
+      1: ItemNavModal(
+          icon: Icons.sync_alt, label: "Transaction", index: 1, toPage: toPage),
+      2: ItemNavModal(icon: Icons.add, label: "Action", index: -1),
+      3: ItemNavModal(
+          icon: Icons.pie_chart, label: "Budget", index: 2, toPage: toPage),
+      4: ItemNavModal(
+          icon: Icons.person, label: "Profile", index: 3, toPage: toPage),
+    };
 
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      extendBody: true,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: List<Widget>.generate(
@@ -86,7 +94,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                   alignment: FractionalOffset.topCenter,
                   child: ScaleTransition(
                     scale: CurvedAnimation(
-                      parent: _controllerAnimation,
+                      parent: _fabController,
                       curve: Interval(
                           0.0, 1.0 - index / _floatingActions.length / 2.0,
                           curve: Curves.easeOut),
@@ -99,53 +107,52 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                         _floatingActions[index].asset,
                         fit: BoxFit.contain,
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        await Navigator.pushNamed(
+                            context,
+                            RouteApplication.getRoute(
+                                ERoute.addEditTransaction),
+                            arguments: _floatingActions[index].type);
+                        //if (reload != null && reload) setState(() {});
+                      },
                     ),
                   ),
                 )).toList()
           ..add(
             FloatingActionButton(
               heroTag: null,
+              elevation: 8.0,
               child: AnimatedBuilder(
-                  animation: _controllerAnimation,
+                  animation: _fabController,
                   builder: (context, child) => Transform(
                         transform: Matrix4.rotationZ(
-                            _controllerAnimation.value * 0.5 * math.pi),
+                            _fabController.value * 0.5 * math.pi),
                         alignment: FractionalOffset.center,
-                        child: Icon(_controllerAnimation.isDismissed
+                        child: Icon(_fabController.isDismissed
                             ? Icons.add
                             : Icons.close),
                       )),
               onPressed: () {
-                if (_controllerAnimation.isDismissed) {
-                  _controllerAnimation.forward();
+                if (_fabController.isDismissed) {
+                  _fabController.forward();
                 } else {
-                  _controllerAnimation.reverse();
+                  _fabController.reverse();
                 }
               },
             ),
           ),
       ),
-      bottomNavigationBar: bottomNavBar(
-        itemsNav: _itemsNav,
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-            _controller.animateToPage(_currentIndex,
-                curve: Curves.linear,
-                duration: const Duration(milliseconds: 250));
-          });
-        },
-      ),
+      bottomNavigationBar: BottomAppBarComponent(
+              navActions: _navActions, currentIndex: _currentIndex)
+          .builder(),
       body: PageView.builder(
           controller: _controller,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: _itemsNav.length,
+          itemCount: _navActions.length - 1,
           itemBuilder: (context, index) {
             switch (index) {
               case 0:
-                return HomePage(toPage: toPage);
+                return HomePage(toPage: (ePage) => toPage(_mapPage[ePage]!));
               case 1:
                 return TransactionPage();
               case 2:

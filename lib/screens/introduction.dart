@@ -142,8 +142,7 @@ class _IntroductionState extends State<Introduction> {
             child: largestButton(
                 text: "Login",
                 onPressed: () => Navigator.pushNamed(
-                    context, RouteApplication.getRoute(ERoute.pin),
-                    arguments: true),
+                    context, RouteApplication.getRoute(ERoute.login)),
                 textColor: MyColor.purple(alpha: 255),
                 background: Colors.grey),
           )
