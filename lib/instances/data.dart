@@ -83,19 +83,19 @@ class DataSample {
 
   Stream<List<ModalTransaction>> get stateStream => _stateController.stream;
 
-  void addTransaction(ModalTransaction modal) {
+  void addTransaction(ModalTransaction modal) async {
     _listenController.sink.add({CRUD.create: modal});
   }
 
-  void removeTransaction(ModalTransaction modal) {
+  void removeTransaction(ModalTransaction modal) async {
     _listenController.sink.add({CRUD.delete: modal});
   }
 
-  void updateTransaction(ModalTransaction was, ModalTransaction update) {
+  void updateTransaction(ModalTransaction was, ModalTransaction update) async {
     _listenController.sink.add({CRUD.update: was.update(update)});
   }
 
-  void callRenderTransaction() {
+  void callRenderTransaction() async {
     _stateController.sink.add(instanceSample());
   }
 

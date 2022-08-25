@@ -178,18 +178,17 @@ class _DetailReportState extends State<DetailReport> {
                                     currency: '\$'))
                             .percentCategoryBuilder(width: size.width)
                         : TransactionComponent(
-                                modal: ModalTransaction(
-                                    category: ECategory.bill,
-                                    money: index * 1.683,
-                                    timeTransaction: DateTime.now(),
-                                    typeTransaction: index % 2 == 0
-                                        ? ETypeTransaction.income
-                                        : ETypeTransaction.expense,
-                                    account: "Paypal",
-                                    isRepeat: false,
-                                    purpose: 'Buy electronic',
-                                    currency: '\$'))
-                            .builder(
+                            modal: ModalTransaction(
+                                category: ECategory.bill,
+                                money: index * 1.683,
+                                timeTransaction: DateTime.now(),
+                                typeTransaction: index % 2 == 0
+                                    ? ETypeTransaction.income
+                                    : ETypeTransaction.expense,
+                                account: "Paypal",
+                                isRepeat: false,
+                                purpose: 'Buy electronic',
+                                currency: '\$'),
                             isEditable: false,
                             onTap: () => Navigator.pushNamed(
                                 context,

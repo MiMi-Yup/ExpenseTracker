@@ -18,6 +18,8 @@ class AddNewAccount extends StatefulWidget {
 }
 
 class _AddNewAccountState extends State<AddNewAccount> {
+  late Object? _argument = ModalRoute.of(context)?.settings.arguments;
+  late bool _isFirstSetup = _argument == null ? true : _argument as bool;
   bool setWallet = false;
   String? _chosenValue;
   int? _value;
@@ -41,11 +43,6 @@ class _AddNewAccountState extends State<AddNewAccount> {
     'PHP',
     "Wallet"
   ];
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,10 +165,13 @@ class _AddNewAccountState extends State<AddNewAccount> {
                             );
 
                             Future.delayed(const Duration(seconds: 1), () {
-                              Navigator.popUntil(
-                                  context, (route) => route.isFirst);
-                              Navigator.pushNamed(context,
-                                  RouteApplication.getRoute(ERoute.main));
+                              if (_isFirstSetup) {
+                                Navigator.popUntil(context, (route) => false);
+                                Navigator.pushNamed(context,
+                                    RouteApplication.getRoute(ERoute.main));
+                              } else {
+                                Navigator.pop(context);
+                              }
                             });
                           },
                           background: MyColor.purple()))

@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark(),
       darkTheme: ThemeData.dark(),
       routes: RouteApplication.routes,
-      initialRoute: RouteApplication.getRoute(ERoute.welcome),
+      initialRoute: RouteApplication.getRoute(ERoute.main),
     );
   }
 }

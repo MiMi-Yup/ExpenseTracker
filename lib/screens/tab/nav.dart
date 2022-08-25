@@ -113,7 +113,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                             RouteApplication.getRoute(
                                 ERoute.addEditTransaction),
                             arguments: _floatingActions[index].type);
-                        //if (reload != null && reload) setState(() {});
+                        _fabController.reverse();
                       },
                     ),
                   ),

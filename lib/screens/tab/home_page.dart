@@ -168,12 +168,12 @@ class _HomePageState extends State<HomePage>
                     ],
                   ),
                 ),
-              ),
+              ).builder(),
               Section(
                   title: "Spend Frequency",
                   headerColor: MyColor.mainBackgroundColor,
                   titleColor: Colors.white,
-                  titleButton: "See all",
+                  action: Text("See all"),
                   onPressed: () => widget.toPage!(EPage.transaction),
                   content: StreamBuilder<List<ModalTransaction>>(
                     initialData: DataSample.instanceSample(),
@@ -185,13 +185,13 @@ class _HomePageState extends State<HomePage>
                           : MediaQuery.removePadding(
                               context: context,
                               removeTop: true,
+                              removeBottom: true,
                               child: ListView(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
                                 children: modals
-                                    .map((modal) =>
-                                        TransactionComponent(modal: modal)
-                                            .builder(
+                                    .map((modal) => TransactionComponent(
+                                          modal: modal,
                                           isEditable: true,
                                           onTap: () async {
                                             await Navigator.pushNamed(
@@ -210,59 +210,17 @@ class _HomePageState extends State<HomePage>
                                             setState(() {});
                                           },
                                           deleteSlidableAction: (context) {
-                                            DataSample.instance()
-                                                .removeTransaction(modal);
-                                            setState(() {});
+                                            Future.delayed(
+                                                const Duration(
+                                                    milliseconds: 500),
+                                                () => DataSample.instance()
+                                                    .removeTransaction(modal));
                                           },
                                         ))
                                     .toList(),
                               ));
-                      // AnimatedList(
-                      //     shrinkWrap: true,
-                      //     initialItemCount: modals.length,
-                      //     physics: NeverScrollableScrollPhysics(),
-                      //     itemBuilder: (context, index, animation) {
-                      //       ModalTransaction modal = modals[index];
-                      //       return SizeTransition(
-                      //         sizeFactor: animation,
-                      //         child: TransactionComponent(modal: modal)
-                      //             .builder(
-                      //           isEditable: true,
-                      //           onTap: () async {
-                      //             await Navigator.pushNamed(
-                      //                 context,
-                      //                 RouteApplication.getRoute(
-                      //                     ERoute.detailTransaction),
-                      //                 arguments: [modal, true]);
-                      //             setState(() {});
-                      //           },
-                      //           editSlidableAction: (context) async {
-                      //             await Navigator.pushNamed(
-                      //                 context,
-                      //                 RouteApplication.getRoute(
-                      //                     ERoute.addEditTransaction),
-                      //                 arguments: modal);
-                      //             setState(() {});
-                      //           },
-                      //           deleteSlidableAction: (context) {
-                      //             AnimatedList.of(context).removeItem(
-                      //                 index,
-                      //                 (_, animation) => SizeTransition(
-                      //                       sizeFactor: animation,
-                      //                       child: TransactionComponent(
-                      //                               modal: modal)
-                      //                           .builder(isEditable: false),
-                      //                     ),
-                      //                 duration: const Duration(seconds: 1));
-                      //             DataSample.instance()
-                      //                 .removeTransaction(modal);
-                      //             setState(() {});
-                      //           },
-                      //         ),
-                      //       );
-                      //     });
                     },
-                  ))
+                  )).builder()
             ]),
           ),
         )
