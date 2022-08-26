@@ -51,7 +51,7 @@ class _BudgetPageState extends State<BudgetPage>
                           child: AnimatedList(
                               shrinkWrap: true,
                               initialItemCount: lengthListView,
-                              physics: NeverScrollableScrollPhysics(),
+                              physics: BouncingScrollPhysics(),
                               itemBuilder: (context, index, animation) {
                                 ModalBudget modal = ModalBudget(
                                     budgetMoney: 0.0,
@@ -89,8 +89,9 @@ class _BudgetPageState extends State<BudgetPage>
                           "You don't have a budget",
                           style: TextStyle(color: Colors.black),
                         ))),
-              SizedBox(
+              Container(
                   width: double.maxFinite,
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
                   child: largestButton(
                       text: "Create a budget", onPressed: () => null))
             ],

@@ -1,5 +1,3 @@
-import 'package:flutter/physics.dart';
-
 class BackgroundAsset {
   static const String _path = "asset/image/background";
   

@@ -175,52 +175,73 @@ class _HomePageState extends State<HomePage>
                   titleColor: Colors.white,
                   action: Text("See all"),
                   onPressed: () => widget.toPage!(EPage.transaction),
-                  content: StreamBuilder<List<ModalTransaction>>(
-                    initialData: DataSample.instanceSample(),
-                    stream: DataSample.instance().stateStream,
-                    builder: (context, snapshot) {
-                      List<ModalTransaction>? modals = snapshot.data;
-                      return modals == null
-                          ? const Center(child: Text("Wait for loading"))
-                          : MediaQuery.removePadding(
-                              context: context,
-                              removeTop: true,
-                              removeBottom: true,
-                              child: ListView(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                children: modals
-                                    .map((modal) => TransactionComponent(
-                                          modal: modal,
-                                          isEditable: true,
-                                          onTap: () async {
-                                            await Navigator.pushNamed(
-                                                context,
-                                                RouteApplication.getRoute(
-                                                    ERoute.detailTransaction),
-                                                arguments: [modal, true]);
-                                            setState(() {});
-                                          },
-                                          editSlidableAction: (context) async {
-                                            await Navigator.pushNamed(
-                                                context,
-                                                RouteApplication.getRoute(
-                                                    ERoute.addEditTransaction),
-                                                arguments: modal);
-                                            setState(() {});
-                                          },
-                                          deleteSlidableAction: (context) {
-                                            Future.delayed(
-                                                const Duration(
-                                                    milliseconds: 500),
-                                                () => DataSample.instance()
-                                                    .removeTransaction(modal));
-                                          },
-                                        ))
-                                    .toList(),
-                              ));
-                    },
-                  )).builder()
+                  content: FutureBuilder<List<ModalTransaction>>(
+                      future: Future.delayed(const Duration(seconds: 2), () {
+                        return DataSample.instanceSample();
+                      }),
+                      builder: (context, snapshot) {
+                        if (snapshot.data == null) {
+                          return const Center(child: Text("Wait for loading"));
+                        } else {
+                          return StreamBuilder<List<ModalTransaction>>(
+                            initialData: DataSample.instanceSample(),
+                            stream: DataSample.instance().stateStream,
+                            builder: (context, snapshot) {
+                              List<ModalTransaction>? modals = snapshot.data;
+                              return modals == null
+                                  ? const Center(
+                                      child: Text("Empty list transaction"))
+                                  : MediaQuery.removePadding(
+                                      context: context,
+                                      removeTop: true,
+                                      removeBottom: false,
+                                      child: ListView(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        children: modals
+                                            .map((modal) =>
+                                                TransactionComponent(
+                                                  modal: modal,
+                                                  isEditable: true,
+                                                  onTap: () async {
+                                                    await Navigator.pushNamed(
+                                                        context,
+                                                        RouteApplication
+                                                            .getRoute(ERoute
+                                                                .detailTransaction),
+                                                        arguments: [
+                                                          modal,
+                                                          true
+                                                        ]);
+                                                    setState(() {});
+                                                  },
+                                                  editSlidableAction:
+                                                      (context) async {
+                                                    await Navigator.pushNamed(
+                                                        context,
+                                                        RouteApplication
+                                                            .getRoute(ERoute
+                                                                .addEditTransaction),
+                                                        arguments: modal);
+                                                    setState(() {});
+                                                  },
+                                                  deleteSlidableAction:
+                                                      (context) {
+                                                    Future.delayed(
+                                                        const Duration(
+                                                            milliseconds: 500),
+                                                        () => DataSample
+                                                                .instance()
+                                                            .removeTransaction(
+                                                                modal));
+                                                  },
+                                                ))
+                                            .toList(),
+                                      ));
+                            },
+                          );
+                        }
+                      })).builder()
             ]),
           ),
         )

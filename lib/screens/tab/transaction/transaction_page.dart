@@ -19,7 +19,6 @@ class TransactionPage extends StatefulWidget {
 
 class _TransactionPageState extends State<TransactionPage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
-  late PageController _controller;
   Map<String, AnimationController?>? _sectionController;
 
   final List<Widget> _charts = [
@@ -36,17 +35,16 @@ class _TransactionPageState extends State<TransactionPage>
   ];
 
   bool hasFilter = false;
+  bool isExpandAll = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = PageController(initialPage: _currentIndex);
     _sectionController = {};
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     _sectionController?.forEach((key, value) {
       value?.dispose();
     });
@@ -181,91 +179,137 @@ class _TransactionPageState extends State<TransactionPage>
               ),
             ),
           ),
-          Expanded(
-              child: StreamBuilder<List<ModalTransaction>>(
-            stream: DataSample.instance().stateStream,
-            initialData: DataSample.instanceSample(),
+          StatefulBuilder(
+              builder: (context, _setState) => Container(
+                    alignment: Alignment.centerRight,
+                    width: double.maxFinite,
+                    child: TextButton(
+                        onPressed: () {
+                          _setState(() => isExpandAll = !isExpandAll);
+                          if (isExpandAll)
+                            _sectionController?.forEach((key, value) {
+                              value?.forward();
+                            });
+                          else
+                            _sectionController?.forEach((key, value) {
+                              value?.reverse();
+                            });
+                        },
+                        child: Text(isExpandAll ? "Shink all" : "Expand all")),
+                  )),
+          FutureBuilder<List<ModalTransaction>>(
+            //load data
+            future: Future.delayed(const Duration(seconds: 2), () {
+              return DataSample.instanceSample();
+            }),
             builder: (context, snapshot) {
-              List<ModalTransaction>? modals = snapshot.data;
-              if (modals == null)
-                return const Center(child: Text("Wait for loading"));
-              else {
-                Map<String, List<ModalTransaction>?> map =
-                    DataSample.filterByDateTime(modals);
-                return CustomScrollView(
-                    physics: BouncingScrollPhysics(),
-                    slivers: map.entries.map((group) {
-                      if (group.value!.isNotEmpty) {
-                        if (!_sectionController!.containsKey(group.key)) {
-                          _sectionController!.addAll({
-                            group.key: AnimationController(
-                                vsync: this,
-                                duration: const Duration(milliseconds: 500))
-                          });
-                        }
-                        return Section(
-                            headerColor: MyColor.mainBackgroundColor,
-                            titleColor: Colors.white,
-                            title:
-                                "${group.key} (${group.value!.length}) transactions",
-                            controller: _sectionController![group.key],
-                            headerPressable: true,
-                            onPressed: () {
-                              if (_sectionController![group.key] != null) {
-                                _sectionController![group.key]!.isDismissed
-                                    ? _sectionController![group.key]!.forward()
-                                    : _sectionController![group.key]!.reverse();
+              if (snapshot.data == null) {
+                return const Expanded(
+                    child: Center(child: Text("Wait for loading")));
+              } else {
+                return Expanded(
+                    child: StreamBuilder<List<ModalTransaction>>(
+                  stream: DataSample.instance().stateStream,
+                  initialData: snapshot.data,
+                  builder: (context, snapshot) {
+                    List<ModalTransaction>? modals = snapshot.data;
+                    if (modals == null) {
+                      return const Center(
+                          child: Text("Empty list transaction"));
+                    } else {
+                      Map<String, List<ModalTransaction>?> map =
+                          DataSample.filterByDateTime(modals);
+                      return CustomScrollView(
+                          physics: BouncingScrollPhysics(),
+                          slivers: map.entries.map((group) {
+                            if (group.value!.isNotEmpty) {
+                              if (!_sectionController!.containsKey(group.key)) {
+                                _sectionController!.addAll({
+                                  group.key: AnimationController(
+                                      vsync: this,
+                                      duration:
+                                          const Duration(milliseconds: 500))
+                                });
                               }
-                            },
-                            content: MediaQuery.removePadding(
-                                context: context,
-                                removeTop: true,
-                                removeBottom: true,
-                                child: ListView(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  children: group.value!
-                                      .map((modal) => TransactionComponent(
-                                            parentController:
-                                                _sectionController![group.key],
-                                            modal: modal,
-                                            isEditable: true,
-                                            onTap: () async {
-                                              await Navigator.pushNamed(
-                                                  context,
-                                                  RouteApplication.getRoute(
-                                                      ERoute.detailTransaction),
-                                                  arguments: [modal, true]);
-                                              setState(() {});
-                                            },
-                                            editSlidableAction:
-                                                (context) async {
-                                              await Navigator.pushNamed(
-                                                  context,
-                                                  RouteApplication.getRoute(
-                                                      ERoute
-                                                          .addEditTransaction),
-                                                  arguments: modal);
-                                              setState(() {});
-                                            },
-                                            deleteSlidableAction: (context) {
-                                              Future.delayed(
-                                                  const Duration(
-                                                      milliseconds: 500),
-                                                  () => DataSample.instance()
-                                                      .removeTransaction(
-                                                          modal));
-                                            },
-                                          ))
-                                      .toList(),
-                                ))).builder();
-                      } else {
-                        return SliverPadding(padding: EdgeInsets.all(0));
-                      }
-                    }).toList());
+                              return Section(
+                                  headerColor: MyColor.mainBackgroundColor,
+                                  titleColor: Colors.white,
+                                  title:
+                                      "${group.key} (${group.value!.length}) transactions",
+                                  controller: _sectionController![group.key],
+                                  headerPressable: true,
+                                  onPressed: () {
+                                    if (_sectionController![group.key] !=
+                                        null) {
+                                      _sectionController![group.key]!
+                                              .isDismissed
+                                          ? _sectionController![group.key]!
+                                              .forward()
+                                          : _sectionController![group.key]!
+                                              .reverse();
+                                    }
+                                  },
+                                  content: MediaQuery.removePadding(
+                                      context: context,
+                                      removeTop: true,
+                                      removeBottom: map.entries.last != group,
+                                      child: ListView(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        children: group.value!
+                                            .map((modal) =>
+                                                TransactionComponent(
+                                                  parentController:
+                                                      _sectionController![
+                                                          group.key],
+                                                  modal: modal,
+                                                  isEditable: true,
+                                                  onTap: () async {
+                                                    await Navigator.pushNamed(
+                                                        context,
+                                                        RouteApplication
+                                                            .getRoute(ERoute
+                                                                .detailTransaction),
+                                                        arguments: [
+                                                          modal,
+                                                          true
+                                                        ]);
+                                                    setState(() {});
+                                                  },
+                                                  editSlidableAction:
+                                                      (context) async {
+                                                    await Navigator.pushNamed(
+                                                        context,
+                                                        RouteApplication
+                                                            .getRoute(ERoute
+                                                                .addEditTransaction),
+                                                        arguments: modal);
+                                                    setState(() {});
+                                                  },
+                                                  deleteSlidableAction:
+                                                      (context) {
+                                                    Future.delayed(
+                                                        const Duration(
+                                                            milliseconds: 500),
+                                                        () => DataSample
+                                                                .instance()
+                                                            .removeTransaction(
+                                                                modal));
+                                                  },
+                                                ))
+                                            .toList(),
+                                      ))).builder();
+                            } else {
+                              return const SliverPadding(
+                                  padding: EdgeInsets.all(0));
+                            }
+                          }).toList());
+                    }
+                  },
+                ));
               }
             },
-          ))
+          )
         ],
       ),
     );
