@@ -48,4 +48,6 @@ class RouteApplication {
   };
 
   static String getRoute(ERoute route) => "/${route.name}";
+
+  static final navigatorKey = GlobalKey<NavigatorState>();
 }

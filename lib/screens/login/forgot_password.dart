@@ -38,7 +38,7 @@ class ForgotPassword extends StatelessWidget {
               SizedBox(
                 height: 100,
               ),
-              editText(
+              EditText(
                   onChanged: (value) => null,
                   hintText: "Email",
                   labelText: "Email"),

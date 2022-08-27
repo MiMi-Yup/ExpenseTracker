@@ -44,6 +44,7 @@ class _OTPVerifyState extends State<OTPVerify> {
         leading: IconButton(
             onPressed: () => null, icon: Icon(Icons.arrow_back_ios_new)),
         elevation: 0.0,
+        backgroundColor: MyColor.mainBackgroundColor,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,

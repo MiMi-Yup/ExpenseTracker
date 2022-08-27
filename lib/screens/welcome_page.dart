@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -14,17 +16,25 @@ class WelcomePage extends StatefulWidget {
 
 class _WelcomePageState extends State<WelcomePage> {
   double opacityLevel = 0.0;
-  late Timer _timer;
+  Timer? _timer;
 
   void _changeOpacity() {
     setState(() => opacityLevel = opacityLevel == 0 ? 1.0 : 0.0);
   }
 
   Future<void> initApplication() async {
-    Timer(
-        const Duration(seconds: 5),
-        () => Navigator.popAndPushNamed(
-            context, RouteApplication.getRoute(ERoute.introduction)));
+    await Future.delayed(const Duration(seconds: 5), () {});
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user == null) {
+        RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
+            RouteApplication.getRoute(ERoute.introduction));
+      } else {
+        RouteApplication.navigatorKey.currentState
+            ?.popUntil((route) => route.isFirst);
+        RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
+            RouteApplication.getRoute(ERoute.pin), arguments: false);
+      }
+    });
   }
 
   @override
@@ -37,7 +47,7 @@ class _WelcomePageState extends State<WelcomePage> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 

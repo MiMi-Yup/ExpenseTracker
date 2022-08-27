@@ -1,6 +1,9 @@
+import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/services/firebase/google_auth.dart';
 import 'package:expense_tracker/widgets/input_otp.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CodeAuth extends StatefulWidget {
@@ -12,7 +15,6 @@ class CodeAuth extends StatefulWidget {
 
 class _CodeAuthState extends State<CodeAuth>
     with SingleTickerProviderStateMixin {
-  
   late bool _initCode = ModalRoute.of(context)?.settings.arguments as bool;
   late bool _confirm = !_initCode;
   String _code = "";
@@ -98,7 +100,17 @@ class _CodeAuthState extends State<CodeAuth>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: null,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: MyColor.mainBackgroundColor,
+        leading: null,
+        actions: [
+          TextButton(
+            onPressed: ()async => await GoogleAuth.signOut(),
+            child: Text("Sign out"),
+          )
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

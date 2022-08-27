@@ -220,12 +220,12 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                 ? ECategory.values.firstWhere((element) =>
                                     element.name == value.toLowerCase())
                                 : null)),
-                    editText(
+                    EditText(
                         onChanged: (value) => modal.purpose = value,
                         fillText: modal.purpose,
                         labelText: "Purpose",
                         hintText: "Purpose"),
-                    editText(
+                    EditText(
                         onChanged: (value) => modal.description = value,
                         fillText: modal.description,
                         labelText: "Description",

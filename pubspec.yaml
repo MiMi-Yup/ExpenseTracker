@@ -44,6 +44,15 @@ dependencies:
   shared_preferences: ^2.0.15
   local_auth: ^2.1.2
 
+  #Firebase services
+  firebase_core: ^1.21.1
+  firebase_auth: ^3.7.0
+  cloud_firestore: ^3.4.6
+  firebase_storage: ^10.3.7
+
+  #Authentication
+  google_sign_in: ^5.4.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

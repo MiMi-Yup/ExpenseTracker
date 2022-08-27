@@ -89,7 +89,7 @@ class _AddNewAccountState extends State<AddNewAccount> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  editText(
+                  EditText(
                       onChanged: (value) => null,
                       hintText: "Name",
                       labelText: "Name"),
