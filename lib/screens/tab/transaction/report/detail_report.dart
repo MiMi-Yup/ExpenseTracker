@@ -59,7 +59,7 @@ class _DetailReportState extends State<DetailReport> {
                     isExpanded: false,
                     hint: "Time",
                     items: ["Day", "Month", "Year"],
-                    chosenValue: null,
+                    choseValue: null,
                     onChanged: (value) => null),
                 Stack(
                   children: [
@@ -158,7 +158,7 @@ class _DetailReportState extends State<DetailReport> {
                     isExpanded: false,
                     hint: "View",
                     items: ["Transaction", "Category"],
-                    chosenValue: indexTypeCategory,
+                    choseValue: indexTypeCategory,
                     onChanged: (value) =>
                         setState(() => indexTypeCategory = value)),
                 IconButton(onPressed: null, icon: Icon(Icons.filter_list))

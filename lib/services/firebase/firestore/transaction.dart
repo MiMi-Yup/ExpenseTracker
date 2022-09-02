@@ -40,6 +40,13 @@ class TransactionFirestore extends IFirestore {
         .toList();
   }
 
+  Future<void> override_(IModal modal) async {
+    return FirebaseFirestore.instance
+        .collection(getPath(uid))
+        .doc(modal.id)
+        .set(modal.toFirestore());
+  }
+
   Future<bool> checkTransactionTypeExists(ModalTransactionType modal) async {
     bool exist = false;
     await FirebaseFirestore.instance
@@ -83,4 +90,15 @@ class TransactionFirestore extends IFirestore {
 
   @override
   String getPath(String? uid) => 'users/user_$uid/all_transactions';
+
+  @override
+  Future<ModalTransaction?> getModalFromRef(
+      DocumentReference<Map<String, dynamic>> ref) async {
+    DocumentSnapshot<ModalTransaction> snapshot = await ref
+        .withConverter(
+            fromFirestore: ModalTransaction.fromFirestore,
+            toFirestore: (ModalTransaction modal, _) => modal.toFirestore())
+        .get();
+    return snapshot.data();
+  }
 }

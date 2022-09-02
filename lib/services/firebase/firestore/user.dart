@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/modals/modal.dart';
+import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
 
@@ -48,7 +49,35 @@ class UserFirestore extends IFirestore {
     return [];
   }
 
-  Future<bool> checkUserExists(){
-    return FirebaseFirestore.instance.doc(getPath(uid)).get().then<bool>((value) => value.exists);
+  @override
+  Future<ModalUser?> getModalFromRef(
+      DocumentReference<Map<String, dynamic>> ref) async {
+    DocumentSnapshot<ModalUser> snapshot = await ref
+        .withConverter(
+            fromFirestore: ModalUser.fromFirestore,
+            toFirestore: (ModalUser modal, _) => modal.toFirestore())
+        .get();
+    return snapshot.data();
+  }
+
+  Future<ModalCurrencyType?> getMainCurrencyAccount() async {
+    List<ModalUser> modals = await read();
+    if (modals.isNotEmpty) {
+      DocumentSnapshot<ModalCurrencyType> snapshot = await modals
+          .first.currencyTypeRef!
+          .withConverter(
+              fromFirestore: ModalCurrencyType.fromFirestore,
+              toFirestore: (ModalCurrencyType modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.data();
+    }
+    return null;
+  }
+
+  Future<bool> checkUserExists() {
+    return FirebaseFirestore.instance
+        .doc(getPath(uid))
+        .get()
+        .then<bool>((value) => value.exists);
   }
 }

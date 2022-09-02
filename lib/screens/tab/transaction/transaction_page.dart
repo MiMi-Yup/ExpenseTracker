@@ -67,7 +67,7 @@ class _TransactionPageState extends State<TransactionPage>
                 isExpanded: false,
                 hint: "Time",
                 items: ["1", "2"],
-                chosenValue: null,
+                choseValue: null,
                 onChanged: (p0) => null,
               ),
               IconButton(

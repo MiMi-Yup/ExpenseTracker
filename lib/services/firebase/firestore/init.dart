@@ -24,7 +24,7 @@ class InitializationFirestore {
     String pathUser = 'users/user_$uid';
     FirebaseFirestore instance = FirebaseFirestore.instance;
     Map<String, CollectionReference<Map<String, dynamic>>> map = {
-      'catetory_types': instance.collection('default_category_types'),
+      'category_types': instance.collection('default_category_types'),
       'account_types': instance.collection('default_account_types'),
       'transaction_types': instance.collection('default_transaction_types')
     };
@@ -99,10 +99,10 @@ class InitializationFirestore {
     const path = 'frequency_types';
 
     final Map<String, IModal> preData = <String, IModal>{
-      "daily": ModalFrequencyType(id: 'daily', interval: '1', name: 'Daily'),
-      "weakly": ModalFrequencyType(id: 'weakly', interval: '7', name: 'Weakly'),
+      "daily": ModalFrequencyType(id: 'daily', interval: 1, name: 'Daily'),
+      "weakly": ModalFrequencyType(id: 'weakly', interval: 7, name: 'Weakly'),
       "monthly":
-          ModalFrequencyType(id: 'monthly', interval: '30', name: 'Monthly')
+          ModalFrequencyType(id: 'monthly', interval: 30, name: 'Monthly')
     };
 
     preData.forEach((key, value) {

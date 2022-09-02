@@ -24,11 +24,8 @@ class DataSample {
           accountRef: null,
           purpose: "Purpose ${index % 10}",
           description: "Đoán xem id:$index",
-          attachments: [],
-          repeat: {
-            'frequency_type_ref': '',
-            'end_after': DateTime.tryParse("2023-01-01 00:00:00Z")
-          },
+          attachments: Set.from([]),
+          repeat: null,
           transactionRef: null);
     });
     return _sample!;

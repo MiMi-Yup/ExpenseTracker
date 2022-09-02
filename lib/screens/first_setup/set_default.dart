@@ -135,7 +135,7 @@ class _SetDefaultState extends State<SetDefault> {
                                   DropDown<ModalAccountType>(
                                 hint: "Choose account type",
                                 items: snapshot.data!,
-                                chosenValue: choseAccountType,
+                                choseValue: choseAccountType,
                                 onChanged: (itemSelected) {
                                   setState(() {
                                     choseAccountType = itemSelected;
@@ -167,7 +167,7 @@ class _SetDefaultState extends State<SetDefault> {
                             DropDown<ModalCurrencyType>(
                           hint: "Choose currency type",
                           items: snapshot.data!,
-                          chosenValue: choseCurrency,
+                          choseValue: choseCurrency,
                           onChanged: (itemSelected) {
                             setState(() {
                               choseCurrency = itemSelected;

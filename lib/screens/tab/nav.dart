@@ -105,6 +105,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                             ? Image.asset(
                                 e.image!,
                                 fit: BoxFit.contain,
+                                color: e.color,
                               )
                             : FutureBuilder<Uint8List?>(
                                 future: ActionFirebaseStorage.downloadFile(
@@ -112,7 +113,8 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData &&
                                       snapshot.data != null) {
-                                    return Image.memory(snapshot.data!);
+                                    return Image.memory(snapshot.data!,
+                                        color: e.color);
                                   }
                                   return SizedBox();
                                 }),
@@ -121,7 +123,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                               context,
                               RouteApplication.getRoute(
                                   ERoute.addEditTransaction),
-                              arguments: e);
+                              arguments: TransactionTypeFirestore().getRef(e));
                           _fabController.reverse();
                         },
                       ),

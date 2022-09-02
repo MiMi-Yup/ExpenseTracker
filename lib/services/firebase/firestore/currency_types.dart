@@ -15,8 +15,7 @@ class CurrencyTypesFirestore extends IFirestore {
 
   @override
   Future<List<ModalCurrencyType>> read() async {
-    QuerySnapshot<ModalCurrencyType> snapshot = await FirebaseFirestore
-        .instance
+    QuerySnapshot<ModalCurrencyType> snapshot = await FirebaseFirestore.instance
         .collection(getPath(uid))
         .withConverter(
             fromFirestore: ModalCurrencyType.fromFirestore,
@@ -24,5 +23,16 @@ class CurrencyTypesFirestore extends IFirestore {
                 currency.toFirestore())
         .get();
     return snapshot.docs.map((e) => e.data()).toList();
+  }
+
+  @override
+  Future<ModalCurrencyType?> getModalFromRef(
+      DocumentReference<Map<String, dynamic>> ref) async {
+    DocumentSnapshot<ModalCurrencyType> snapshot = await ref
+        .withConverter(
+            fromFirestore: ModalCurrencyType.fromFirestore,
+            toFirestore: (ModalCurrencyType modal, _) => modal.toFirestore())
+        .get();
+    return snapshot.data();
   }
 }

@@ -40,4 +40,14 @@ class BudgetFirestore extends IFirestore {
 
   @override
   String getPath(String? uid) => 'users/user_$uid/budgets';
+
+  @override
+  Future<ModalBudget?> getModalFromRef(DocumentReference<Map<String, dynamic>> ref) async {
+    DocumentSnapshot<ModalBudget> snapshot = await ref
+        .withConverter(
+            fromFirestore: ModalBudget.fromFirestore,
+            toFirestore: (ModalBudget modal, _) => modal.toFirestore())
+        .get();
+    return snapshot.data();
+  }
 }

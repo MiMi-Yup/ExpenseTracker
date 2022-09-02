@@ -44,4 +44,14 @@ class AccountFirestore extends IFirestore {
         .then((value) => exist = value.size > 0, onError: (e) => print(e));
     return exist;
   }
+
+  @override
+  Future<ModalAccount?> getModalFromRef(DocumentReference<Map<String, dynamic>> ref) async {
+    DocumentSnapshot<ModalAccount> snapshot = await ref
+        .withConverter(
+            fromFirestore: ModalAccount.fromFirestore,
+            toFirestore: (ModalAccount modal, _) => modal.toFirestore())
+        .get();
+    return snapshot.data();
+  }
 }

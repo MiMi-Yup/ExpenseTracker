@@ -2,7 +2,11 @@ import 'dart:developer';
 
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/instances/category_component.dart';
+import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction_type.dart';
+import 'package:expense_tracker/services/firebase/firestore/category_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -68,10 +72,12 @@ class _TransactionComponentState extends State<TransactionComponent>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text(
-                  //   CategoryInstance.instances[widget.modal.category]!().name,
-                  //   style: TextStyle(color: Colors.white),
-                  // ),
+                  FutureBuilder<ModalCategoryType?>(
+                      future: CategoryTypeFirebase()
+                          .getModalFromRef(widget.modal.categoryTypeRef!),
+                      builder: (context, snapshot) => Text(
+                          '${snapshot.hasData ? snapshot.data!.name : ''}',
+                          style: TextStyle(color: Colors.white))),
                   SizedBox(height: 10.0),
                   Text(
                     widget.modal.description ?? "",
@@ -85,12 +91,16 @@ class _TransactionComponentState extends State<TransactionComponent>
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Text(
-            //   widget.modal.getMoney,
-            //   style: TextStyle(
-            //       color:
-            //           MyColor.colorTransaction[widget.modal.typeTransaction]),
-            // ),
+            FutureBuilder<ModalTransactionType?>(
+                future: TransactionTypeFirestore()
+                    .getModalFromRef(widget.modal.transactionTypeRef!),
+                builder: (context, snapshot) => Text(
+                      widget.modal.getMoney('\$'),
+                      style: TextStyle(
+                          color: snapshot.hasData
+                              ? snapshot.data?.color
+                              : Colors.white),
+                    )),
             SizedBox(height: 10.0),
             Text(
               widget.modal.getTimeTransaction,

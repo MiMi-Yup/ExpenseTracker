@@ -9,13 +9,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
 
 class AccountTypeUtilities {
-  String? uid = FirebaseAuth.instance.currentUser?.uid;
   String getPathStorage(String? uid, String? id, String? nameFile) =>
       'account_types/user_$uid/$id/$nameFile';
   Stream<TaskSnapshot> add(File file, ModalAccountType modal) {
+    AccountTypeFirestore instance = AccountTypeFirestore();
     String? id = modal.id ??= modal.name?.replaceAll(' ', '_');
     String nameFile = basename(file.path);
-    String pathStorage = getPathStorage(uid, id, nameFile);
+    String pathStorage = getPathStorage(instance.uid, id, nameFile);
 
     Stream<TaskSnapshot> task =
         ActionFirebaseStorage.uploadFile(file, pathStorage).snapshotEvents;
@@ -23,7 +23,7 @@ class AccountTypeUtilities {
     task.listen((event) async {
       if (event.state == TaskState.success) {
         modal.image = pathStorage;
-        await AccountTypeFirestore().insert(modal);
+        await instance.insert(modal);
       }
     });
 

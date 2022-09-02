@@ -45,4 +45,8 @@ class ModalTransactionType extends IModal {
         'image': image,
         'local_asset': localAsset
       };
+
+  @override
+  String toString() =>
+      "${name?[0].toUpperCase()}${name?.substring(1).toLowerCase()}";
 }

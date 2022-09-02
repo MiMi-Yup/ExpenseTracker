@@ -38,4 +38,15 @@ class ModalCategoryType extends IModal {
 
   @override
   Map<String, dynamic> updateFirestore() => toFirestore();
+
+  @override
+  String toString() =>
+      "${name?[0].toUpperCase()}${name?.substring(1).toLowerCase()}";
+
+  @override
+  bool operator ==(dynamic other) =>
+      other != null && other is ModalCategoryType && id == other.id;
+
+  @override
+  int get hashCode => super.hashCode;
 }

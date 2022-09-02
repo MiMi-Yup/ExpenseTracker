@@ -91,7 +91,7 @@ class _AddEditBudgetState extends State<AddEditBudget> {
                         isExpanded: true,
                         hint: "Category",
                         items: ["Shopping", "Eat"],
-                        chosenValue: null,
+                        choseValue: null,
                         onChanged: (value) => null),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -5,6 +5,11 @@ class ModalTransactionLog extends IModal {
   DocumentReference? lastTransactionRef;
   DocumentReference? firstTransactionRef;
 
+  ModalTransactionLog(
+      {required super.id,
+      this.firstTransactionRef,
+      required this.lastTransactionRef});
+
   ModalTransactionLog.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options)
       : super.fromFirestore(snapshot, options) {
@@ -27,7 +32,7 @@ class ModalTransactionLog extends IModal {
 
 class ModalTransaction extends IModal {
   DocumentReference? accountRef;
-  List<String>? attachments;
+  Set<String>? attachments;
   DocumentReference? categoryTypeRef;
   String? description;
   double? money;
@@ -55,13 +60,14 @@ class ModalTransaction extends IModal {
       : super.fromFirestore(snapshot, options) {
     Map<String, dynamic>? data = snapshot.data();
     accountRef = data?['account_ref'];
-    attachments = data?['attachments'];
+    attachments = Set<String>.from(data?['attachments']);
     categoryTypeRef = data?['category_type_ref'];
     description = data?['description'];
     money = data?['money'];
     purpose = data?['purpose'];
     repeat = data?['repeat'];
-    timeCreate = data?['time_create'];
+    timeCreate = DateTime.fromMillisecondsSinceEpoch(
+        (data?['time_create'] as Timestamp).millisecondsSinceEpoch);
     transactionTypeRef = data?['transaction_type_ref'];
     transactionRef = data?['transaction_ref'];
   }
@@ -70,7 +76,7 @@ class ModalTransaction extends IModal {
   Map<String, dynamic> toFirestore() {
     return {
       'account_ref': accountRef,
-      'attachments': attachments,
+      'attachments': attachments?.toList(),
       'category_type_ref': categoryTypeRef,
       'description': description,
       'money': money,
@@ -162,6 +168,6 @@ class ModalTransaction extends IModal {
       ? "${timeCreate!.day}/${timeCreate!.month}/${timeCreate!.year}"
       : "";
 
-  String getMoney(String currency_code) =>
-      money != null ? "$currency_code${money!.toStringAsFixed(3)}" : "";
+  String getMoney(String currencyCode) =>
+      money != null ? "$currencyCode${money!.toStringAsFixed(3)}" : "";
 }

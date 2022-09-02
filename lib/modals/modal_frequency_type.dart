@@ -3,7 +3,7 @@ import 'package:expense_tracker/modals/modal.dart';
 
 class ModalFrequencyType extends IModal {
   String? name;
-  String? interval;
+  double? interval;
 
   ModalFrequencyType(
       {required super.id, required this.name, required this.interval});
@@ -12,7 +12,7 @@ class ModalFrequencyType extends IModal {
       DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options)
       : super.fromFirestore(snapshot, options) {
     Map<String, dynamic>? data = snapshot.data();
-    interval = data?['interval'];
+    interval = double.tryParse(data?['interval']);
     name = data?['name'];
   }
 
@@ -23,4 +23,14 @@ class ModalFrequencyType extends IModal {
 
   @override
   Map<String, dynamic> updateFirestore() => toFirestore();
+
+  @override
+  String toString() => '$name';
+
+  @override
+  bool operator ==(dynamic other) =>
+      other != null && other is ModalFrequencyType && id == other.id;
+
+  @override
+  int get hashCode => super.hashCode;
 }

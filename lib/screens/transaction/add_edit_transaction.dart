@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
@@ -8,14 +9,28 @@ import 'package:expense_tracker/constants/enum/enum_category.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/constants/enum/enum_transaction.dart';
 import 'package:expense_tracker/instances/data.dart';
+import 'package:expense_tracker/modals/modal_account.dart';
+import 'package:expense_tracker/modals/modal_category_type.dart';
+import 'package:expense_tracker/modals/modal_currency_type.dart';
+import 'package:expense_tracker/modals/modal_frequency_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction_type.dart';
+import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
+import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
+import 'package:expense_tracker/services/firebase/firestore/category_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/currency_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/frequency_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/user.dart';
+import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/editText.dart';
 import 'package:expense_tracker/widgets/edit_date_time.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -27,19 +42,18 @@ class AddEditTransaction extends StatefulWidget {
 }
 
 class _AddEditTransactionState extends State<AddEditTransaction> {
-  final itemWallets = ["MoMo", "Vietinbank", "Vietcombank"];
-
   late double height = MediaQuery.of(context).size.height;
-  late final Object? _argument = ModalRoute.of(context)?.settings.arguments;
-  // late ModalTransaction modal = _argument is ModalTransaction
-  //     ? ModalTransaction.clone(_argument as ModalTransaction)
-  //     : ModalTransaction.minInit(
-  //         typeTransaction: _argument as ETypeTransaction);
-  late ModalTransaction modal = _argument is ModalTransaction
-      ? ModalTransaction.clone(_argument as ModalTransaction)
-      : ModalTransaction.minInit(transactionTypeRef: null);
 
-  String? selectedCategory;
+  ModalTransactionType? modalTransactionType;
+  late final Object? _argument = ModalRoute.of(context)?.settings.arguments;
+  ModalTransaction? originModal;
+  late ModalTransaction modal = _argument is ModalTransaction
+      ? ModalTransaction.clone((originModal = _argument as ModalTransaction))
+      : ModalTransaction.minInit(
+          transactionTypeRef: _argument as DocumentReference);
+
+  ModalCategoryType? choseCategoryType;
+  ModalAccount? choseAccount;
   String? selectedWallet;
   String? description;
   String? purpose;
@@ -71,15 +85,40 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  String convertTime(TimeOfDay? time) {
+    if (time != null) {
+      int hour = time.hour;
+      int minute = time.minute;
+      bool isPM = hour >= 12;
+      hour = hour > 12 ? hour - 12 : hour;
+
+      return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute} ${isPM ? "PM" : "AM"}";
+    }
+    return '';
   }
 
-  Future<Object?> _setRepeat({required BuildContext context}) async {
-    String? selectedFrequency;
-    DateTime? startD, endD;
-    TimeOfDay? startT, endT;
+  String convertTimeStamp(DateTime? date) {
+    if (date != null) {
+      return '${date.year}/${date.month}/${date.day} ${convertTime(TimeOfDay(hour: date.hour, minute: date.minute))}';
+    }
+    return '';
+  }
+
+  Future<Map<String, dynamic>?> _setRepeat(
+      {required BuildContext context, Map<String, dynamic>? preData}) async {
+    ModalFrequencyType? choseFrequencyType;
+    DateTime? endDate;
+    TimeOfDay? endTime;
+
+    if (preData != null) {
+      choseFrequencyType = await FrequencyTypesFirestore()
+          .getModalFromRef(preData['frequency_type_ref']);
+      endDate = (preData['end_after'] as DateTime);
+      endTime = TimeOfDay(hour: endDate.hour, minute: endDate.minute);
+    } else {
+      endDate = DateTime.now();
+      endTime = TimeOfDay.now();
+    }
 
     await showModalBottomSheet(
         context: context,
@@ -104,73 +143,79 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                               "Frequency",
                               style: TextStyle(color: Colors.grey),
                             ),
-                            DropDown<String>(
-                                hint: "Frequency repeat",
-                                items: ["Daily", "Monthly", "Yearly"],
-                                hintColor: Colors.cyan,
-                                chosenValue: selectedFrequency,
-                                onChanged: (value) =>
-                                    setState(() => selectedFrequency = value)),
-                            Text(
-                              "Start from",
-                              style: TextStyle(color: Colors.grey),
+                            FutureBuilder<List<ModalFrequencyType>>(
+                              future: FrequencyTypesFirestore().read(),
+                              initialData: [],
+                              builder: (context, snapshot) =>
+                                  DropDown<ModalFrequencyType>(
+                                      hint: "Frequency repeat",
+                                      items: snapshot.data!,
+                                      hintColor: Colors.cyan,
+                                      choseValue: snapshot.hasData
+                                          ? choseFrequencyType
+                                          : null,
+                                      onChanged: (value) => setState(
+                                          () => choseFrequencyType = value)),
                             ),
-                            editDateTime(
-                                icon: Icons.calendar_month,
-                                value: DateTime.now().toString(),
-                                onPressed: () async => showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime.now(),
-                                        lastDate: DateTime.now())
-                                    .then((value) => startD = value)),
-                            editDateTime(
-                                icon: Icons.timer_sharp,
-                                value: TimeOfDay.now().toString(),
-                                onPressed: () async => showTimePicker(
-                                        context: context,
-                                        initialTime: TimeOfDay.now())
-                                    .then((value) => startT = value)),
                             Text(
                               "End after",
                               style: TextStyle(color: Colors.grey),
                             ),
                             editDateTime(
                                 icon: Icons.calendar_month,
-                                value: DateTime.now().toString(),
+                                value:
+                                    '${endDate?.year}/${endDate?.month}/${endDate?.day}',
                                 onPressed: () async => showDatePicker(
                                         context: context,
                                         initialDate: DateTime.now(),
                                         firstDate: DateTime.now(),
                                         lastDate: DateTime.now())
-                                    .then((value) => endD = value)),
+                                    .then((value) =>
+                                        setState(() => endDate = value))),
                             editDateTime(
                                 icon: Icons.timer_sharp,
-                                value: TimeOfDay.now().toString(),
+                                value: convertTime(endTime),
                                 onPressed: () async => showTimePicker(
                                         context: context,
                                         initialTime: TimeOfDay.now())
-                                    .then((value) => endT = value))
+                                    .then((value) =>
+                                        setState(() => endTime = value)))
                           ]),
                     ),
                   ),
                 )));
-    return startD;
+    return choseFrequencyType == null
+        ? null
+        : {
+            'frequency_type_ref':
+                FrequencyTypesFirestore().getRef(choseFrequencyType!),
+            'end_after': DateTime(endDate!.year, endDate!.month, endDate!.day,
+                endTime!.hour, endTime!.minute)
+          };
   }
 
   @override
   Widget build(BuildContext context) {
+    if (modalTransactionType == null) {
+      modal.transactionTypeRef
+          ?.withConverter(
+              fromFirestore: ModalTransactionType.fromFirestore,
+              toFirestore: (ModalTransactionType modal, _) =>
+                  modal.toFirestore())
+          .get()
+          .then((value) => modalTransactionType = value.data());
+    }
+
     return Scaffold(
-      // appBar: AppBar(
-      //   leading: IconButton(
-      //       onPressed: () => Navigator.pop(context),
-      //       icon: Icon(Icons.arrow_back_ios)),
-      //   title: Text(
-      //       "${modal.typeTransaction?.name[0].toUpperCase()}${modal.typeTransaction?.name.substring(1).toLowerCase()}"),
-      //   centerTitle: true,
-      //   elevation: 0,
-      //   backgroundColor: MyColor.mainBackgroundColor,
-      // ),
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back_ios)),
+        title: Text(modalTransactionType.toString()),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: MyColor.mainBackgroundColor,
+      ),
       bottomSheet: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         reverse: true,
@@ -187,16 +232,21 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
             ),
             Padding(
               padding: const EdgeInsets.all(10.0),
-              child: TextField(
-                keyboardType: TextInputType.number,
-                style: TextStyle(fontSize: 40.0),
-                decoration: InputDecoration(
-                    prefixText: "\$",
-                    isCollapsed: true,
-                    hintText: "\0.00",
-                    border: InputBorder.none),
-                onChanged: (value) => modal.money = double.tryParse(value),
-                controller: TextEditingController(text: "${modal.money ?? ""}"),
+              child: FutureBuilder<ModalCurrencyType?>(
+                future: UserFirestore().getMainCurrencyAccount(),
+                builder: (context, snapshot) => TextField(
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(fontSize: 40.0),
+                  decoration: InputDecoration(
+                      prefixText:
+                          "${snapshot.data == null ? '' : snapshot.data!.currencyCode} ",
+                      isCollapsed: true,
+                      hintText: "0.00",
+                      border: InputBorder.none),
+                  onChanged: (value) => modal.money = double.tryParse(value),
+                  controller:
+                      TextEditingController(text: "${modal.money ?? ""}"),
+                ),
               ),
             ),
             Container(
@@ -210,20 +260,6 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // dropDown(
-                    //     hintText: "Choose category",
-                    //     items: ECategory.values
-                    //         .map((e) =>
-                    //             "${e.name[0].toUpperCase()}${e.name.substring(1).toLowerCase()}")
-                    //         .toList(),
-                    //     chosenValue: modal.category != null
-                    //         ? "${modal.category?.name[0].toUpperCase()}${modal.category?.name.substring(1).toLowerCase()}"
-                    //         : null,
-                    //     onChanged: (value) => setState(() => modal.category =
-                    //         value != null
-                    //             ? ECategory.values.firstWhere((element) =>
-                    //                 element.name == value.toLowerCase())
-                    //             : null)),
                     EditText(
                         onChanged: (value) => modal.purpose = value,
                         fillText: modal.purpose,
@@ -234,28 +270,42 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                         fillText: modal.description,
                         labelText: "Description",
                         hintText: "Description"),
-                    DropDown<String>(
-                        hint: "Choose account",
-                        items: itemWallets,
-                        chosenValue: selectedWallet,
-                        onChanged: (value) =>
-                            setState(() => selectedWallet = value)),
+                    FutureBuilder<List<ModalCategoryType>>(
+                      future: CategoryTypeFirebase().read(),
+                      initialData: [],
+                      builder: (context, snapshot) =>
+                          DropDown<ModalCategoryType>(
+                              hint: "Choose category",
+                              items: snapshot.data!,
+                              choseValue: choseCategoryType,
+                              onChanged: (value) =>
+                                  setState(() => choseCategoryType = value)),
+                    ),
+                    FutureBuilder<List<ModalAccount>>(
+                      future: AccountFirestore().read(),
+                      initialData: [],
+                      builder: (context, snapshot) => DropDown<ModalAccount>(
+                          hint: "Choose account",
+                          items: snapshot.data!,
+                          choseValue: choseAccount,
+                          onChanged: (value) =>
+                              setState(() => choseAccount = value)),
+                    ),
                     (modal.attachments == null || modal.attachments!.isEmpty)
                         ? Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: GestureDetector(
                               onTap: () async {
-                                FilePickerResult? result = await FilePicker
-                                    .platform
-                                    .pickFiles(allowMultiple: true);
-                                if (result != null) {
-                                  List<File> files = result.paths
-                                      .map((path) => File(path!))
-                                      .toList();
-                                  setState(() => modal.attachments =
-                                      files.map((e) => e.path).toList());
-                                } else {
-                                  // User canceled the picker
+                                List<String?>? picker = await _filePicker();
+                                if (picker != null) {
+                                  setState(() {
+                                    if (modal.attachments == null) {
+                                      modal.attachments = Set.from(picker);
+                                    } else {
+                                      modal.attachments
+                                          ?.addAll(Set.from(picker));
+                                    }
+                                  });
                                 }
                               },
                               child: DottedBorder(
@@ -281,9 +331,26 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                             child: ListView(
                               scrollDirection: Axis.horizontal,
                               children: modal.attachments!
-                                  .map<Widget>((e) => Image.file(File(e)))
+                                  .map<Widget>((e) => GestureDetector(
+                                      onTap: () => setState(() {
+                                            modal.attachments?.remove(e);
+                                          }),
+                                      child: Image.file(File(e))))
                                   .toList()
                                 ..add(GestureDetector(
+                                  onTap: () async {
+                                    List<String?>? picker = await _filePicker();
+                                    if (picker != null) {
+                                      setState(() {
+                                        if (modal.attachments == null) {
+                                          modal.attachments = Set.from(picker);
+                                        } else {
+                                          modal.attachments
+                                              ?.addAll(Set.from(picker));
+                                        }
+                                      });
+                                    }
+                                  },
                                   child: Container(
                                     margin: EdgeInsets.only(left: 10.0),
                                     alignment: Alignment.center,
@@ -293,6 +360,32 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                         shape: BoxShape.circle,
                                         color: Colors.grey),
                                     child: Icon(Icons.add),
+                                  ),
+                                ))
+                                ..add(GestureDetector(
+                                  onTap: () async {
+                                    List<String?>? picker = await _filePicker();
+                                    if (picker != null) {
+                                      setState(() {
+                                        if (modal.attachments == null) {
+                                          modal.attachments = Set.from(picker);
+                                        } else {
+                                          modal.attachments?.clear();
+                                          modal.attachments
+                                              ?.addAll(Set.from(picker));
+                                        }
+                                      });
+                                    }
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(left: 10.0),
+                                    alignment: Alignment.center,
+                                    width: 50.0,
+                                    height: 50.0,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.grey),
+                                    child: Icon(Icons.remove),
                                   ),
                                 )),
                             ),
@@ -311,59 +404,169 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                             )
                           ],
                         ),
-                        // Switch(
-                        //     value: modal.isRepeat ?? false,
-                        //     onChanged: (value) async {
-                        //       await _setRepeat(context: context);
-                        //       setState(() => modal.isRepeat = value);
-                        //     })
+                        Switch(
+                            value: modal.repeat != null,
+                            onChanged: (value) async {
+                              if (modal.repeat == null) {
+                                modal.repeat =
+                                    await _setRepeat(context: context);
+                                if (modal.repeat == null)
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          duration: const Duration(seconds: 1),
+                                          content: Text(
+                                              "Frequency hasn't selected yet")));
+                              } else {
+                                modal.repeat = null;
+                              }
+                              setState(() {});
+                            })
                       ],
                     ),
                     Visibility(
-                        visible: isRepeated,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _frequencyRepeat(
-                                title: "Start from",
-                                subTitle: DateTime.now().toString()),
-                            _frequencyRepeat(
-                                title: "End after",
-                                subTitle: DateTime.now().toString()),
-                            TextButton(
-                                onPressed: () async =>
-                                    await _setRepeat(context: context),
-                                child: Text("Edit"))
-                          ],
-                        )),
+                        visible: modal.repeat != null,
+                        child: modal.repeat != null
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  FutureBuilder<ModalFrequencyType?>(
+                                    future: FrequencyTypesFirestore()
+                                        .getModalFromRef(modal
+                                            .repeat?['frequency_type_ref']),
+                                    builder: (context, snapshot) =>
+                                        _frequencyRepeat(
+                                            title: "Frequency",
+                                            subTitle: snapshot.data?.name),
+                                  ),
+                                  _frequencyRepeat(
+                                      title: "End after",
+                                      subTitle: convertTimeStamp(
+                                          modal.repeat?['end_after'])),
+                                  TextButton(
+                                      onPressed: () async {
+                                        modal.repeat = await _setRepeat(
+                                            context: context,
+                                            preData: modal.repeat);
+                                        if (modal.repeat == null)
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  duration: const Duration(
+                                                      seconds: 1),
+                                                  content: Text(
+                                                      "Frequency hasn't selected yet")));
+                                        setState(() {});
+                                      },
+                                      child: Text("Edit"))
+                                ],
+                              )
+                            : SizedBox()),
                     SizedBox(
                         width: double.maxFinite,
                         child: largestButton(
                             text: "Continue",
-                            onPressed: () {
-                              showDialog(
-                                builder: (context) => Dialog(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Image.asset(
-                                          IconAsset.success,
-                                          scale: 2,
-                                        ),
-                                        SizedBox(height: 16.0),
-                                        Text(
-                                            "Transaction has been successfully added")
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                context: context,
-                              );
+                            onPressed: () async {
+                              if (choseAccount == null ||
+                                  choseCategoryType == null ||
+                                  modal.money == null ||
+                                  modal.purpose == null ||
+                                  modal.purpose!.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text("Please fill field")));
+                              } else {
+                                modal.accountRef =
+                                    AccountFirestore().getRef(choseAccount!);
+                                modal.categoryTypeRef = CategoryTypeFirebase()
+                                    .getRef(choseCategoryType!);
+                                modal.timeCreate = DateTime.now();
+
+                                TransactionUtilities().add(modal);
+                              }
+                              // File image = File(pathImage!);
+                              // await showDialog(
+                              //   context: context,
+                              //   builder: (context) => Dialog(
+                              //     shape: RoundedRectangleBorder(
+                              //         borderRadius:
+                              //             BorderRadius.circular(10.0)),
+                              //     child: Container(
+                              //       padding: EdgeInsets.all(10.0),
+                              //       width: 300,
+                              //       height: 50,
+                              //       color: Colors.black,
+                              //       child: StreamBuilder<TaskSnapshot>(
+                              //           builder: (context, snapshot) {
+                              //             if (snapshot.data != null) {
+                              //               TaskState state =
+                              //                   snapshot.data!.state;
+                              //               switch (state) {
+                              //                 case TaskState.running:
+                              //                   return ClipRRect(
+                              //                     borderRadius:
+                              //                         BorderRadius.all(
+                              //                             Radius.circular(
+                              //                                 10)),
+                              //                     child:
+                              //                         LinearProgressIndicator(
+                              //                       value: snapshot.data!
+                              //                               .bytesTransferred /
+                              //                           snapshot
+                              //                               .data!.totalBytes,
+                              //                       valueColor:
+                              //                           AlwaysStoppedAnimation<
+                              //                                   Color>(
+                              //                               Color(
+                              //                                   0xff00ff00)),
+                              //                       backgroundColor:
+                              //                           Color(0xffD6D6D6),
+                              //                     ),
+                              //                   );
+                              //                 case TaskState.canceled:
+                              //                   break;
+                              //                 case TaskState.paused:
+                              //                   break;
+                              //                 case TaskState.success:
+                              //                   RouteApplication
+                              //                       .navigatorKey.currentState
+                              //                       ?.pop();
+                              //                   break;
+                              //                 case TaskState.error:
+                              //                   break;
+                              //               }
+                              //             }
+                              //             return SizedBox();
+                              //           },
+                              //           initialData: null,
+                              //           stream: AccountTypeUtilities()
+                              //               .add(image, modal)),
+                              //     ),
+                              //   ),
+                              // );
+
+                              // showDialog(
+                              //   builder: (context) => Dialog(
+                              //     shape: RoundedRectangleBorder(
+                              //         borderRadius:
+                              //             BorderRadius.circular(10.0)),
+                              //     child: Padding(
+                              //       padding: const EdgeInsets.all(16.0),
+                              //       child: Column(
+                              //         mainAxisSize: MainAxisSize.min,
+                              //         children: [
+                              //           Image.asset(
+                              //             IconAsset.success,
+                              //             scale: 2,
+                              //           ),
+                              //           SizedBox(height: 16.0),
+                              //           Text(
+                              //               "Transaction has been successfully added")
+                              //         ],
+                              //       ),
+                              //     ),
+                              //   ),
+                              //   context: context,
+                              // );
 
                               // if (_argument is ETypeTransaction) {
                               //   modal.timeTransaction = DateTime.now();
@@ -387,7 +590,8 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                               : RouteApplication.getRoute(
                                                   ERoute.main))));
                             },
-                            background: MyColor.purple()))
+                            background: modalTransactionType?.color ??
+                                MyColor.purple()))
                   ],
                 ),
               ),
@@ -396,5 +600,19 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
         ),
       ),
     );
+  }
+
+  String? uid = FirebaseAuth.instance.currentUser?.uid;
+  String getPathStorage(String? uid, String? id, String? nameFile) =>
+      'attachments/user_$uid/$id/$nameFile';
+
+  Future<List<String?>?> _filePicker() async {
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: true);
+    if (result != null) {
+      return result.paths;
+    } else {
+      return null;
+    }
   }
 }

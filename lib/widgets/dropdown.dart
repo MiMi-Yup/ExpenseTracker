@@ -4,7 +4,7 @@ class DropDown<T> extends DropdownButton<T> {
   DropDown(
       {Key? key,
       required List<T> items,
-      required T? chosenValue,
+      required T? choseValue,
       required void Function(T?) onChanged,
       required String hint,
       bool isExpanded = true,
@@ -16,7 +16,7 @@ class DropDown<T> extends DropdownButton<T> {
       : super(
           key: key, isExpanded: isExpanded,
           focusColor: focusColor,
-          value: chosenValue,
+          value: choseValue,
           underline: const SizedBox(),
           borderRadius: BorderRadius.circular(10.0),
           //elevation: 5,

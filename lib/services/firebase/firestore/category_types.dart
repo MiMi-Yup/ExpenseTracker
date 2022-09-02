@@ -30,10 +30,22 @@ class CategoryTypeFirebase extends IFirestore {
 
   @override
   Future<List<ModalCategoryType>> read() async {
-    QuerySnapshot<Map<String, dynamic>> collection =
-        await FirebaseFirestore.instance.collection(getPath(uid)).get();
-    return collection.docs
-        .map((snapshot) => ModalCategoryType.fromFirestore(snapshot, null))
-        .toList();
+    QuerySnapshot<ModalCategoryType> snapshot = await FirebaseFirestore.instance
+        .collection(getPath(uid))
+        .withConverter(
+            fromFirestore: ModalCategoryType.fromFirestore,
+            toFirestore: (ModalCategoryType modal, _) => modal.toFirestore())
+        .get();
+    return snapshot.docs.map((e) => e.data()).toList();
+  }
+
+  @override
+  Future<ModalCategoryType?> getModalFromRef(DocumentReference ref) async {
+    DocumentSnapshot<ModalCategoryType> snapshot = await ref
+        .withConverter(
+            fromFirestore: ModalCategoryType.fromFirestore,
+            toFirestore: (ModalCategoryType modal, _) => modal.toFirestore())
+        .get();
+    return snapshot.data();
   }
 }

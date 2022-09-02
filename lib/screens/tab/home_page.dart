@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/asset/category.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
@@ -6,6 +7,7 @@ import 'package:expense_tracker/instances/data.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/widgets/component/overview_transaction_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
@@ -97,7 +99,7 @@ class _HomePageState extends State<HomePage>
                     hint: "Time",
                     isExpanded: false,
                     items: ["1", "2", "3"],
-                    chosenValue: null,
+                    choseValue: null,
                     onChanged: (p0) => null),
                 actions: [
                   IconButton(
@@ -174,79 +176,155 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
               ).builder(),
+              // Section(
+              //     title: "Spend Frequency",
+              //     headerColor: MyColor.mainBackgroundColor,
+              //     titleColor: Colors.white,
+              //     action: Text("See all"),
+              //     onPressed: () => widget.toPage!(EPage.transaction),
+              //     content: FutureBuilder<List<ModalTransaction>>(
+              //         future: Future.delayed(const Duration(seconds: 2), () {
+              //           return DataSample.instanceSample();
+              //         }),
+              //         builder: (context, snapshot) {
+              //           if (snapshot.data == null) {
+              //             return const Center(child: Text("Wait for loading"));
+              //           } else {
+              //             return StreamBuilder<List<ModalTransaction>>(
+              //               initialData: DataSample.instanceSample(),
+              //               stream: DataSample.instance().stateStream,
+              //               builder: (context, snapshot) {
+              //                 List<ModalTransaction>? modals = snapshot.data;
+              //                 return modals == null
+              //                     ? const Center(
+              //                         child: Text("Empty list transaction"))
+              //                     : MediaQuery.removePadding(
+              //                         context: context,
+              //                         removeTop: true,
+              //                         removeBottom: false,
+              //                         child: ListView(
+              //                           shrinkWrap: true,
+              //                           physics: NeverScrollableScrollPhysics(),
+              //                           children: modals
+              //                               .map((modal) =>
+              //                                   TransactionComponent(
+              //                                     modal: modal,
+              //                                     isEditable: true,
+              //                                     onTap: () async {
+              //                                       await Navigator.pushNamed(
+              //                                           context,
+              //                                           RouteApplication
+              //                                               .getRoute(ERoute
+              //                                                   .detailTransaction),
+              //                                           arguments: [
+              //                                             modal,
+              //                                             true
+              //                                           ]);
+              //                                       setState(() {});
+              //                                     },
+              //                                     editSlidableAction:
+              //                                         (context) async {
+              //                                       await Navigator.pushNamed(
+              //                                           context,
+              //                                           RouteApplication
+              //                                               .getRoute(ERoute
+              //                                                   .addEditTransaction),
+              //                                           arguments: modal);
+              //                                       setState(() {});
+              //                                     },
+              //                                     deleteSlidableAction:
+              //                                         (context) {
+              //                                       Future.delayed(
+              //                                           const Duration(
+              //                                               milliseconds: 500),
+              //                                           () => DataSample
+              //                                                   .instance()
+              //                                               .removeTransaction(
+              //                                                   modal));
+              //                                     },
+              //                                   ))
+              //                               .toList(),
+              //                         ));
+              //               },
+              //             );
+              //           }
+              //         })).builder()
               Section(
                   title: "Spend Frequency",
                   headerColor: MyColor.mainBackgroundColor,
                   titleColor: Colors.white,
                   action: Text("See all"),
                   onPressed: () => widget.toPage!(EPage.transaction),
-                  content: FutureBuilder<List<ModalTransaction>>(
-                      future: Future.delayed(const Duration(seconds: 2), () {
-                        return DataSample.instanceSample();
-                      }),
-                      builder: (context, snapshot) {
-                        if (snapshot.data == null) {
-                          return const Center(child: Text("Wait for loading"));
-                        } else {
-                          return StreamBuilder<List<ModalTransaction>>(
-                            initialData: DataSample.instanceSample(),
-                            stream: DataSample.instance().stateStream,
-                            builder: (context, snapshot) {
-                              List<ModalTransaction>? modals = snapshot.data;
-                              return modals == null
-                                  ? const Center(
-                                      child: Text("Empty list transaction"))
-                                  : MediaQuery.removePadding(
-                                      context: context,
-                                      removeTop: true,
-                                      removeBottom: false,
-                                      child: ListView(
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        children: modals
-                                            .map((modal) =>
-                                                TransactionComponent(
-                                                  modal: modal,
-                                                  isEditable: true,
-                                                  onTap: () async {
-                                                    await Navigator.pushNamed(
-                                                        context,
-                                                        RouteApplication
-                                                            .getRoute(ERoute
-                                                                .detailTransaction),
-                                                        arguments: [
-                                                          modal,
-                                                          true
-                                                        ]);
-                                                    setState(() {});
-                                                  },
-                                                  editSlidableAction:
-                                                      (context) async {
-                                                    await Navigator.pushNamed(
-                                                        context,
-                                                        RouteApplication
-                                                            .getRoute(ERoute
-                                                                .addEditTransaction),
-                                                        arguments: modal);
-                                                    setState(() {});
-                                                  },
-                                                  deleteSlidableAction:
-                                                      (context) {
-                                                    Future.delayed(
-                                                        const Duration(
-                                                            milliseconds: 500),
-                                                        () => DataSample
-                                                                .instance()
-                                                            .removeTransaction(
-                                                                modal));
-                                                  },
-                                                ))
-                                            .toList(),
-                                      ));
-                            },
-                          );
-                        }
-                      })).builder()
+                  content: StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
+                    initialData: null,
+                    stream: CurrentTransaction().getStreamTransaction(),
+                    builder: (context, snapshot) {
+                      QuerySnapshot<ModalTransactionLog>? query = snapshot.data;
+                      return query == null
+                          ? const Center(child: Text("Empty list transaction"))
+                          : MediaQuery.removePadding(
+                              context: context,
+                              removeTop: true,
+                              removeBottom: false,
+                              child: ListView(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                children: query.docs.map((e) {
+                                  ModalTransactionLog log = e.data();
+                                  DocumentReference docRef =
+                                      log.lastTransactionRef ??
+                                          log.firstTransactionRef!;
+                                  return FutureBuilder<
+                                          DocumentSnapshot<ModalTransaction>>(
+                                      future: docRef
+                                          .withConverter(
+                                              fromFirestore: ModalTransaction
+                                                  .fromFirestore,
+                                              toFirestore:
+                                                  (ModalTransaction modal, _) =>
+                                                      modal.toFirestore())
+                                          .get(),
+                                      builder: (context, snapshot) => snapshot
+                                              .hasData
+                                          ? TransactionComponent(
+                                              modal: snapshot.data!.data()!,
+                                              isEditable: true,
+                                              onTap: () async {
+                                                await Navigator.pushNamed(
+                                                    context,
+                                                    RouteApplication.getRoute(
+                                                        ERoute
+                                                            .detailTransaction),
+                                                    arguments: [
+                                                      snapshot.data!.data()!,
+                                                      true
+                                                    ]);
+                                                setState(() {});
+                                              },
+                                              editSlidableAction:
+                                                  (context) async {
+                                                // await Navigator.pushNamed(
+                                                //     context,
+                                                //     RouteApplication.getRoute(
+                                                //         ERoute
+                                                //             .addEditTransaction),
+                                                //     arguments: modal);
+                                                // setState(() {});
+                                              },
+                                              deleteSlidableAction: (context) {
+                                                // Future.delayed(
+                                                //     const Duration(
+                                                //         milliseconds: 500),
+                                                //     () => DataSample.instance()
+                                                //         .removeTransaction(
+                                                //             modal));
+                                              },
+                                            )
+                                          : SizedBox());
+                                }).toList(),
+                              ));
+                    },
+                  )).builder()
             ]),
           ),
         )

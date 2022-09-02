@@ -106,7 +106,7 @@ class _AddNewAccountState extends State<AddNewAccount> {
                       child: DropDown<String>(
                         hint: "Choose account type",
                         items: _listDropDown,
-                        chosenValue: _chosenValue,
+                        choseValue: _chosenValue,
                         onChanged: (itemSelected) {
                           _chosenValue = itemSelected;
                           setState(() => itemSelected == _addWallet

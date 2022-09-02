@@ -37,7 +37,7 @@ class ExportPage extends StatelessWidget {
               child: DropDown<String>(
                   hint: "Type transaction export",
                   items: ["All", "Income", "Expense"],
-                  chosenValue: "All",
+                  choseValue: "All",
                   onChanged: (value) => null),
             ),
             Text("When date range?"),
@@ -56,7 +56,7 @@ class ExportPage extends StatelessWidget {
                       "Last 3 months",
                       "Last nearly year"
                     ],
-                    chosenValue: "Last 30 days",
+                    choseValue: "Last 30 days",
                     onChanged: (value) => null)),
             Text("What format do you want to export?"),
             Container(
@@ -70,7 +70,7 @@ class ExportPage extends StatelessWidget {
                 child: DropDown<String>(
                     hint: "Extension files export",
                     items: ["CSV", "Excel", "SpreadSheet"],
-                    chosenValue: "CSV",
+                    choseValue: "CSV",
                     onChanged: (value) => null)),
             Expanded(
                 child: Align(

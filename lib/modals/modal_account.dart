@@ -23,4 +23,15 @@ class ModalAccount extends IModal {
 
   @override
   Map<String, dynamic> updateFirestore() => toFirestore();
+
+  @override
+  String toString() =>
+      "${accountTypeRef?.id[0].toUpperCase()}${accountTypeRef?.id.substring(1).toLowerCase()}";
+
+  @override
+  bool operator ==(dynamic other) =>
+      other != null && other is ModalAccount && id == other.id;
+
+  @override
+  int get hashCode => super.hashCode;
 }
