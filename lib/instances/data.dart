@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/enum/enum_category.dart';
 import 'package:expense_tracker/constants/enum/enum_frequency.dart';
 import 'package:expense_tracker/constants/enum/enum_transaction.dart';
@@ -14,19 +15,21 @@ class DataSample {
   static List<ModalTransaction> instanceSample() {
     _sample ??= List<ModalTransaction>.generate(300, (index) {
       return ModalTransaction(
-          category: ECategory.values[index % 5],
+          id: null,
+          categoryTypeRef: null,
           money: index * 3.131592,
-          timeTransaction: DateTime.tryParse(
+          timeCreate: DateTime.tryParse(
               "2022-0${Random().nextInt(9) + 1}-0${Random().nextInt(9) + 1}T0${Random().nextInt(9) + 1}:12:50+07:00"),
-          typeTransaction: ETypeTransaction.values[index % 2],
-          isRepeat: index % 2 == 0 ? true : false,
-          account: "Bank $index",
+          transactionTypeRef: null,
+          accountRef: null,
           purpose: "Purpose ${index % 10}",
-          currency: ["\$", "&", "%", "@", "#"][index % 5],
           description: "Đoán xem id:$index",
-          attachment: [],
-          frequency: EFrequency.values[index % 3],
-          endAfter: DateTime.tryParse("2023-01-01 00:00:00Z"));
+          attachments: [],
+          repeat: {
+            'frequency_type_ref': '',
+            'end_after': DateTime.tryParse("2023-01-01 00:00:00Z")
+          },
+          transactionRef: null);
     });
     return _sample!;
   }
@@ -40,7 +43,7 @@ class DataSample {
         <String, List<ModalTransaction>?>{};
 
     for (int index = 0; index < data.length; index++) {
-      String key = _getDate(data[index].timeTransaction!);
+      String key = _getDate(data[index].timeCreate!);
       if (result.containsKey(key)) {
         result[key]!.add(data[index]);
       } else {

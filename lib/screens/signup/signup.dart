@@ -1,12 +1,10 @@
-import 'dart:developer';
-
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/routes/route.dart';
-import 'package:expense_tracker/services/firebase/email_auth.dart';
-import 'package:expense_tracker/services/firebase/google_auth.dart';
+import 'package:expense_tracker/services/firebase/auth/email_auth.dart';
+import 'package:expense_tracker/services/firebase/auth/google_auth.dart';
 import 'package:expense_tracker/widgets/check_box.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:expense_tracker/widgets/editText.dart';
@@ -22,7 +20,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  final modal = ModalUser(userName: null, email: null, password: null);
+  final modal = ModalUser(email: null, password: null, id: '');
   bool acceptTerm = false;
 
   String? errorEmail;
@@ -48,7 +46,7 @@ class _SignUpState extends State<SignUp> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: EditText(
-                  onChanged: (userName) => modal.userName = userName,
+                  onChanged: (displayName) => modal.displayName = displayName,
                   labelText: "Tên người dùng",
                   hintText: "User name",
                   enableRegex: true,
@@ -94,30 +92,37 @@ class _SignUpState extends State<SignUp> {
                     onPressed: () async {
                       if (modal.validation) {
                         if (acceptTerm) {
-                          UserCredential? user =
-                              await EmailAuth.createUserWithPassword(
-                                      email: modal.email!,
-                                      password: modal.password!)
-                                  .catchError((err) {
+                          EmailAuth.createUserWithPassword(
+                                  email: modal.email!,
+                                  password: modal.password!)
+                              .then((value) => null, onError: (err) {
                             errorPassword = null;
                             errorEmail = null;
                             if (err is FirebaseAuthException) {
                               switch ((err as FirebaseAuthException).code) {
                                 case 'weak-password':
-                                  setState(() => errorPassword =
-                                      "Weak password. Please try password stronger!");
+                                  errorPassword =
+                                      "Weak password. Please try password stronger!";
                                   break;
                                 case 'email-already-in-use':
-                                  setState(() => errorEmail =
-                                      "User exist! Swtich to login page.");
+                                  errorEmail =
+                                      "User exist! Swtich to login page.";
                                   break;
                                 case 'invalid-email':
-                                  setState(
-                                      () => errorEmail = "Wrong email format");
+                                  errorEmail = "Wrong email format";
+                                  break;
+                                case 'wrong-password':
+                                  errorPassword = "Wrong password";
+                                  break;
+                                case 'user-not-found':
+                                  errorEmail = "User not exist";
                                   break;
                                 default:
+                                  errorEmail = errorPassword =
+                                      (err as FirebaseAuthException).code;
                                   print((err as FirebaseAuthException).code);
                               }
+                              setState(() {});
                             }
                           });
                         } else {

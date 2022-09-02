@@ -34,11 +34,16 @@ class _HomePageState extends State<HomePage>
   ];
   int _currentIndex = 0;
   late double height = MediaQuery.of(context).size.height;
+  // final List<OverviewTransactionComponent> overview_transaction = [
+  //   OverviewTransactionComponent(
+  //       typeTransaction: ETypeTransaction.income, currency: "\$", money: 5000),
+  //   OverviewTransactionComponent(
+  //       typeTransaction: ETypeTransaction.expense, currency: "\$", money: 3000)
+  // ];
+
   final List<OverviewTransactionComponent> overview_transaction = [
-    OverviewTransactionComponent(
-        typeTransaction: ETypeTransaction.income, currency: "\$", money: 5000),
-    OverviewTransactionComponent(
-        typeTransaction: ETypeTransaction.expense, currency: "\$", money: 3000)
+    OverviewTransactionComponent(transactionTypeRef: null),
+    OverviewTransactionComponent(transactionTypeRef: null)
   ];
 
   @override
@@ -88,8 +93,8 @@ class _HomePageState extends State<HomePage>
                         foregroundImage: AssetImage(CategoryAsset.moneyBag)),
                   ),
                 ),
-                title: dropDown(
-                    hintText: "Time",
+                title: DropDown<String>(
+                    hint: "Time",
                     isExpanded: false,
                     items: ["1", "2", "3"],
                     chosenValue: null,

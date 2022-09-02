@@ -57,14 +57,14 @@ class _OverviewReportState extends State<OverviewReport> {
                     children: [
                       Text("and your biggest",
                           style: TextStyle(color: Colors.black)),
-                      CategoryComponent(
-                              modal: ModalBudget(
-                                  budgetMoney: 0.0,
-                                  nowMoney: 0.0,
-                                  isLimited: false,
-                                  category: ECategory.shopping,
-                                  currency: '\$'))
-                          .nameCategoryBuilder(),
+                      // CategoryComponent(
+                      //         modal: ModalBudget(
+                      //             budgetMoney: 0.0,
+                      //             nowMoney: 0.0,
+                      //             isLimited: false,
+                      //             category: ECategory.shopping,
+                      //             currency: '\$'))
+                      //     .nameCategoryBuilder(),
                       Text("\$120", style: TextStyle(color: Colors.black))
                     ],
                   ),
@@ -105,14 +105,14 @@ class _OverviewReportState extends State<OverviewReport> {
                     children: [
                       Text("and your biggest",
                           style: TextStyle(color: Colors.black)),
-                      CategoryComponent(
-                              modal: ModalBudget(
-                                  budgetMoney: 0.0,
-                                  nowMoney: 0.0,
-                                  isLimited: false,
-                                  category: ECategory.shopping,
-                                  currency: '\$'))
-                          .nameCategoryBuilder(),
+                      // CategoryComponent(
+                      //         modal: ModalBudget(
+                      //             budgetMoney: 0.0,
+                      //             nowMoney: 0.0,
+                      //             isLimited: false,
+                      //             category: ECategory.shopping,
+                      //             currency: '\$'))
+                      //     .nameCategoryBuilder(),
                       Text("\$120", style: TextStyle(color: Colors.black))
                     ],
                   ),

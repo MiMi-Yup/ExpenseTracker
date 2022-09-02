@@ -87,9 +87,9 @@ class _AddEditBudgetState extends State<AddEditBudget> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    dropDown(
+                    DropDown<String>(
                         isExpanded: true,
-                        hintText: "Category",
+                        hint: "Category",
                         items: ["Shopping", "Eat"],
                         chosenValue: null,
                         onChanged: (value) => null),

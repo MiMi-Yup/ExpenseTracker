@@ -29,8 +29,8 @@ class _DetailTransactionState extends State<DetailTransaction> {
         width: double.maxFinite,
         height: size.height / 3,
         decoration: BoxDecoration(
-            color: MyColor.colorTransaction[modal?.typeTransaction] ??
-                Colors.white70,
+            // color: MyColor.colorTransaction[modal?.typeTransaction] ??
+            //     Colors.white70,
             borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(10.0),
                 bottomRight: Radius.circular(10.0))),
@@ -161,9 +161,9 @@ class _DetailTransactionState extends State<DetailTransaction> {
                 SizedBox(
                   height: 20.0,
                 ),
-                Text(
-                    "${modal?.typeTransaction?.name[0].toUpperCase()}${modal?.typeTransaction?.name.substring(1).toLowerCase()}",
-                    style: TextStyle(color: Colors.black))
+                // Text(
+                //     "${modal?.typeTransaction?.name[0].toUpperCase()}${modal?.typeTransaction?.name.substring(1).toLowerCase()}",
+                //     style: TextStyle(color: Colors.black))
               ],
             ),
             Column(
@@ -173,9 +173,9 @@ class _DetailTransactionState extends State<DetailTransaction> {
                 SizedBox(
                   height: 20.0,
                 ),
-                Text(
-                    "${modal?.category?.name[0].toUpperCase()}${modal?.category?.name.substring(1).toLowerCase()}",
-                    style: TextStyle(color: Colors.black))
+                // Text(
+                //     "${modal?.category?.name[0].toUpperCase()}${modal?.category?.name.substring(1).toLowerCase()}",
+                //     style: TextStyle(color: Colors.black))
               ],
             ),
             Column(
@@ -185,7 +185,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
                 SizedBox(
                   height: 20.0,
                 ),
-                Text("${modal?.account}", style: TextStyle(color: Colors.black))
+                // Text("${modal?.account}", style: TextStyle(color: Colors.black))
               ],
             )
           ],
@@ -228,7 +228,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
               alignment: Alignment.center,
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(10.0)),
-              child: modal?.attachment != null
+              child: modal?.attachments != null
                   ? Image.asset(IconAsset.success, fit: BoxFit.fill)
                   : null,
             ),

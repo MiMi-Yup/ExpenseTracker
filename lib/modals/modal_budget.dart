@@ -1,29 +1,54 @@
-import 'package:expense_tracker/constants/enum/enum_category.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expense_tracker/modals/modal.dart';
 
-class ModalBudget {
-  double budgetMoney;
-  double nowMoney;
-  bool isLimited;
-  ECategory category;
-  String currency;
-
-  double get remainMoney {
-    double _sub = budgetMoney - nowMoney;
-    return _sub < 0 ? 0 : _sub;
-  }
-
-  double get percent {
-    if (budgetMoney == 0) return 1;
-    double _percent = nowMoney / budgetMoney;
-    return _percent > 1 ? 1 : _percent;
-  }
-
-  bool get isExceedLimit => isLimited && (nowMoney - budgetMoney) > 0;
+class ModalBudget extends IModal {
+  double? budget;
+  DocumentReference? categoryTypeRef;
+  DateTime? timeCreate;
+  double? percentAlert;
 
   ModalBudget(
-      {required this.budgetMoney,
-      required this.nowMoney,
-      this.isLimited = false,
-      required this.category,
-      required this.currency});
+      {required super.id,
+      required this.budget,
+      required this.percentAlert,
+      required this.timeCreate,
+      required this.categoryTypeRef});
+
+  ModalBudget.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options)
+      : super.fromFirestore(snapshot, options) {
+    Map<String, dynamic>? data = snapshot.data();
+    budget = data?['budget'];
+    categoryTypeRef = data?['category_type_ref'];
+    timeCreate = data?['time_create'];
+    percentAlert = data?['percent_alert'];
+  }
+
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'budget': budget,
+      'category_type_ref': categoryTypeRef,
+      'time_create': timeCreate,
+      'percent_alert': percentAlert
+    };
+  }
+
+  Map<String, dynamic> updateFirestore() {
+    return {'budget': budget, 'percent_alert': percentAlert};
+  }
+
+  double remainMoney(double currentMoney) {
+    double sub = budget ?? 0 - currentMoney;
+    return sub < 0 ? 0 : sub;
+  }
+
+  double get percent => percentAlert ?? 0.0;
+
+  bool isExceedLimit(double currentMoney) {
+    if (percentAlert != null) {
+      return currentMoney - (budget ?? 0.0) > 0 ? true : false;
+    }
+    return false;
+  }
 }

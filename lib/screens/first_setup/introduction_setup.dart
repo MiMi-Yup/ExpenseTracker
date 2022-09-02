@@ -34,13 +34,14 @@ class IntroductionSetup extends StatelessWidget {
             ),
           ),
           Container(
-            width: double.maxFinite,
-            margin: EdgeInsets.all(25.0),
-            child: largestButton(
+              width: double.maxFinite,
+              margin: EdgeInsets.all(25.0),
+              child: largestButton(
                 text: "Let’s go",
-                onPressed: () => Navigator.pushNamed(
-                    context, RouteApplication.getRoute(ERoute.addEditAccount))),
-          )
+                onPressed: () => RouteApplication.navigatorKey.currentState
+                    ?.pushNamed(
+                        RouteApplication.getRoute(ERoute.setDefault)),
+              ))
         ],
       ),
     );

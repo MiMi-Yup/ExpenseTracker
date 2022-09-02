@@ -1,22 +1,20 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/constants/enum/enum_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/screens/tab/budget_page.dart';
 import 'package:expense_tracker/screens/tab/home_page.dart';
 import 'package:expense_tracker/screens/tab/profile/profile_page.dart';
 import 'package:expense_tracker/screens/tab/transaction/transaction_page.dart';
+import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
+import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
 import 'package:expense_tracker/widgets/bottom_nav.dart';
 import 'package:flutter/material.dart';
 
 enum EPage { home, transaction, budget, profile }
-
-class _FloatingActionData {
-  String asset;
-  ETypeTransaction type;
-  _FloatingActionData({required this.asset, required this.type});
-}
 
 class Navigation extends StatefulWidget {
   const Navigation({Key? key}) : super(key: key);
@@ -32,12 +30,6 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
     EPage.budget: 2,
     EPage.profile: 3
   };
-
-  final List<_FloatingActionData> _floatingActions = [
-    _FloatingActionData(asset: IconAsset.income, type: ETypeTransaction.income),
-    _FloatingActionData(
-        asset: IconAsset.expense, type: ETypeTransaction.expense)
-  ];
 
   int _currentIndex = 0;
   late PageController _controller;
@@ -74,7 +66,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
           icon: Icons.home, label: "Home", index: 0, toPage: toPage),
       1: ItemNavModal(
           icon: Icons.sync_alt, label: "Transaction", index: 1, toPage: toPage),
-      2: ItemNavModal(icon: Icons.add, label: "Action", index: -1),
+      2: ItemNavModal(icon: null, label: "Action", index: -1),
       3: ItemNavModal(
           icon: Icons.pie_chart, label: "Budget", index: 2, toPage: toPage),
       4: ItemNavModal(
@@ -84,63 +76,82 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
     return Scaffold(
       extendBody: true,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: List<Widget>.generate(
-            _floatingActions.length,
-            (index) => Container(
-                  height: 70.0,
-                  width: 56.0,
-                  alignment: FractionalOffset.topCenter,
-                  child: ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _fabController,
-                      curve: Interval(
-                          0.0, 1.0 - index / _floatingActions.length / 2.0,
-                          curve: Curves.easeOut),
-                    ),
-                    child: FloatingActionButton(
-                      heroTag: null,
-                      backgroundColor: Colors.black,
-                      mini: true,
-                      child: Image.asset(
-                        _floatingActions[index].asset,
-                        fit: BoxFit.contain,
+      floatingActionButton: FutureBuilder<List<ModalTransactionType>>(
+        future: TransactionTypeFirestore().read(),
+        initialData: [],
+        builder: (context, snapshot) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: snapshot.data!
+              .map<Widget>((e) => Container(
+                    height: 70.0,
+                    width: 56.0,
+                    alignment: FractionalOffset.topCenter,
+                    child: ScaleTransition(
+                      scale: CurvedAnimation(
+                        parent: _fabController,
+                        curve: Interval(
+                            0.0,
+                            1.0 -
+                                (snapshot.data!.indexOf(e) /
+                                        snapshot.data!.length) /
+                                    2.0,
+                            curve: Curves.easeOut),
                       ),
-                      onPressed: () async {
-                        await Navigator.pushNamed(
-                            context,
-                            RouteApplication.getRoute(
-                                ERoute.addEditTransaction),
-                            arguments: _floatingActions[index].type);
-                        _fabController.reverse();
-                      },
+                      child: FloatingActionButton(
+                        heroTag: null,
+                        backgroundColor: Colors.black,
+                        mini: true,
+                        child: e.localAsset != null && e.localAsset == true
+                            ? Image.asset(
+                                e.image!,
+                                fit: BoxFit.contain,
+                              )
+                            : FutureBuilder<Uint8List?>(
+                                future: ActionFirebaseStorage.downloadFile(
+                                    e.image!),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData &&
+                                      snapshot.data != null) {
+                                    return Image.memory(snapshot.data!);
+                                  }
+                                  return SizedBox();
+                                }),
+                        onPressed: () async {
+                          await Navigator.pushNamed(
+                              context,
+                              RouteApplication.getRoute(
+                                  ERoute.addEditTransaction),
+                              arguments: e);
+                          _fabController.reverse();
+                        },
+                      ),
                     ),
-                  ),
-                )).toList()
-          ..add(
-            FloatingActionButton(
-              heroTag: null,
-              elevation: 8.0,
-              child: AnimatedBuilder(
-                  animation: _fabController,
-                  builder: (context, child) => Transform(
-                        transform: Matrix4.rotationZ(
-                            _fabController.value * 0.5 * math.pi),
-                        alignment: FractionalOffset.center,
-                        child: Icon(_fabController.isDismissed
-                            ? Icons.add
-                            : Icons.close),
-                      )),
-              onPressed: () {
-                if (_fabController.isDismissed) {
-                  _fabController.forward();
-                } else {
-                  _fabController.reverse();
-                }
-              },
+                  ))
+              .toList()
+            ..add(
+              FloatingActionButton(
+                heroTag: null,
+                elevation: 8.0,
+                child: AnimatedBuilder(
+                    animation: _fabController,
+                    builder: (context, child) => Transform(
+                          transform: Matrix4.rotationZ(
+                              _fabController.value * 0.5 * math.pi),
+                          alignment: FractionalOffset.center,
+                          child: Icon(_fabController.isDismissed
+                              ? Icons.add
+                              : Icons.close),
+                        )),
+                onPressed: () {
+                  if (_fabController.isDismissed) {
+                    _fabController.forward();
+                  } else {
+                    _fabController.reverse();
+                  }
+                },
+              ),
             ),
-          ),
+        ),
       ),
       bottomNavigationBar: BottomAppBarComponent(
               navActions: _navActions, currentIndex: _currentIndex)

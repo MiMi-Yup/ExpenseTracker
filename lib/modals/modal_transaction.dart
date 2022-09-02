@@ -1,104 +1,155 @@
-import 'package:expense_tracker/constants/enum/enum_category.dart';
-import 'package:expense_tracker/constants/enum/enum_frequency.dart';
-import 'package:expense_tracker/constants/enum/enum_transaction.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expense_tracker/modals/modal.dart';
 
-class ModalTransaction {
-  ECategory? category;
+class ModalTransactionLog extends IModal {
+  DocumentReference? lastTransactionRef;
+  DocumentReference? firstTransactionRef;
+
+  ModalTransactionLog.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options)
+      : super.fromFirestore(snapshot, options) {
+    Map<String, dynamic>? data = snapshot.data();
+    lastTransactionRef = data?['last_transaction_ref'];
+    firstTransactionRef = data?['first_transaction_ref'];
+  }
+
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'first_transaction_ref': firstTransactionRef,
+      'last_transaction_ref': lastTransactionRef
+    };
+  }
+
+  @override
+  Map<String, dynamic> updateFirestore() => toFirestore();
+}
+
+class ModalTransaction extends IModal {
+  DocumentReference? accountRef;
+  List<String>? attachments;
+  DocumentReference? categoryTypeRef;
   String? description;
-  String? purpose;
   double? money;
-  DateTime? timeTransaction;
-  ETypeTransaction? typeTransaction;
-  List<String>? attachment;
-  String? account;
-  bool? isRepeat;
-  EFrequency? frequency;
-  DateTime? endAfter;
-  String? currency;
-  DateTime? lastModified;
+  String? purpose;
+  Map<String, dynamic>? repeat;
+  DateTime? timeCreate;
+  DocumentReference? transactionTypeRef;
+  DocumentReference? transactionRef;
 
-  ModalTransaction({
-    required this.category,
-    required this.money,
-    required this.timeTransaction,
-    required this.typeTransaction,
-    required this.isRepeat,
-    required this.account,
-    required this.purpose,
-    required this.currency,
-    this.description,
-    this.attachment,
-    this.frequency,
-    this.endAfter,
-  });
+  ModalTransaction(
+      {required super.id,
+      required this.accountRef,
+      required this.attachments,
+      required this.description,
+      required this.purpose,
+      required this.money,
+      required this.repeat,
+      required this.timeCreate,
+      required this.transactionRef,
+      required this.transactionTypeRef,
+      required this.categoryTypeRef});
 
-  ModalTransaction.minInit({required this.typeTransaction});
+  ModalTransaction.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options)
+      : super.fromFirestore(snapshot, options) {
+    Map<String, dynamic>? data = snapshot.data();
+    accountRef = data?['account_ref'];
+    attachments = data?['attachments'];
+    categoryTypeRef = data?['category_type_ref'];
+    description = data?['description'];
+    money = data?['money'];
+    purpose = data?['purpose'];
+    repeat = data?['repeat'];
+    timeCreate = data?['time_create'];
+    transactionTypeRef = data?['transaction_type_ref'];
+    transactionRef = data?['transaction_ref'];
+  }
 
-  ModalTransaction.clone(ModalTransaction clone) {
-    category = clone.category;
-    money = clone.money;
-    timeTransaction = clone.timeTransaction;
-    typeTransaction = clone.typeTransaction;
-    isRepeat = clone.isRepeat;
-    account = clone.account;
-    purpose = clone.purpose;
-    currency = clone.currency;
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'account_ref': accountRef,
+      'attachments': attachments,
+      'category_type_ref': categoryTypeRef,
+      'description': description,
+      'money': money,
+      'purpose': purpose,
+      'repeat': repeat,
+      'time_create': timeCreate,
+      'transaction_type_ref': transactionTypeRef,
+      'transaction_ref': transactionRef
+    };
+  }
+
+  @override
+  Map<String, dynamic> updateFirestore() => {'transaction_ref': transactionRef};
+
+  ModalTransaction.minInit({required this.transactionTypeRef}) : super(id: '');
+
+  ModalTransaction.clone(ModalTransaction clone) : super(id: '') {
+    id = clone.id;
+    accountRef = clone.accountRef;
+    attachments = clone.attachments;
+    categoryTypeRef = clone.categoryTypeRef;
     description = clone.description;
-    attachment = clone.attachment;
-    frequency = clone.frequency;
-    endAfter = clone.endAfter;
+    money = clone.money;
+    purpose = clone.purpose;
+    repeat = clone.repeat;
+    timeCreate = clone.timeCreate;
+    transactionTypeRef = clone.transactionTypeRef;
+    transactionRef = clone.transactionRef;
   }
 
   ModalTransaction copyWith(ModalTransaction source) {
-    category = source.category ?? category;
-    money = source.money ?? money;
-    timeTransaction = source.timeTransaction ?? timeTransaction;
-    typeTransaction = source.typeTransaction ?? typeTransaction;
-    isRepeat = source.isRepeat ?? isRepeat;
-    account = source.account ?? account;
-    purpose = source.purpose ?? purpose;
-    currency = source.currency ?? currency;
+    id = source.id ?? id;
+    accountRef = source.accountRef ?? accountRef;
+    attachments = source.attachments ?? attachments;
+    categoryTypeRef = source.categoryTypeRef ?? categoryTypeRef;
     description = source.description ?? description;
-    attachment = source.attachment ?? attachment;
-    frequency = source.frequency ?? frequency;
-    endAfter = source.endAfter ?? endAfter;
+    money = source.money ?? money;
+    purpose = source.purpose ?? purpose;
+    repeat = source.repeat ?? repeat;
+    timeCreate = source.timeCreate ?? timeCreate;
+    transactionTypeRef = source.transactionTypeRef ?? transactionTypeRef;
+    transactionRef = source.transactionRef ?? transactionRef;
     return this;
   }
 
-  ModalTransaction override(ModalTransaction source) {
-    category = source.category;
-    money = source.money;
-    timeTransaction = source.timeTransaction;
-    typeTransaction = source.typeTransaction;
-    isRepeat = source.isRepeat;
-    account = source.account;
-    purpose = source.purpose;
-    currency = source.currency;
+  ModalTransaction override_(ModalTransaction source) {
+    id = source.id;
+    accountRef = source.accountRef;
+    attachments = source.attachments;
+    categoryTypeRef = source.categoryTypeRef;
     description = source.description;
-    attachment = source.attachment;
-    frequency = source.frequency;
-    endAfter = source.endAfter;
+    money = source.money;
+    purpose = source.purpose;
+    repeat = source.repeat;
+    timeCreate = source.timeCreate;
+    transactionTypeRef = source.transactionTypeRef;
+    transactionRef = source.transactionRef;
     return this;
   }
 
   ModalTransaction update(ModalTransaction source) {
-    category = source.category;
-    money = source.money;
-    isRepeat = source.isRepeat;
-    account = source.account;
-    purpose = source.purpose;
-    currency = source.currency;
+    id = source.id;
+    accountRef = source.accountRef;
+    attachments = source.attachments;
+    categoryTypeRef = source.categoryTypeRef;
     description = source.description;
-    attachment = source.attachment;
-    frequency = source.frequency;
-    endAfter = source.endAfter;
+    money = source.money;
+    purpose = source.purpose;
+    repeat = source.repeat;
+    timeCreate = source.timeCreate;
+    transactionTypeRef = source.transactionTypeRef;
+    transactionRef = source.transactionRef;
     return this;
   }
 
   String get getTimeTransaction {
-    if (timeTransaction != null) {
-      int hour = timeTransaction!.hour;
-      int minute = timeTransaction!.minute;
+    if (timeCreate != null) {
+      int hour = timeCreate!.hour;
+      int minute = timeCreate!.minute;
       bool isPM = hour >= 12;
       hour = hour > 12 ? hour - 12 : hour;
 
@@ -107,10 +158,10 @@ class ModalTransaction {
     return "";
   }
 
-  String get getDateTransaction => timeTransaction != null
-      ? "${timeTransaction!.day}/${timeTransaction!.month}/${timeTransaction!.year}"
+  String get getDateTransaction => timeCreate != null
+      ? "${timeCreate!.day}/${timeCreate!.month}/${timeCreate!.year}"
       : "";
 
-  String get getMoney =>
-      money != null ? "$currency${money!.toStringAsFixed(3)}" : "";
+  String getMoney(String currency_code) =>
+      money != null ? "$currency_code${money!.toStringAsFixed(3)}" : "";
 }

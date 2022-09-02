@@ -3,11 +3,11 @@ enum ERoute {
   introduction,
   login,
   signUp,
-  verify,
   authGoogle,
   forgotPassword,
   pin,
   introductionSetupAccount,
+  setDefault,
   main,
   notification,
   overviewReport,
@@ -20,6 +20,9 @@ enum ERoute {
   addEditAccount,
   addEditTransaction,
   detailTransaction,
+  termOfCondition,
 
-  termOfCondition
+  addEditAccountType,
+  addEditCategoryType,
+  editTransactionType
 }

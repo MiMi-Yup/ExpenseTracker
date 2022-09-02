@@ -65,7 +65,7 @@ class _EditTextState extends State<EditText> {
             case ETypeEditText.password:
               if (!widget._regex.hasMatch(_controller.text)) {
                 widget.errorText =
-                    "Weak password! Please try stronger passwrod";
+                    "Weak password! Strong password is has least:\n8 Characters\n1 Lowercase\n1 Uppercase\n1 Numberic number\n1 Special character";
               }
               break;
             case ETypeEditText.normal:
@@ -107,8 +107,10 @@ class _EditTextState extends State<EditText> {
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: widget.labelText,
+                labelStyle: TextStyle(fontSize: 18),
                 hintText: widget.hintText,
                 errorText: widget.errorText,
+                errorStyle: TextStyle(fontSize: 18),
                 suffixIcon: widget.type == ETypeEditText.password
                     ? IconButton(
                         onPressed: () =>

@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
+import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/routes/route.dart';
-import 'package:expense_tracker/services/firebase/google_auth.dart';
+import 'package:expense_tracker/services/firebase/auth/google_auth.dart';
+import 'package:expense_tracker/services/firebase/firestore/user.dart';
 import 'package:expense_tracker/widgets/input_otp.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CodeAuth extends StatefulWidget {
@@ -22,7 +24,7 @@ class _CodeAuthState extends State<CodeAuth>
 
   late AnimationController controller;
   final Map<String, String?> message = <String, String?>{
-    "setup": "Let’s setup your PIN",
+    "setup": "Let's setup your PIN",
     "confirm": "Ok. Re type your PIN again",
     "enter": "Enter your PIN",
     "wrong": "Incorrect PIN, please try again"
@@ -68,7 +70,7 @@ class _CodeAuthState extends State<CodeAuth>
     }
   }
 
-  void _onDone(String value) {
+  void _onDone(String value) async {
     bool wrong = false;
     if (_initCode) {
       //confirm code
@@ -79,21 +81,44 @@ class _CodeAuthState extends State<CodeAuth>
         } else {
           //add pin completed. go to next
           _initCode = false;
+
+          await UserFirestore().read().then((value) async {
+            if (value.isNotEmpty) {
+              ModalUser fieldUser = value.first;
+              fieldUser.passcode = _code;
+              await UserFirestore().update(null, fieldUser);
+            } else {
+              await UserFirestore().insert(ModalUser(
+                  id: null, email: null, password: null, passcode: _code));
+            }
+          });
         }
       }
       _confirm = !_confirm;
     } else {
-      //do something after enter code
-      //check account has been setup yet
-      if (true) {
-        Navigator.popUntil(context, (route) => route.isFirst);
-        Navigator.pushNamed(context,
-            RouteApplication.getRoute(ERoute.introductionSetupAccount));
-      } else {
-        Navigator.popUntil(context, (route) => route.isFirst);
-        Navigator.pushNamed(context, RouteApplication.getRoute(ERoute.main));
-      }
+      UserFirestore().read().then((user) {
+        if (user.isEmpty) {
+          wrong = true;
+        } else {
+          bool allowAccess = user.first.passcode == value;
+          if (allowAccess) {
+            bool wasSetup = user.first.wasSetup ?? false;
+            if (wasSetup) {
+              RouteApplication.navigatorKey.currentState
+                  ?.popUntil((route) => route.isFirst);
+              RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
+                  RouteApplication.getRoute(ERoute.main));
+            } else {
+              RouteApplication.navigatorKey.currentState
+                  ?.popUntil((route) => route.isFirst);
+              RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
+                  RouteApplication.getRoute(ERoute.introductionSetupAccount));
+            }
+          }
+        }
+      });
     }
+
     _changedTitle(wrongPIN: wrong);
   }
 
@@ -106,7 +131,7 @@ class _CodeAuthState extends State<CodeAuth>
         leading: null,
         actions: [
           TextButton(
-            onPressed: ()async => await GoogleAuth.signOut(),
+            onPressed: () async => await GoogleAuth.signOut(),
             child: Text("Sign out"),
           )
         ],
@@ -142,7 +167,7 @@ class _CodeAuthState extends State<CodeAuth>
                       color: Colors.white,
                       textStyle: TextStyle()),
                   keyboardType: TextInputType.number,
-                  onDone: (value) => _onDone(value),
+                  onDone: _onDone,
                   clearOnDone: true,
                   autofocus: true,
                 ),

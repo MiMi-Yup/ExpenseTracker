@@ -63,9 +63,9 @@ class _TransactionPageState extends State<TransactionPage>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              dropDown(
+              DropDown<String>(
                 isExpanded: false,
-                hintText: "Time",
+                hint: "Time",
                 items: ["1", "2"],
                 chosenValue: null,
                 onChanged: (p0) => null,

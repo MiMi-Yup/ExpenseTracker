@@ -61,17 +61,17 @@ class _TransactionComponentState extends State<TransactionComponent>
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Row(
           children: [
-            CategoryInstance.instances[widget.modal.category]!()
-                .getFullCategory(height: 50.0),
+            // CategoryInstance.instances[widget.modal.category]!()
+            //     .getFullCategory(height: 50.0),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    CategoryInstance.instances[widget.modal.category]!().name,
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  // Text(
+                  //   CategoryInstance.instances[widget.modal.category]!().name,
+                  //   style: TextStyle(color: Colors.white),
+                  // ),
                   SizedBox(height: 10.0),
                   Text(
                     widget.modal.description ?? "",
@@ -85,12 +85,12 @@ class _TransactionComponentState extends State<TransactionComponent>
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              widget.modal.getMoney,
-              style: TextStyle(
-                  color:
-                      MyColor.colorTransaction[widget.modal.typeTransaction]),
-            ),
+            // Text(
+            //   widget.modal.getMoney,
+            //   style: TextStyle(
+            //       color:
+            //           MyColor.colorTransaction[widget.modal.typeTransaction]),
+            // ),
             SizedBox(height: 10.0),
             Text(
               widget.modal.getTimeTransaction,

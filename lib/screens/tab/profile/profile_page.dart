@@ -1,9 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/asset/category.dart';
 import 'package:expense_tracker/constants/color.dart';
+import 'package:expense_tracker/instances/data.dart';
+import 'package:expense_tracker/modals/modal_transaction.dart';
+import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/screens/tab/profile/account_page.dart';
 import 'package:expense_tracker/screens/tab/profile/export_page.dart';
 import 'package:expense_tracker/screens/tab/profile/setting_preference.dart';
+import 'package:expense_tracker/services/firebase/auth/google_auth.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -54,7 +61,19 @@ class ProfilePage extends StatelessWidget {
                   )
                 ],
               ),
-              IconButton(onPressed: null, icon: Icon(Icons.edit))
+              IconButton(
+                  onPressed: () async {
+                    // FirebaseFirestore.instance
+                    //     .collection('user/user01/account').doc('account01').set({'typeAccountRef':FirebaseFirestore.instance.doc('typeAccount/01')});
+                    FirebaseFirestore.instance
+                        .doc('user/user01/account/account01')
+                        .get()
+                        .then((value) => value
+                            .data()!['typeAccountRef']
+                            .get()
+                            .then((value) => print(value.data())));
+                  },
+                  icon: Icon(Icons.edit))
             ],
           ),
           SizedBox(
@@ -110,7 +129,9 @@ class ProfilePage extends StatelessWidget {
                                                   Expanded(
                                                       child: largestButton(
                                                           text: "Yes",
-                                                          onPressed: () => null,
+                                                          onPressed: () =>
+                                                              GoogleAuth
+                                                                  .signOut(),
                                                           background:
                                                               MyColor.purple()))
                                                 ],
@@ -120,9 +141,9 @@ class ProfilePage extends StatelessWidget {
                                         ));
                               }
                             : (e.value is Widget
-                                ? () => Navigator.push<void>(
-                                    context,
-                                    MaterialPageRoute<void>(
+                                ? () => RouteApplication
+                                        .navigatorKey.currentState
+                                        ?.push(MaterialPageRoute<void>(
                                       builder: (context) => e.value as Widget,
                                     ))
                                 : null),

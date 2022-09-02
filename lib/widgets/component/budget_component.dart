@@ -58,9 +58,9 @@ class BudgetComponent {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CategoryInstance.instances[modal.category]!()
-                              .getMinCategory(
-                                  height: 10.0, indicatorColor: Colors.orange),
+                          // CategoryInstance.instances[modal.category]!()
+                          //     .getMinCategory(
+                          //         height: 10.0, indicatorColor: Colors.orange),
                           Visibility(
                             child: Icon(Icons.warning_amber),
                             visible: true,
@@ -68,7 +68,7 @@ class BudgetComponent {
                         ],
                       ),
                       SizedBox(height: 10.0),
-                      Text("Remaining ${modal.currency}${modal.remainMoney}"),
+                      // Text("Remaining ${modal.currency}${modal.remainMoney}"),
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                         child: Stack(
@@ -92,17 +92,17 @@ class BudgetComponent {
                           ],
                         ),
                       ),
-                      Text(
-                        "${modal.currency}${modal.nowMoney} ${modal.isLimited ? "of ${modal.currency}${modal.budgetMoney}" : ""}",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      SizedBox(height: 10.0),
-                      Visibility(
-                          visible: modal.isExceedLimit,
-                          child: Text(
-                            "You're exceed the limit!",
-                            style: TextStyle(color: Colors.red),
-                          ))
+                      // Text(
+                      //   "${modal.currency}${modal.nowMoney} ${modal.isLimited ? "of ${modal.currency}${modal.budgetMoney}" : ""}",
+                      //   style: TextStyle(color: Colors.grey),
+                      // ),
+                      // SizedBox(height: 10.0),
+                      // Visibility(
+                      //     visible: modal.isExceedLimit,
+                      //     child: Text(
+                      //       "You're exceed the limit!",
+                      //       style: TextStyle(color: Colors.red),
+                      //     ))
                     ],
                   ),
                 ))));

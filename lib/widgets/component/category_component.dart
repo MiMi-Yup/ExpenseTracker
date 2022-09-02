@@ -15,10 +15,10 @@ class CategoryComponent {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CategoryInstance.instances[modal.category]!()
-              .getFullCategory(height: 50.0),
-          Text(CategoryInstance.instances[modal.category]!().name,
-              style: TextStyle(color: Colors.black))
+          // CategoryInstance.instances[modal.category]!()
+          //     .getFullCategory(height: 50.0),
+          // Text(CategoryInstance.instances[modal.category]!().name,
+          //     style: TextStyle(color: Colors.black))
         ],
       ),
     );
@@ -36,12 +36,12 @@ class CategoryComponent {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              CategoryInstance.instances[modal.category]!()
-                  .getMinCategory(height: 10.0),
-              Text(
-                "${modal.currency}${modal.nowMoney}",
-                style: TextStyle(color: valueColor),
-              )
+              // CategoryInstance.instances[modal.category]!()
+              //     .getMinCategory(height: 10.0),
+              // Text(
+              //   "${modal.currency}${modal.nowMoney}",
+              //   style: TextStyle(color: valueColor),
+              // )
             ],
           ),
           SizedBox(height: 10.0),
@@ -54,14 +54,14 @@ class CategoryComponent {
                     borderRadius: BorderRadius.circular(height * 2),
                     color: backgroundIndicatorColor),
               ),
-              Container(
-                width: width * modal.percent,
-                height: height,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(height * 2),
-                    color: CategoryInstance
-                        .instances[modal.category]!().assetColor),
-              )
+              // Container(
+              //   width: width * modal.percent,
+              //   height: height,
+              //   decoration: BoxDecoration(
+              //       borderRadius: BorderRadius.circular(height * 2),
+              //       color: CategoryInstance
+              //           .instances[modal.category]!().assetColor),
+              // )
             ],
           )
         ],

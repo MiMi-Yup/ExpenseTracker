@@ -1,11 +1,16 @@
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/screens/add_types/add_edit_account_types.dart';
+import 'package:expense_tracker/screens/add_types/add_edit_category_types.dart';
+import 'package:expense_tracker/screens/add_types/edit_transaction_types.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main()async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await FirebaseAuth.instance.currentUser?.reload();
   runApp(const MyApp());
 }
 
@@ -21,6 +26,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       routes: RouteApplication.routes,
       initialRoute: RouteApplication.getRoute(ERoute.welcome),
+      //home: AddEditAccountTypes(),
     );
   }
 }

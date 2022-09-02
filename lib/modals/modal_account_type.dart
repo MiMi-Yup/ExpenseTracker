@@ -1,0 +1,51 @@
+import 'dart:ui';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expense_tracker/modals/modal.dart';
+
+class ModalAccountType extends IModal {
+  Color? color;
+  String? image;
+  String? name;
+  bool? localAsset;
+
+  ModalAccountType(
+      {required super.id,
+      required this.color,
+      required this.image,
+      required this.name,
+      required this.localAsset});
+
+  ModalAccountType.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options)
+      : super.fromFirestore(snapshot, options) {
+    Map<String, dynamic>? data = snapshot.data();
+    color = Color(data?['color']);
+    image = data?['image'];
+    name = data?['name'];
+    localAsset = data?['local_asset'];
+  }
+
+  @override
+  Map<String, dynamic> toFirestore() {
+    return {
+      'color': color?.value,
+      'image': image,
+      'name': name,
+      'local_asset': localAsset
+    };
+  }
+
+  @override
+  Map<String, dynamic> updateFirestore() => toFirestore();
+
+  @override
+  String toString() => '$name';
+
+  @override
+  bool operator ==(dynamic other) =>
+      other != null && other is ModalAccountType && id == other.id;
+
+  @override
+  int get hashCode => super.hashCode;
+}

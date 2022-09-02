@@ -12,13 +12,13 @@ class OverviewTransactionComponent extends ModalTransaction {
   };
 
   OverviewTransactionComponent(
-      {required super.typeTransaction, double? money, String? currency})
+      {required super.transactionTypeRef, double? money, String? currency})
       : super.minInit() {
     this.money = money;
-    this.currency = currency;
+    //this.currency = currency;
   }
 
-  OverviewTransactionComponent.minInit({required super.typeTransaction})
+  OverviewTransactionComponent.minInit({required super.transactionTypeRef})
       : super.minInit();
 
   Widget builder({void Function()? onTap}) {
@@ -26,30 +26,30 @@ class OverviewTransactionComponent extends ModalTransaction {
       onTap: onTap,
       child: Container(
           padding: const EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-              color: MyColor.colorTransaction[typeTransaction]),
+          // decoration: BoxDecoration(
+          //     borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+          //     color: MyColor.colorTransaction[typeTransaction]),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                margin: const EdgeInsets.only(right: 8.0),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16.0),
-                    color: Colors.white),
-                child: Image.asset(_assetMap[typeTransaction]!),
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(typeTransaction!.name.toUpperCase()),
-                  Text(
-                    "${currency}${money}",
-                    style: const TextStyle(fontSize: 20.0),
-                  )
-                ],
-              )
+              // Container(
+              //   padding: const EdgeInsets.all(8.0),
+              //   margin: const EdgeInsets.only(right: 8.0),
+              //   decoration: BoxDecoration(
+              //       borderRadius: BorderRadius.circular(16.0),
+              //       color: Colors.white),
+              //   child: Image.asset(_assetMap[typeTransaction]!),
+              // ),
+              // Column(
+              //   mainAxisSize: MainAxisSize.min,
+              //   children: [
+              //     Text(typeTransaction!.name.toUpperCase()),
+              //     Text(
+              //       "${currency}${money}",
+              //       style: const TextStyle(fontSize: 20.0),
+              //     )
+              //   ],
+              // )
             ],
           )),
     );

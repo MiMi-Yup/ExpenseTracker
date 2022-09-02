@@ -43,6 +43,7 @@ dependencies:
   flutter_slidable: ^1.0.0
   shared_preferences: ^2.0.15
   local_auth: ^2.1.2
+  flutter_colorpicker: ^1.0.3
 
   #Firebase services
   firebase_core: ^1.21.1
@@ -88,6 +89,8 @@ flutter:
     - asset/image/bank/jago_bank.png
     - asset/image/bank/mandiri_bank.png
     - asset/image/bank/paypal_bank.png
+    - asset/image/bank/vietinbank.png
+    - asset/image/bank/vietcombank.png
 
     - asset/image/icon/success.png
     - asset/image/icon/income.png

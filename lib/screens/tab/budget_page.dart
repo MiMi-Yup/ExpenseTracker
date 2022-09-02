@@ -43,52 +43,52 @@ class _BudgetPageState extends State<BudgetPage>
                   topRight: Radius.circular(16.0))),
           child: Column(
             children: [
-              Expanded(
-                  child: hasData
-                      ? MediaQuery.removePadding(
-                          context: context,
-                          removeTop: true,
-                          child: AnimatedList(
-                              shrinkWrap: true,
-                              initialItemCount: lengthListView,
-                              physics: BouncingScrollPhysics(),
-                              itemBuilder: (context, index, animation) {
-                                ModalBudget modal = ModalBudget(
-                                    budgetMoney: 0.0,
-                                    nowMoney: 0.0,
-                                    isLimited: false,
-                                    category: ECategory.shopping,
-                                    currency: '\$');
-                                return SizeTransition(
-                                  sizeFactor: animation,
-                                  child: BudgetComponent(modal: modal).builder(
-                                    width: MediaQuery.of(context).size.width,
-                                    onTap: null,
-                                    editSlidableAction: null,
-                                    deleteSlidableAction: (context) {
-                                      lengthListView -= 1;
-                                      AnimatedList.of(context).removeItem(
-                                          index,
-                                          (_, animation) => SizeTransition(
-                                                sizeFactor: animation,
-                                                child: BudgetComponent(
-                                                        modal: modal)
-                                                    .builder(
-                                                        width: MediaQuery.of(
-                                                                context)
-                                                            .size
-                                                            .width),
-                                              ),
-                                          duration: const Duration(seconds: 1));
-                                    },
-                                  ),
-                                );
-                              }))
-                      : Center(
-                          child: Text(
-                          "You don't have a budget",
-                          style: TextStyle(color: Colors.black),
-                        ))),
+              // Expanded(
+              //     child: hasData
+              //         ? MediaQuery.removePadding(
+              //             context: context,
+              //             removeTop: true,
+              //             child: AnimatedList(
+              //                 shrinkWrap: true,
+              //                 initialItemCount: lengthListView,
+              //                 physics: BouncingScrollPhysics(),
+              //                 itemBuilder: (context, index, animation) {
+              //                   ModalBudget modal = ModalBudget(
+              //                       budgetMoney: 0.0,
+              //                       nowMoney: 0.0,
+              //                       isLimited: false,
+              //                       category: ECategory.shopping,
+              //                       currency: '\$');
+              //                   return SizeTransition(
+              //                     sizeFactor: animation,
+              //                     child: BudgetComponent(modal: modal).builder(
+              //                       width: MediaQuery.of(context).size.width,
+              //                       onTap: null,
+              //                       editSlidableAction: null,
+              //                       deleteSlidableAction: (context) {
+              //                         lengthListView -= 1;
+              //                         AnimatedList.of(context).removeItem(
+              //                             index,
+              //                             (_, animation) => SizeTransition(
+              //                                   sizeFactor: animation,
+              //                                   child: BudgetComponent(
+              //                                           modal: modal)
+              //                                       .builder(
+              //                                           width: MediaQuery.of(
+              //                                                   context)
+              //                                               .size
+              //                                               .width),
+              //                                 ),
+              //                             duration: const Duration(seconds: 1));
+              //                       },
+              //                     ),
+              //                   );
+              //                 }))
+              //         : Center(
+              //             child: Text(
+              //             "You don't have a budget",
+              //             style: TextStyle(color: Colors.black),
+              //           ))),
               Container(
                   width: double.maxFinite,
                   padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),

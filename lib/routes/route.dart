@@ -1,14 +1,17 @@
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/screens/account/add_new_account.dart';
+import 'package:expense_tracker/screens/add_types/add_edit_account_types.dart';
+import 'package:expense_tracker/screens/add_types/add_edit_category_types.dart';
+import 'package:expense_tracker/screens/add_types/edit_transaction_types.dart';
 import 'package:expense_tracker/screens/budget/add_edit_budget.dart';
 import 'package:expense_tracker/screens/first_setup/code_auth.dart';
 import 'package:expense_tracker/screens/first_setup/introduction_setup.dart';
+import 'package:expense_tracker/screens/first_setup/set_default.dart';
 import 'package:expense_tracker/screens/introduction.dart';
 import 'package:expense_tracker/screens/login/forgot_password.dart';
 import 'package:expense_tracker/screens/login/login.dart';
 import 'package:expense_tracker/screens/notification.dart';
 import 'package:expense_tracker/screens/signup/signup.dart';
-import 'package:expense_tracker/screens/signup/verify.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/screens/tab/profile/account_page.dart';
 import 'package:expense_tracker/screens/tab/profile/export_page.dart';
@@ -27,10 +30,10 @@ class RouteApplication {
     getRoute(ERoute.introduction): (context) => Introduction(),
     getRoute(ERoute.login): (context) => Login(),
     getRoute(ERoute.signUp): (context) => SignUp(),
-    getRoute(ERoute.verify): (context) => OTPVerify(),
     getRoute(ERoute.authGoogle): (context) => Container(),
     getRoute(ERoute.forgotPassword): (context) => ForgotPassword(),
     getRoute(ERoute.pin): (context) => CodeAuth(),
+    getRoute(ERoute.setDefault): (context) => SetDefault(),
     getRoute(ERoute.introductionSetupAccount): (context) => IntroductionSetup(),
     getRoute(ERoute.main): (context) => Navigation(),
     getRoute(ERoute.notification): (context) => NotificationPage(),
@@ -44,7 +47,10 @@ class RouteApplication {
     getRoute(ERoute.addEditAccount): (context) => AddNewAccount(),
     getRoute(ERoute.addEditTransaction): (context) => AddEditTransaction(),
     getRoute(ERoute.detailTransaction): (context) => DetailTransaction(),
-    getRoute(ERoute.termOfCondition): (context) => Container()
+    getRoute(ERoute.termOfCondition): (context) => Container(),
+    getRoute(ERoute.addEditAccountType): (context) => AddEditAccountTypes(),
+    getRoute(ERoute.addEditCategoryType): (context) => AddEditCategoryTypes(),
+    getRoute(ERoute.editTransactionType): (context) => EditTransactionTypes()
   };
 
   static String getRoute(ERoute route) => "/${route.name}";

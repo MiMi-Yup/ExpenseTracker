@@ -55,9 +55,9 @@ class _DetailReportState extends State<DetailReport> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                dropDown(
+                DropDown<String>(
                     isExpanded: false,
-                    hintText: "Time",
+                    hint: "Time",
                     items: ["Day", "Month", "Year"],
                     chosenValue: null,
                     onChanged: (value) => null),
@@ -154,9 +154,9 @@ class _DetailReportState extends State<DetailReport> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                dropDown(
+                DropDown<String>(
                     isExpanded: false,
-                    hintText: "View",
+                    hint: "View",
                     items: ["Transaction", "Category"],
                     chosenValue: indexTypeCategory,
                     onChanged: (value) =>
@@ -164,40 +164,41 @@ class _DetailReportState extends State<DetailReport> {
                 IconButton(onPressed: null, icon: Icon(Icons.filter_list))
               ],
             ),
-            Expanded(
-              child: ListView(
-                children: List.generate(
-                    200,
-                    (index) => indexTypeCategory == "Category"
-                        ? CategoryComponent(
-                                modal: ModalBudget(
-                                    budgetMoney: 0.0,
-                                    nowMoney: 0.0,
-                                    isLimited: false,
-                                    category: ECategory.shopping,
-                                    currency: '\$'))
-                            .percentCategoryBuilder(width: size.width)
-                        : TransactionComponent(
-                            modal: ModalTransaction(
-                                category: ECategory.bill,
-                                money: index * 1.683,
-                                timeTransaction: DateTime.now(),
-                                typeTransaction: index % 2 == 0
-                                    ? ETypeTransaction.income
-                                    : ETypeTransaction.expense,
-                                account: "Paypal",
-                                isRepeat: false,
-                                purpose: 'Buy electronic',
-                                currency: '\$'),
-                            isEditable: false,
-                            onTap: () => Navigator.pushNamed(
-                                context,
-                                RouteApplication.getRoute(
-                                    ERoute.detailTransaction),
-                                arguments: null),
-                          )),
-              ),
-            )
+            // Expanded(
+            //   child: ListView(
+            //     children: List.generate(
+            //         200,
+            //         (index) => indexTypeCategory == "Category"
+            //             ? CategoryComponent(
+            //                     modal: ModalBudget(
+            //                         budgetMoney: 0.0,
+            //                         nowMoney: 0.0,
+            //                         isLimited: false,
+            //                         category: ECategory.shopping,
+            //                         currency: '\$'))
+            //                 .percentCategoryBuilder(width: size.width)
+            //             : TransactionComponent(
+            //                 modal: ModalTransaction(
+            //                     id: null,
+            //                     category: ECategory.bill,
+            //                     money: index * 1.683,
+            //                     timeTransaction: DateTime.now(),
+            //                     typeTransaction: index % 2 == 0
+            //                         ? ETypeTransaction.income
+            //                         : ETypeTransaction.expense,
+            //                     account: "Paypal",
+            //                     isRepeat: false,
+            //                     purpose: 'Buy electronic',
+            //                     currency: '\$'),
+            //                 isEditable: false,
+            //                 onTap: () => Navigator.pushNamed(
+            //                     context,
+            //                     RouteApplication.getRoute(
+            //                         ERoute.detailTransaction),
+            //                     arguments: null),
+            //               )),
+            //   ),
+            // )
           ],
         ),
       ),
