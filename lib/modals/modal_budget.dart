@@ -20,7 +20,8 @@ class ModalBudget extends IModal {
     Map<String, dynamic>? data = snapshot.data();
     budget = data?['budget'];
     categoryTypeRef = data?['category_type_ref'];
-    timeCreate = data?['time_create'];
+    timeCreate = DateTime.fromMillisecondsSinceEpoch(
+        (data?['time_create'] as Timestamp).millisecondsSinceEpoch);
     percentAlert = data?['percent_alert'];
   }
 

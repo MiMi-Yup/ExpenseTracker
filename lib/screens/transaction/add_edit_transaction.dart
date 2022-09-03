@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -54,13 +55,6 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
 
   ModalCategoryType? choseCategoryType;
   ModalAccount? choseAccount;
-  String? selectedWallet;
-  String? description;
-  String? purpose;
-  bool isRepeated = false;
-
-  //demo attachments
-  List<String>? itemattachmentss;
 
   Widget _frequencyRepeat(
       {required String title,
@@ -113,7 +107,8 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
     if (preData != null) {
       choseFrequencyType = await FrequencyTypesFirestore()
           .getModalFromRef(preData['frequency_type_ref']);
-      endDate = (preData['end_after'] as DateTime);
+      endDate = DateTime.fromMillisecondsSinceEpoch(
+          (preData['end_after'] as Timestamp).millisecondsSinceEpoch);
       endTime = TimeOfDay(hour: endDate.hour, minute: endDate.minute);
     } else {
       endDate = DateTime.now();
@@ -194,412 +189,463 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
           };
   }
 
+  Future<bool> loadData() async {
+    modalTransactionType = await TransactionTypeFirestore()
+        .getModalFromRef(modal.transactionTypeRef!);
+    if (originModal != null) {
+      choseAccount =
+          await AccountFirestore().getModalFromRef(modal.accountRef!);
+      choseCategoryType =
+          await CategoryTypeFirebase().getModalFromRef(modal.categoryTypeRef!);
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (modalTransactionType == null) {
-      modal.transactionTypeRef
-          ?.withConverter(
-              fromFirestore: ModalTransactionType.fromFirestore,
-              toFirestore: (ModalTransactionType modal, _) =>
-                  modal.toFirestore())
-          .get()
-          .then((value) => modalTransactionType = value.data());
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.arrow_back_ios)),
-        title: Text(modalTransactionType.toString()),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: MyColor.mainBackgroundColor,
-      ),
-      bottomSheet: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        reverse: true,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0),
-              child: Text(
-                "How much",
-                style: TextStyle(fontSize: 25.0, color: Colors.grey),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: FutureBuilder<ModalCurrencyType?>(
-                future: UserFirestore().getMainCurrencyAccount(),
-                builder: (context, snapshot) => TextField(
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(fontSize: 40.0),
-                  decoration: InputDecoration(
-                      prefixText:
-                          "${snapshot.data == null ? '' : snapshot.data!.currencyCode} ",
-                      isCollapsed: true,
-                      hintText: "0.00",
-                      border: InputBorder.none),
-                  onChanged: (value) => modal.money = double.tryParse(value),
-                  controller:
-                      TextEditingController(text: "${modal.money ?? ""}"),
+    return FutureBuilder(
+        future: loadData(),
+        builder: (context, snapshot) => snapshot.hasData
+            ? Scaffold(
+                appBar: AppBar(
+                  leading: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.arrow_back_ios)),
+                  title: Text(modalTransactionType.toString()),
+                  centerTitle: true,
+                  elevation: 0,
+                  backgroundColor: MyColor.mainBackgroundColor,
                 ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10.0),
-                      topRight: Radius.circular(10.0))),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    EditText(
-                        onChanged: (value) => modal.purpose = value,
-                        fillText: modal.purpose,
-                        labelText: "Purpose",
-                        hintText: "Purpose"),
-                    EditText(
-                        onChanged: (value) => modal.description = value,
-                        fillText: modal.description,
-                        labelText: "Description",
-                        hintText: "Description"),
-                    FutureBuilder<List<ModalCategoryType>>(
-                      future: CategoryTypeFirebase().read(),
-                      initialData: [],
-                      builder: (context, snapshot) =>
-                          DropDown<ModalCategoryType>(
-                              hint: "Choose category",
-                              items: snapshot.data!,
-                              choseValue: choseCategoryType,
-                              onChanged: (value) =>
-                                  setState(() => choseCategoryType = value)),
-                    ),
-                    FutureBuilder<List<ModalAccount>>(
-                      future: AccountFirestore().read(),
-                      initialData: [],
-                      builder: (context, snapshot) => DropDown<ModalAccount>(
-                          hint: "Choose account",
-                          items: snapshot.data!,
-                          choseValue: choseAccount,
-                          onChanged: (value) =>
-                              setState(() => choseAccount = value)),
-                    ),
-                    (modal.attachments == null || modal.attachments!.isEmpty)
-                        ? Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: GestureDetector(
-                              onTap: () async {
-                                List<String?>? picker = await _filePicker();
-                                if (picker != null) {
-                                  setState(() {
-                                    if (modal.attachments == null) {
-                                      modal.attachments = Set.from(picker);
-                                    } else {
-                                      modal.attachments
-                                          ?.addAll(Set.from(picker));
-                                    }
-                                  });
-                                }
-                              },
-                              child: DottedBorder(
-                                  borderType: BorderType.RRect,
-                                  radius: Radius.circular(20.0),
-                                  dashPattern: [5, 5],
-                                  color: Colors.grey,
-                                  strokeWidth: 2,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Image.asset(IconAsset.attachment),
-                                          Text("Add attachments")
-                                        ]),
-                                  )),
-                            ),
-                          )
-                        : SizedBox(
-                            height: height / 5,
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: modal.attachments!
-                                  .map<Widget>((e) => GestureDetector(
-                                      onTap: () => setState(() {
-                                            modal.attachments?.remove(e);
-                                          }),
-                                      child: Image.file(File(e))))
-                                  .toList()
-                                ..add(GestureDetector(
-                                  onTap: () async {
-                                    List<String?>? picker = await _filePicker();
-                                    if (picker != null) {
-                                      setState(() {
-                                        if (modal.attachments == null) {
-                                          modal.attachments = Set.from(picker);
-                                        } else {
-                                          modal.attachments
-                                              ?.addAll(Set.from(picker));
-                                        }
-                                      });
-                                    }
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(left: 10.0),
-                                    alignment: Alignment.center,
-                                    width: 50.0,
-                                    height: 50.0,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.grey),
-                                    child: Icon(Icons.add),
-                                  ),
-                                ))
-                                ..add(GestureDetector(
-                                  onTap: () async {
-                                    List<String?>? picker = await _filePicker();
-                                    if (picker != null) {
-                                      setState(() {
-                                        if (modal.attachments == null) {
-                                          modal.attachments = Set.from(picker);
-                                        } else {
-                                          modal.attachments?.clear();
-                                          modal.attachments
-                                              ?.addAll(Set.from(picker));
-                                        }
-                                      });
-                                    }
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(left: 10.0),
-                                    alignment: Alignment.center,
-                                    width: 50.0,
-                                    height: 50.0,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.grey),
-                                    child: Icon(Icons.remove),
-                                  ),
-                                )),
-                            ),
-                          ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Repeat"),
-                            Text(
-                              "Repeat transaction, set your own time",
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 13),
-                            )
-                          ],
+                bottomSheet: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
+                  reverse: true,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Text(
+                          "How much",
+                          style: TextStyle(fontSize: 25.0, color: Colors.grey),
                         ),
-                        Switch(
-                            value: modal.repeat != null,
-                            onChanged: (value) async {
-                              if (modal.repeat == null) {
-                                modal.repeat =
-                                    await _setRepeat(context: context);
-                                if (modal.repeat == null)
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          duration: const Duration(seconds: 1),
-                                          content: Text(
-                                              "Frequency hasn't selected yet")));
-                              } else {
-                                modal.repeat = null;
-                              }
-                              setState(() {});
-                            })
-                      ],
-                    ),
-                    Visibility(
-                        visible: modal.repeat != null,
-                        child: modal.repeat != null
-                            ? Row(
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: FutureBuilder<ModalCurrencyType?>(
+                          future: UserFirestore().getMainCurrencyAccount(),
+                          builder: (context, snapshot) => TextField(
+                            keyboardType: TextInputType.number,
+                            style: TextStyle(fontSize: 40.0),
+                            decoration: InputDecoration(
+                                prefixText:
+                                    "${snapshot.data == null ? '' : snapshot.data!.currencyCode} ",
+                                isCollapsed: true,
+                                hintText: "0.00",
+                                border: InputBorder.none),
+                            onChanged: (value) =>
+                                modal.money = double.tryParse(value),
+                            controller: TextEditingController(
+                                text: "${modal.money ?? ""}"),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              EditText(
+                                  onChanged: (value) => modal.purpose = value,
+                                  fillText: modal.purpose,
+                                  labelText: "Purpose",
+                                  hintText: "Purpose"),
+                              EditText(
+                                  onChanged: (value) =>
+                                      modal.description = value,
+                                  fillText: modal.description,
+                                  labelText: "Description",
+                                  hintText: "Description"),
+                              FutureBuilder<List<ModalCategoryType>>(
+                                future: CategoryTypeFirebase().read(),
+                                initialData: [],
+                                builder: (context, snapshot) =>
+                                    DropDown<ModalCategoryType>(
+                                        hint: "Choose category",
+                                        items: snapshot.data!,
+                                        choseValue: choseCategoryType,
+                                        onChanged: (value) => setState(
+                                            () => choseCategoryType = value)),
+                              ),
+                              FutureBuilder<List<ModalAccount>>(
+                                future: AccountFirestore().read(),
+                                initialData: [],
+                                builder: (context, snapshot) => DropDown<
+                                        ModalAccount>(
+                                    hint: "Choose account",
+                                    items: snapshot.data!,
+                                    choseValue: choseAccount,
+                                    onChanged: (value) =>
+                                        setState(() => choseAccount = value)),
+                              ),
+                              (modal.attachments == null ||
+                                      modal.attachments!.isEmpty)
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          List<String?>? picker =
+                                              await _filePicker();
+                                          if (picker != null) {
+                                            setState(() {
+                                              if (modal.attachments == null) {
+                                                modal.attachments =
+                                                    Set.from(picker);
+                                              } else {
+                                                modal.attachments
+                                                    ?.addAll(Set.from(picker));
+                                              }
+                                            });
+                                          }
+                                        },
+                                        child: DottedBorder(
+                                            borderType: BorderType.RRect,
+                                            radius: Radius.circular(20.0),
+                                            dashPattern: [5, 5],
+                                            color: Colors.grey,
+                                            strokeWidth: 2,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Image.asset(
+                                                        IconAsset.attachment),
+                                                    Text("Add attachments")
+                                                  ]),
+                                            )),
+                                      ),
+                                    )
+                                  : SizedBox(
+                                      height: height / 5,
+                                      child: ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: modal.attachments!
+                                            .map<Widget>((e) => GestureDetector(
+                                                onTap: () => setState(() {
+                                                      modal.attachments
+                                                          ?.remove(e);
+                                                    }),
+                                                child: originModal == null
+                                                    ? Image.file(File(e))
+                                                    : FutureBuilder<Uint8List?>(
+                                                        future:
+                                                            ActionFirebaseStorage
+                                                                .downloadFile(
+                                                                    e),
+                                                        builder: (context,
+                                                                snapshot) =>
+                                                            snapshot.hasData
+                                                                ? Image.memory(
+                                                                    snapshot
+                                                                        .data!)
+                                                                : SizedBox(),
+                                                      )))
+                                            .toList()
+                                          ..add(GestureDetector(
+                                            onTap: () async {
+                                              List<String?>? picker =
+                                                  await _filePicker();
+                                              if (picker != null) {
+                                                setState(() {
+                                                  if (modal.attachments ==
+                                                      null) {
+                                                    modal.attachments =
+                                                        Set.from(picker);
+                                                  } else {
+                                                    modal.attachments?.addAll(
+                                                        Set.from(picker));
+                                                  }
+                                                });
+                                              }
+                                            },
+                                            child: Container(
+                                              margin:
+                                                  EdgeInsets.only(left: 10.0),
+                                              alignment: Alignment.center,
+                                              width: 50.0,
+                                              height: 50.0,
+                                              decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.grey),
+                                              child: Icon(Icons.add),
+                                            ),
+                                          ))
+                                          ..add(GestureDetector(
+                                            onTap: () async {
+                                              List<String?>? picker =
+                                                  await _filePicker();
+                                              if (picker != null) {
+                                                setState(() {
+                                                  if (modal.attachments ==
+                                                      null) {
+                                                    modal.attachments =
+                                                        Set.from(picker);
+                                                  } else {
+                                                    modal.attachments?.clear();
+                                                    modal.attachments?.addAll(
+                                                        Set.from(picker));
+                                                  }
+                                                });
+                                              }
+                                            },
+                                            child: Container(
+                                              margin:
+                                                  EdgeInsets.only(left: 10.0),
+                                              alignment: Alignment.center,
+                                              width: 50.0,
+                                              height: 50.0,
+                                              decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.grey),
+                                              child: Icon(Icons.remove),
+                                            ),
+                                          )),
+                                      ),
+                                    ),
+                              Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  FutureBuilder<ModalFrequencyType?>(
-                                    future: FrequencyTypesFirestore()
-                                        .getModalFromRef(modal
-                                            .repeat?['frequency_type_ref']),
-                                    builder: (context, snapshot) =>
-                                        _frequencyRepeat(
-                                            title: "Frequency",
-                                            subTitle: snapshot.data?.name),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Repeat"),
+                                      Text(
+                                        "Repeat transaction, set your own time",
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 13),
+                                      )
+                                    ],
                                   ),
-                                  _frequencyRepeat(
-                                      title: "End after",
-                                      subTitle: convertTimeStamp(
-                                          modal.repeat?['end_after'])),
-                                  TextButton(
+                                  Switch(
+                                      value: modal.repeat != null,
+                                      onChanged: (value) async {
+                                        if (modal.repeat == null) {
+                                          modal.repeat = await _setRepeat(
+                                              context: context);
+                                          if (modal.repeat == null)
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                                    duration: const Duration(
+                                                        seconds: 1),
+                                                    content: Text(
+                                                        "Frequency hasn't selected yet")));
+                                        } else {
+                                          modal.repeat = null;
+                                        }
+                                        setState(() {});
+                                      })
+                                ],
+                              ),
+                              Visibility(
+                                  visible: modal.repeat != null,
+                                  child: modal.repeat != null
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            FutureBuilder<ModalFrequencyType?>(
+                                              future: FrequencyTypesFirestore()
+                                                  .getModalFromRef(modal
+                                                          .repeat?[
+                                                      'frequency_type_ref']),
+                                              builder: (context, snapshot) =>
+                                                  _frequencyRepeat(
+                                                      title: "Frequency",
+                                                      subTitle:
+                                                          snapshot.data?.name),
+                                            ),
+                                            _frequencyRepeat(
+                                                title: "End after",
+                                                subTitle: convertTimeStamp(modal
+                                                    .repeat?['end_after'])),
+                                            TextButton(
+                                                onPressed: () async {
+                                                  modal.repeat =
+                                                      await _setRepeat(
+                                                          context: context,
+                                                          preData:
+                                                              modal.repeat);
+                                                  if (modal.repeat == null)
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(SnackBar(
+                                                            duration:
+                                                                const Duration(
+                                                                    seconds: 1),
+                                                            content: Text(
+                                                                "Frequency hasn't selected yet")));
+                                                  setState(() {});
+                                                },
+                                                child: Text("Edit"))
+                                          ],
+                                        )
+                                      : SizedBox()),
+                              SizedBox(
+                                  width: double.maxFinite,
+                                  child: largestButton(
+                                      text: "Continue",
                                       onPressed: () async {
-                                        modal.repeat = await _setRepeat(
-                                            context: context,
-                                            preData: modal.repeat);
-                                        if (modal.repeat == null)
+                                        if (choseAccount == null ||
+                                            choseCategoryType == null ||
+                                            modal.money == null ||
+                                            modal.purpose == null ||
+                                            modal.purpose!.isEmpty) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
-                                                  duration: const Duration(
-                                                      seconds: 1),
                                                   content: Text(
-                                                      "Frequency hasn't selected yet")));
-                                        setState(() {});
+                                                      "Please fill field")));
+                                        } else {
+                                          modal.accountRef = AccountFirestore()
+                                              .getRef(choseAccount!);
+                                          modal.categoryTypeRef =
+                                              CategoryTypeFirebase()
+                                                  .getRef(choseCategoryType!);
+                                          modal.timeCreate = DateTime.now();
+
+                                          TransactionUtilities().add(modal);
+                                        }
+                                        // File image = File(pathImage!);
+                                        // await showDialog(
+                                        //   context: context,
+                                        //   builder: (context) => Dialog(
+                                        //     shape: RoundedRectangleBorder(
+                                        //         borderRadius:
+                                        //             BorderRadius.circular(10.0)),
+                                        //     child: Container(
+                                        //       padding: EdgeInsets.all(10.0),
+                                        //       width: 300,
+                                        //       height: 50,
+                                        //       color: Colors.black,
+                                        //       child: StreamBuilder<TaskSnapshot>(
+                                        //           builder: (context, snapshot) {
+                                        //             if (snapshot.data != null) {
+                                        //               TaskState state =
+                                        //                   snapshot.data!.state;
+                                        //               switch (state) {
+                                        //                 case TaskState.running:
+                                        //                   return ClipRRect(
+                                        //                     borderRadius:
+                                        //                         BorderRadius.all(
+                                        //                             Radius.circular(
+                                        //                                 10)),
+                                        //                     child:
+                                        //                         LinearProgressIndicator(
+                                        //                       value: snapshot.data!
+                                        //                               .bytesTransferred /
+                                        //                           snapshot
+                                        //                               .data!.totalBytes,
+                                        //                       valueColor:
+                                        //                           AlwaysStoppedAnimation<
+                                        //                                   Color>(
+                                        //                               Color(
+                                        //                                   0xff00ff00)),
+                                        //                       backgroundColor:
+                                        //                           Color(0xffD6D6D6),
+                                        //                     ),
+                                        //                   );
+                                        //                 case TaskState.canceled:
+                                        //                   break;
+                                        //                 case TaskState.paused:
+                                        //                   break;
+                                        //                 case TaskState.success:
+                                        //                   RouteApplication
+                                        //                       .navigatorKey.currentState
+                                        //                       ?.pop();
+                                        //                   break;
+                                        //                 case TaskState.error:
+                                        //                   break;
+                                        //               }
+                                        //             }
+                                        //             return SizedBox();
+                                        //           },
+                                        //           initialData: null,
+                                        //           stream: AccountTypeUtilities()
+                                        //               .add(image, modal)),
+                                        //     ),
+                                        //   ),
+                                        // );
+
+                                        // showDialog(
+                                        //   builder: (context) => Dialog(
+                                        //     shape: RoundedRectangleBorder(
+                                        //         borderRadius:
+                                        //             BorderRadius.circular(10.0)),
+                                        //     child: Padding(
+                                        //       padding: const EdgeInsets.all(16.0),
+                                        //       child: Column(
+                                        //         mainAxisSize: MainAxisSize.min,
+                                        //         children: [
+                                        //           Image.asset(
+                                        //             IconAsset.success,
+                                        //             scale: 2,
+                                        //           ),
+                                        //           SizedBox(height: 16.0),
+                                        //           Text(
+                                        //               "Transaction has been successfully added")
+                                        //         ],
+                                        //       ),
+                                        //     ),
+                                        //   ),
+                                        //   context: context,
+                                        // );
+
+                                        // if (_argument is ETypeTransaction) {
+                                        //   modal.timeTransaction = DateTime.now();
+                                        //   DataSample.instance().addTransaction(modal);
+                                        // } else {
+                                        //   DataSample.instance().updateTransaction(
+                                        //       _argument as ModalTransaction, modal);
+                                        // }
+
+                                        // Storage.monitorUploadFile(
+                                        //     File(modal.attachments!.first));
+
+                                        Future.delayed(
+                                            const Duration(seconds: 1),
+                                            () => Navigator.popUntil(
+                                                context,
+                                                ModalRoute.withName(_argument
+                                                        is ModalTransaction
+                                                    ? RouteApplication.getRoute(
+                                                        ERoute
+                                                            .detailTransaction)
+                                                    : RouteApplication.getRoute(
+                                                        ERoute.main))));
                                       },
-                                      child: Text("Edit"))
-                                ],
-                              )
-                            : SizedBox()),
-                    SizedBox(
-                        width: double.maxFinite,
-                        child: largestButton(
-                            text: "Continue",
-                            onPressed: () async {
-                              if (choseAccount == null ||
-                                  choseCategoryType == null ||
-                                  modal.money == null ||
-                                  modal.purpose == null ||
-                                  modal.purpose!.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text("Please fill field")));
-                              } else {
-                                modal.accountRef =
-                                    AccountFirestore().getRef(choseAccount!);
-                                modal.categoryTypeRef = CategoryTypeFirebase()
-                                    .getRef(choseCategoryType!);
-                                modal.timeCreate = DateTime.now();
-
-                                TransactionUtilities().add(modal);
-                              }
-                              // File image = File(pathImage!);
-                              // await showDialog(
-                              //   context: context,
-                              //   builder: (context) => Dialog(
-                              //     shape: RoundedRectangleBorder(
-                              //         borderRadius:
-                              //             BorderRadius.circular(10.0)),
-                              //     child: Container(
-                              //       padding: EdgeInsets.all(10.0),
-                              //       width: 300,
-                              //       height: 50,
-                              //       color: Colors.black,
-                              //       child: StreamBuilder<TaskSnapshot>(
-                              //           builder: (context, snapshot) {
-                              //             if (snapshot.data != null) {
-                              //               TaskState state =
-                              //                   snapshot.data!.state;
-                              //               switch (state) {
-                              //                 case TaskState.running:
-                              //                   return ClipRRect(
-                              //                     borderRadius:
-                              //                         BorderRadius.all(
-                              //                             Radius.circular(
-                              //                                 10)),
-                              //                     child:
-                              //                         LinearProgressIndicator(
-                              //                       value: snapshot.data!
-                              //                               .bytesTransferred /
-                              //                           snapshot
-                              //                               .data!.totalBytes,
-                              //                       valueColor:
-                              //                           AlwaysStoppedAnimation<
-                              //                                   Color>(
-                              //                               Color(
-                              //                                   0xff00ff00)),
-                              //                       backgroundColor:
-                              //                           Color(0xffD6D6D6),
-                              //                     ),
-                              //                   );
-                              //                 case TaskState.canceled:
-                              //                   break;
-                              //                 case TaskState.paused:
-                              //                   break;
-                              //                 case TaskState.success:
-                              //                   RouteApplication
-                              //                       .navigatorKey.currentState
-                              //                       ?.pop();
-                              //                   break;
-                              //                 case TaskState.error:
-                              //                   break;
-                              //               }
-                              //             }
-                              //             return SizedBox();
-                              //           },
-                              //           initialData: null,
-                              //           stream: AccountTypeUtilities()
-                              //               .add(image, modal)),
-                              //     ),
-                              //   ),
-                              // );
-
-                              // showDialog(
-                              //   builder: (context) => Dialog(
-                              //     shape: RoundedRectangleBorder(
-                              //         borderRadius:
-                              //             BorderRadius.circular(10.0)),
-                              //     child: Padding(
-                              //       padding: const EdgeInsets.all(16.0),
-                              //       child: Column(
-                              //         mainAxisSize: MainAxisSize.min,
-                              //         children: [
-                              //           Image.asset(
-                              //             IconAsset.success,
-                              //             scale: 2,
-                              //           ),
-                              //           SizedBox(height: 16.0),
-                              //           Text(
-                              //               "Transaction has been successfully added")
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   ),
-                              //   context: context,
-                              // );
-
-                              // if (_argument is ETypeTransaction) {
-                              //   modal.timeTransaction = DateTime.now();
-                              //   DataSample.instance().addTransaction(modal);
-                              // } else {
-                              //   DataSample.instance().updateTransaction(
-                              //       _argument as ModalTransaction, modal);
-                              // }
-
-                              // Storage.monitorUploadFile(
-                              //     File(modal.attachments!.first));
-
-                              Future.delayed(
-                                  const Duration(seconds: 1),
-                                  () => Navigator.popUntil(
-                                      context,
-                                      ModalRoute.withName(
-                                          _argument is ModalTransaction
-                                              ? RouteApplication.getRoute(
-                                                  ERoute.detailTransaction)
-                                              : RouteApplication.getRoute(
-                                                  ERoute.main))));
-                            },
-                            background: modalTransactionType?.color ??
-                                MyColor.purple()))
-                  ],
+                                      background: modalTransactionType?.color ??
+                                          MyColor.purple()))
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+              )
+            : Center(
+                child: Text("Wait"),
+              ));
   }
 
   String? uid = FirebaseAuth.instance.currentUser?.uid;

@@ -60,12 +60,26 @@ class ModalTransaction extends IModal {
       : super.fromFirestore(snapshot, options) {
     Map<String, dynamic>? data = snapshot.data();
     accountRef = data?['account_ref'];
-    attachments = Set<String>.from(data?['attachments']);
+    attachments = data?['attachments'] == null
+        ? null
+        : Set<String>.from(data?['attachments']);
     categoryTypeRef = data?['category_type_ref'];
     description = data?['description'];
     money = data?['money'];
     purpose = data?['purpose'];
-    repeat = data?['repeat'];
+
+    if (data?['repeat'] != null) {
+      repeat = <String, dynamic>{};
+      (data?['repeat'] as Map<String, dynamic>).forEach((key, value) {
+        key == 'end_after'
+            ? repeat?.addAll({
+                key: DateTime.fromMillisecondsSinceEpoch(
+                    (value as Timestamp).millisecondsSinceEpoch)
+              })
+            : repeat?.addAll({key: value});
+      });
+    }
+
     timeCreate = DateTime.fromMillisecondsSinceEpoch(
         (data?['time_create'] as Timestamp).millisecondsSinceEpoch);
     transactionTypeRef = data?['transaction_type_ref'];

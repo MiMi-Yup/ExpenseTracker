@@ -46,7 +46,7 @@ class AccountFirestore extends IFirestore {
   }
 
   @override
-  Future<ModalAccount?> getModalFromRef(DocumentReference<Map<String, dynamic>> ref) async {
+  Future<ModalAccount?> getModalFromRef(DocumentReference<Object?> ref) async {
     DocumentSnapshot<ModalAccount> snapshot = await ref
         .withConverter(
             fromFirestore: ModalAccount.fromFirestore,
