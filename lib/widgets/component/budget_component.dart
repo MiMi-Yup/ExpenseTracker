@@ -1,4 +1,4 @@
-import 'package:expense_tracker/instances/category_component.dart';
+import 'package:expense_tracker/instances/category_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';

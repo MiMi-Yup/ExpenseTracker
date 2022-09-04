@@ -79,80 +79,84 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
       floatingActionButton: FutureBuilder<List<ModalTransactionType>>(
         future: TransactionTypeFirestore().read(),
         initialData: [],
-        builder: (context, snapshot) => Column(
-          mainAxisSize: MainAxisSize.min,
-          children: snapshot.data!
-              .map<Widget>((e) => Container(
-                    height: 70.0,
-                    width: 56.0,
-                    alignment: FractionalOffset.topCenter,
-                    child: ScaleTransition(
-                      scale: CurvedAnimation(
-                        parent: _fabController,
-                        curve: Interval(
-                            0.0,
-                            1.0 -
-                                (snapshot.data!.indexOf(e) /
-                                        snapshot.data!.length) /
-                                    2.0,
-                            curve: Curves.easeOut),
+        builder: (context, snapshot) => Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: snapshot.data!
+                .map<Widget>((e) => Container(
+                      height: 70.0,
+                      width: 56.0,
+                      alignment: FractionalOffset.topCenter,
+                      child: ScaleTransition(
+                        scale: CurvedAnimation(
+                          parent: _fabController,
+                          curve: Interval(
+                              0.0,
+                              1.0 -
+                                  (snapshot.data!.indexOf(e) /
+                                          snapshot.data!.length) /
+                                      2.0,
+                              curve: Curves.easeOut),
+                        ),
+                        child: FloatingActionButton(
+                          heroTag: null,
+                          backgroundColor: Colors.black,
+                          mini: true,
+                          child: e.localAsset != null && e.localAsset == true
+                              ? Image.asset(
+                                  e.image!,
+                                  fit: BoxFit.contain,
+                                  color: e.color,
+                                )
+                              : FutureBuilder<Uint8List?>(
+                                  future: ActionFirebaseStorage.downloadFile(
+                                      e.image!),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData &&
+                                        snapshot.data != null) {
+                                      return Image.memory(snapshot.data!,
+                                          color: e.color);
+                                    }
+                                    return SizedBox();
+                                  }),
+                          onPressed: () async {
+                            await Navigator.pushNamed(
+                                context,
+                                RouteApplication.getRoute(
+                                    ERoute.addEditTransaction),
+                                arguments:
+                                    TransactionTypeFirestore().getRef(e));
+                            _fabController.reverse();
+                          },
+                        ),
                       ),
-                      child: FloatingActionButton(
-                        heroTag: null,
-                        backgroundColor: Colors.black,
-                        mini: true,
-                        child: e.localAsset != null && e.localAsset == true
-                            ? Image.asset(
-                                e.image!,
-                                fit: BoxFit.contain,
-                                color: e.color,
-                              )
-                            : FutureBuilder<Uint8List?>(
-                                future: ActionFirebaseStorage.downloadFile(
-                                    e.image!),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData &&
-                                      snapshot.data != null) {
-                                    return Image.memory(snapshot.data!,
-                                        color: e.color);
-                                  }
-                                  return SizedBox();
-                                }),
-                        onPressed: () async {
-                          await Navigator.pushNamed(
-                              context,
-                              RouteApplication.getRoute(
-                                  ERoute.addEditTransaction),
-                              arguments: TransactionTypeFirestore().getRef(e));
-                          _fabController.reverse();
-                        },
-                      ),
-                    ),
-                  ))
-              .toList()
-            ..add(
-              FloatingActionButton(
-                heroTag: null,
-                elevation: 8.0,
-                child: AnimatedBuilder(
-                    animation: _fabController,
-                    builder: (context, child) => Transform(
-                          transform: Matrix4.rotationZ(
-                              _fabController.value * 0.5 * math.pi),
-                          alignment: FractionalOffset.center,
-                          child: Icon(_fabController.isDismissed
-                              ? Icons.add
-                              : Icons.close),
-                        )),
-                onPressed: () {
-                  if (_fabController.isDismissed) {
-                    _fabController.forward();
-                  } else {
-                    _fabController.reverse();
-                  }
-                },
+                    ))
+                .toList()
+              ..add(
+                FloatingActionButton(
+                  heroTag: null,
+                  elevation: 8.0,
+                  child: AnimatedBuilder(
+                      animation: _fabController,
+                      builder: (context, child) => Transform(
+                            transform: Matrix4.rotationZ(
+                                _fabController.value * 0.5 * math.pi),
+                            alignment: FractionalOffset.center,
+                            child: Icon(_fabController.isDismissed
+                                ? Icons.add
+                                : Icons.close),
+                          )),
+                  onPressed: () {
+                    if (_fabController.isDismissed) {
+                      _fabController.forward();
+                    } else {
+                      _fabController.reverse();
+                    }
+                  },
+                ),
               ),
-            ),
+          ),
         ),
       ),
       bottomNavigationBar: BottomAppBarComponent(

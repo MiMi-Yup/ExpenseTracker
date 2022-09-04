@@ -20,7 +20,7 @@ class AccountTypeFirestore extends IFirestore {
 
     if (!exist) {
       return FirebaseFirestore.instance
-          .collection(getPath(uid))
+          .collection(getPath(user?.uid))
           .doc(modal.id)
           .delete();
     }
@@ -29,7 +29,7 @@ class AccountTypeFirestore extends IFirestore {
   @override
   Future<List<ModalAccountType>> read() async {
     QuerySnapshot<ModalAccountType> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .withConverter(
             fromFirestore: ModalAccountType.fromFirestore,
             toFirestore: (ModalAccountType accountType, _) =>
@@ -39,7 +39,8 @@ class AccountTypeFirestore extends IFirestore {
   }
 
   @override
-  Future<ModalAccountType?> getModalFromRef(DocumentReference<Map<String, dynamic>> ref) async {
+  Future<ModalAccountType?> getModalFromRef(
+      DocumentReference<Object?> ref) async {
     DocumentSnapshot<ModalAccountType> snapshot = await ref
         .withConverter(
             fromFirestore: ModalAccountType.fromFirestore,

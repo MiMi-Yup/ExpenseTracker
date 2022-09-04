@@ -19,7 +19,7 @@ class AccountFirestore extends IFirestore {
     bool exist = await TransactionFirestore().checkAccountExists(modal);
     if (!exist) {
       return FirebaseFirestore.instance
-          .collection(getPath(uid))
+          .collection(getPath(user?.uid))
           .doc(modal.id)
           .delete();
     }
@@ -27,17 +27,19 @@ class AccountFirestore extends IFirestore {
 
   @override
   Future<List<ModalAccount>> read() async {
-    QuerySnapshot<Map<String, dynamic>> collection =
-        await FirebaseFirestore.instance.collection(getPath(uid)).get();
-    return collection.docs
-        .map((snapshot) => ModalAccount.fromFirestore(snapshot, null))
-        .toList();
+    QuerySnapshot<ModalAccount> snapshot = await FirebaseFirestore.instance
+        .collection(getPath(user?.uid))
+        .withConverter(
+            fromFirestore: ModalAccount.fromFirestore,
+            toFirestore: (ModalAccount modal, _) => modal.toFirestore())
+        .get();
+    return snapshot.docs.map((e) => e.data()).toList();
   }
 
   Future<bool> checkAccountTypeExists(ModalAccountType modal) async {
     bool exist = false;
     await FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .where('account_type_ref',
             isEqualTo: AccountTypeFirestore().getRef(modal))
         .get()

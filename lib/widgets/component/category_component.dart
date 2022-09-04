@@ -1,4 +1,5 @@
-import 'package:expense_tracker/instances/category_component.dart';
+import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:flutter/material.dart';
 
@@ -15,10 +16,12 @@ class CategoryComponent {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // CategoryInstance.instances[modal.category]!()
-          //     .getFullCategory(height: 50.0),
-          // Text(CategoryInstance.instances[modal.category]!().name,
-          //     style: TextStyle(color: Colors.black))
+          CategoryInstance.instance()
+              .getHintCategoryComponent(modal.categoryTypeRef!.id)
+              .getFullCategory(),
+          Text(
+              '${CategoryInstance.instance().getModal(modal.categoryTypeRef!.id)?.name}',
+              style: TextStyle(color: Colors.black))
         ],
       ),
     );
@@ -36,12 +39,13 @@ class CategoryComponent {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // CategoryInstance.instances[modal.category]!()
-              //     .getMinCategory(height: 10.0),
-              // Text(
-              //   "${modal.currency}${modal.nowMoney}",
-              //   style: TextStyle(color: valueColor),
-              // )
+              CategoryInstance.instance()
+                  .getHintCategoryComponent(modal.categoryTypeRef!.id)
+                  .getMinCategory(),
+              Text(
+                  //now money query missing
+                  '${UserInstance.instance().getCurrency().currencyCode} ${modal.budget}',
+                  style: TextStyle(color: valueColor))
             ],
           ),
           SizedBox(height: 10.0),
@@ -54,14 +58,15 @@ class CategoryComponent {
                     borderRadius: BorderRadius.circular(height * 2),
                     color: backgroundIndicatorColor),
               ),
-              // Container(
-              //   width: width * modal.percent,
-              //   height: height,
-              //   decoration: BoxDecoration(
-              //       borderRadius: BorderRadius.circular(height * 2),
-              //       color: CategoryInstance
-              //           .instances[modal.category]!().assetColor),
-              // )
+              Container(
+                width: width * modal.percent,
+                height: height,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(height * 2),
+                    color: CategoryInstance.instance()
+                        .getModal(modal.categoryTypeRef!.id)
+                        ?.color),
+              )
             ],
           )
         ],

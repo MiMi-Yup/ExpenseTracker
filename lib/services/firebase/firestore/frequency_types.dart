@@ -17,7 +17,7 @@ class FrequencyTypesFirestore extends IFirestore {
   Future<List<ModalFrequencyType>> read() async {
     QuerySnapshot<ModalFrequencyType> snapshot = await FirebaseFirestore
         .instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .withConverter(
             fromFirestore: ModalFrequencyType.fromFirestore,
             toFirestore: (ModalFrequencyType currency, _) =>

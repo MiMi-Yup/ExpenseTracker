@@ -9,7 +9,9 @@ import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_category.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/constants/enum/enum_transaction.dart';
-import 'package:expense_tracker/instances/data.dart';
+import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/transaction_type_instance.dart';
+import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_currency_type.dart';
@@ -190,13 +192,13 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
   }
 
   Future<bool> loadData() async {
-    modalTransactionType = await TransactionTypeFirestore()
-        .getModalFromRef(modal.transactionTypeRef!);
+    modalTransactionType = TranasactionTypeInstance.instance()
+        .getModal(modal.transactionTypeRef!.id);
     if (originModal != null) {
       choseAccount =
           await AccountFirestore().getModalFromRef(modal.accountRef!);
       choseCategoryType =
-          await CategoryTypeFirebase().getModalFromRef(modal.categoryTypeRef!);
+          CategoryInstance.instance().getModal(modal.categoryTypeRef!.id);
     }
     return true;
   }
@@ -231,15 +233,13 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: FutureBuilder<ModalCurrencyType?>(
-                          future: UserFirestore().getMainCurrencyAccount(),
-                          builder: (context, snapshot) => TextField(
+                          padding: const EdgeInsets.all(10.0),
+                          child: TextField(
                             keyboardType: TextInputType.number,
                             style: TextStyle(fontSize: 40.0),
                             decoration: InputDecoration(
                                 prefixText:
-                                    "${snapshot.data == null ? '' : snapshot.data!.currencyCode} ",
+                                    "${UserInstance.instance().getCurrency().currencyCode} ",
                                 isCollapsed: true,
                                 hintText: "0.00",
                                 border: InputBorder.none),
@@ -247,9 +247,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                 modal.money = double.tryParse(value),
                             controller: TextEditingController(
                                 text: "${modal.money ?? ""}"),
-                          ),
-                        ),
-                      ),
+                          )),
                       Container(
                         decoration: BoxDecoration(
                             color: Colors.black,

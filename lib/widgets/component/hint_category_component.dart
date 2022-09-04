@@ -1,15 +1,11 @@
+import 'package:expense_tracker/modals/modal_category_type.dart';
+import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class HintCategoryComponent {
-  String name;
-  Color backgroundColor;
-  String assetName;
-  Color? assetColor;
-  HintCategoryComponent(
-      {required this.name,
-      required this.backgroundColor,
-      required this.assetName,
-      this.assetColor});
+  ModalCategoryType modal;
+  HintCategoryComponent({required this.modal});
 
   Widget getFullCategory({double height = 50.0}) => Container(
         width: height,
@@ -17,13 +13,20 @@ class HintCategoryComponent {
         padding: const EdgeInsets.all(8.0),
         margin: const EdgeInsets.only(right: 8.0),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8.0), color: backgroundColor),
+            borderRadius: BorderRadius.circular(8.0),
+            color: modal.color?.withAlpha(25)),
         child: AspectRatio(
           aspectRatio: 1.0,
-          child: Image.asset(
-            assetName,
-            color: assetColor,
-          ),
+          child: modal.localAsset == true
+              ? Image.asset(
+                  modal.image!,
+                  color: modal.color,
+                )
+              : FutureBuilder<Uint8List?>(
+                  future: ActionFirebaseStorage.downloadFile(modal.image!),
+                  builder: (context, snapshot) => snapshot.hasData
+                      ? Image.memory(snapshot.data!)
+                      : Text("Wait")),
         ),
       );
 
@@ -32,7 +35,7 @@ class HintCategoryComponent {
         padding: EdgeInsets.all(10.0),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(height * 2),
-            border: Border.all(color: backgroundColor)),
+            border: Border.all(color: modal.color!.withAlpha(150))),
         child: Row(
           children: [
             Container(
@@ -40,9 +43,9 @@ class HintCategoryComponent {
               width: height,
               margin: EdgeInsets.only(right: 10.0),
               decoration: BoxDecoration(
-                  color: indicatorColor ?? assetColor, shape: BoxShape.circle),
+                  color: indicatorColor ?? modal.color, shape: BoxShape.circle),
             ),
-            Text(name)
+            Text(modal.name!)
           ],
         ),
       );

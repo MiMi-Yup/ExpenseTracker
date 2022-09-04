@@ -1,8 +1,12 @@
+import 'dart:collection';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/instances/data.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
+import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/overview_transaction.dart';
@@ -54,12 +58,9 @@ class _TransactionPageState extends State<TransactionPage>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 26),
       child: Column(
         children: [
-          SizedBox(
-            height: 50,
-          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -197,122 +198,161 @@ class _TransactionPageState extends State<TransactionPage>
                         },
                         child: Text(isExpandAll ? "Shink all" : "Expand all")),
                   )),
-          FutureBuilder<List<ModalTransaction>>(
-            //load data
-            future: Future.delayed(const Duration(seconds: 2), () {
-              return DataSample.instanceSample();
-            }),
-            builder: (context, snapshot) {
-              if (snapshot.data == null) {
-                return const Expanded(
-                    child: Center(child: Text("Wait for loading")));
-              } else {
-                return Expanded(
-                    child: StreamBuilder<List<ModalTransaction>>(
-                  stream: DataSample.instance().stateStream,
-                  initialData: snapshot.data,
-                  builder: (context, snapshot) {
-                    List<ModalTransaction>? modals = snapshot.data;
-                    if (modals == null) {
-                      return const Center(
-                          child: Text("Empty list transaction"));
-                    } else {
-                      Map<String, List<ModalTransaction>?> map =
-                          DataSample.filterByDateTime(modals);
-                      return CustomScrollView(
-                          physics: BouncingScrollPhysics(),
-                          slivers: map.entries.map((group) {
-                            if (group.value!.isNotEmpty) {
-                              if (!_sectionController!.containsKey(group.key)) {
-                                _sectionController!.addAll({
-                                  group.key: AnimationController(
-                                      vsync: this,
-                                      duration:
-                                          const Duration(milliseconds: 500))
-                                });
-                              }
-                              return Section(
-                                  headerColor: MyColor.mainBackgroundColor,
-                                  titleColor: Colors.white,
-                                  title:
-                                      "${group.key} (${group.value!.length}) transactions",
-                                  controller: _sectionController![group.key],
-                                  headerPressable: true,
-                                  onPressed: () {
-                                    if (_sectionController![group.key] !=
-                                        null) {
-                                      _sectionController![group.key]!
-                                              .isDismissed
-                                          ? _sectionController![group.key]!
-                                              .forward()
-                                          : _sectionController![group.key]!
-                                              .reverse();
-                                    }
-                                  },
-                                  content: MediaQuery.removePadding(
-                                      context: context,
-                                      removeTop: true,
-                                      removeBottom: map.entries.last != group,
-                                      child: ListView(
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        children: group.value!
-                                            .map((modal) =>
-                                                TransactionComponent(
-                                                  parentController:
-                                                      _sectionController![
-                                                          group.key],
-                                                  modal: modal,
-                                                  isEditable: true,
-                                                  onTap: () async {
-                                                    await Navigator.pushNamed(
-                                                        context,
-                                                        RouteApplication
-                                                            .getRoute(ERoute
-                                                                .detailTransaction),
-                                                        arguments: [
-                                                          modal,
-                                                          true
-                                                        ]);
-                                                    setState(() {});
-                                                  },
-                                                  editSlidableAction:
-                                                      (context) async {
-                                                    await Navigator.pushNamed(
-                                                        context,
-                                                        RouteApplication
-                                                            .getRoute(ERoute
-                                                                .addEditTransaction),
-                                                        arguments: modal);
-                                                    setState(() {});
-                                                  },
-                                                  deleteSlidableAction:
-                                                      (context) {
-                                                    Future.delayed(
-                                                        const Duration(
-                                                            milliseconds: 500),
-                                                        () => DataSample
-                                                                .instance()
-                                                            .removeTransaction(
-                                                                modal));
-                                                  },
-                                                ))
-                                            .toList(),
-                                      ))).builder();
-                            } else {
-                              return const SliverPadding(
-                                  padding: EdgeInsets.all(0));
-                            }
-                          }).toList());
-                    }
-                  },
-                ));
-              }
-            },
-          )
+          StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
+              initialData: null,
+              stream: CurrentTransaction().getStreamTransaction(),
+              builder: (context, snapshot) {
+                if (snapshot.data == null) {
+                  //wait to loading
+                  return CircularProgressIndicator();
+                } else {
+                  if (snapshot.data!.size == 0) {
+                    //hasn't transaction yet
+                    return Expanded(
+                        child: Center(child: Text("Empty list transaction")));
+                  } else {
+                    return FutureBuilder<
+                            SplayTreeMap<String, List<ModalTransaction>?>>(
+                        initialData: null,
+                        future: filterTransactionByDateTime(snapshot.data!),
+                        builder: (context, snapshot) => snapshot.hasData
+                            ? Expanded(
+                                child: CustomScrollView(
+                                    physics: BouncingScrollPhysics(),
+                                    slivers:
+                                        snapshot.data!.entries.map((group) {
+                                      if (group.value!.isNotEmpty) {
+                                        if (!_sectionController!
+                                            .containsKey(group.key)) {
+                                          _sectionController!.addAll({
+                                            group.key: AnimationController(
+                                                vsync: this,
+                                                duration: const Duration(
+                                                    milliseconds: 500))
+                                          });
+                                        }
+                                        return Section(
+                                            headerColor:
+                                                MyColor.mainBackgroundColor,
+                                            titleColor: Colors.white,
+                                            title:
+                                                "${group.key} (${group.value!.length}) transactions",
+                                            controller:
+                                                _sectionController![group.key],
+                                            headerPressable: true,
+                                            onPressed: () {
+                                              if (_sectionController![
+                                                      group.key] !=
+                                                  null) {
+                                                _sectionController![group.key]!
+                                                        .isDismissed
+                                                    ? _sectionController![
+                                                            group.key]!
+                                                        .forward()
+                                                    : _sectionController![
+                                                            group.key]!
+                                                        .reverse();
+                                              }
+                                            },
+                                            content: MediaQuery.removePadding(
+                                                context: context,
+                                                removeTop: true,
+                                                removeBottom: snapshot
+                                                        .data!.entries.last !=
+                                                    group,
+                                                child: ListView(
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      NeverScrollableScrollPhysics(),
+                                                  children: group.value!
+                                                      .map((modal) =>
+                                                          TransactionComponent(
+                                                            parentController:
+                                                                _sectionController![
+                                                                    group.key],
+                                                            modal: modal,
+                                                            isEditable: true,
+                                                            onTap: () async {
+                                                              await Navigator.pushNamed(
+                                                                  context,
+                                                                  RouteApplication.getRoute(
+                                                                      ERoute.detailTransaction),
+                                                                  arguments: [
+                                                                    modal,
+                                                                    true
+                                                                  ]);
+                                                              setState(() {});
+                                                            },
+                                                            editSlidableAction:
+                                                                (context) async {
+                                                              // await Navigator.pushNamed(
+                                                              //     context,
+                                                              //     RouteApplication
+                                                              //         .getRoute(ERoute
+                                                              //             .addEditTransaction),
+                                                              //     arguments: modal);
+                                                              // setState(() {});
+                                                            },
+                                                            deleteSlidableAction:
+                                                                (context) {
+                                                              // Future.delayed(
+                                                              //     const Duration(
+                                                              //         milliseconds:
+                                                              //             500),
+                                                              //     () => DataSample
+                                                              //             .instance()
+                                                              //         .removeTransaction(
+                                                              //             modal));
+                                                            },
+                                                          ))
+                                                      .toList(),
+                                                ))).builder();
+                                      } else {
+                                        return const SliverPadding(
+                                            padding: EdgeInsets.all(0));
+                                      }
+                                    }).toList()))
+                            : LinearProgressIndicator());
+                  }
+                }
+              })
         ],
       ),
     );
+  }
+
+  String _getDate(DateTime date) =>
+      "${date.year}-${date.month >= 10 ? date.month : "0${date.month}"}-${date.day >= 10 ? date.day : "0${date.day}"}";
+
+  Future<SplayTreeMap<String, List<ModalTransaction>?>>
+      filterTransactionByDateTime(
+          QuerySnapshot<ModalTransactionLog> querySnapshot) async {
+    TransactionFirestore service = TransactionFirestore();
+
+    Map<String, List<ModalTransaction>?> result =
+        <String, List<ModalTransaction>?>{};
+
+    Iterable<DocumentReference<Object?>> iterable =
+        querySnapshot.docs.map<DocumentReference<Object?>>((e) {
+      ModalTransactionLog log = e.data();
+      return log.lastTransactionRef ?? log.firstTransactionRef!;
+    });
+
+    for (int index = 0; index < iterable.length; index++) {
+      ModalTransaction? modal =
+          await service.getModalFromRef(iterable.elementAt(index));
+      String key = _getDate(modal!.timeCreate!);
+      if (result.containsKey(key)) {
+        result[key]!.add(modal);
+      } else {
+        result.addAll({
+          key: [modal]
+        });
+      }
+    }
+
+    return SplayTreeMap<String, List<ModalTransaction>?>.from(result,
+        (key1, key2) => DateTime.parse(key1).compareTo(DateTime.parse(key2)));
   }
 
   @override

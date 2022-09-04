@@ -3,11 +3,12 @@ import 'package:expense_tracker/constants/asset/category.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/constants/enum/enum_transaction.dart';
-import 'package:expense_tracker/instances/data.dart';
+import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
+import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/widgets/component/overview_transaction_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
@@ -91,8 +92,9 @@ class _HomePageState extends State<HomePage>
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CircleAvatar(
-                        backgroundColor: MyColor.purple(),
-                        foregroundImage: AssetImage(CategoryAsset.moneyBag)),
+                        backgroundImage: NetworkImage(
+                            UserInstance.instance().getModal().photoURL!,
+                            scale: 1.0)),
                   ),
                 ),
                 title: DropDown<String>(
@@ -201,20 +203,13 @@ class _HomePageState extends State<HomePage>
                                   DocumentReference docRef =
                                       log.lastTransactionRef ??
                                           log.firstTransactionRef!;
-                                  return FutureBuilder<
-                                          DocumentSnapshot<ModalTransaction>>(
-                                      future: docRef
-                                          .withConverter(
-                                              fromFirestore: ModalTransaction
-                                                  .fromFirestore,
-                                              toFirestore:
-                                                  (ModalTransaction modal, _) =>
-                                                      modal.toFirestore())
-                                          .get(),
+                                  return FutureBuilder<ModalTransaction?>(
+                                      future: TransactionFirestore()
+                                          .getModalFromRef(docRef),
                                       builder: (context, snapshot) => snapshot
                                               .hasData
                                           ? TransactionComponent(
-                                              modal: snapshot.data!.data()!,
+                                              modal: snapshot.data!,
                                               isEditable: true,
                                               onTap: () async {
                                                 await Navigator.pushNamed(
@@ -223,7 +218,7 @@ class _HomePageState extends State<HomePage>
                                                         ERoute
                                                             .detailTransaction),
                                                     arguments: [
-                                                      snapshot.data!.data()!,
+                                                      snapshot.data!,
                                                       true
                                                     ]);
                                                 setState(() {});
@@ -247,7 +242,7 @@ class _HomePageState extends State<HomePage>
                                                 //             modal));
                                               },
                                             )
-                                          : SizedBox());
+                                          : LinearProgressIndicator());
                                 }).toList(),
                               ));
                     },

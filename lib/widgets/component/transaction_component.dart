@@ -1,7 +1,9 @@
 import 'dart:developer';
 
 import 'package:expense_tracker/constants/color.dart';
-import 'package:expense_tracker/instances/category_component.dart';
+import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/transaction_type_instance.dart';
+import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
@@ -65,8 +67,9 @@ class _TransactionComponentState extends State<TransactionComponent>
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Row(
           children: [
-            // CategoryInstance.instances[widget.modal.category]!()
-            //     .getFullCategory(height: 50.0),
+            CategoryInstance.instance()
+                .getHintCategoryComponent(widget.modal.categoryTypeRef!.id)
+                .getFullCategory(height: 50.0),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Column(
@@ -91,16 +94,14 @@ class _TransactionComponentState extends State<TransactionComponent>
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            FutureBuilder<ModalTransactionType?>(
-                future: TransactionTypeFirestore()
-                    .getModalFromRef(widget.modal.transactionTypeRef!),
-                builder: (context, snapshot) => Text(
-                      widget.modal.getMoney('\$'),
-                      style: TextStyle(
-                          color: snapshot.hasData
-                              ? snapshot.data?.color
-                              : Colors.white),
-                    )),
+            Text(
+              widget.modal.getMoney(
+                  '${UserInstance.instance().getCurrency().currencyCode}'),
+              style: TextStyle(
+                  color: TranasactionTypeInstance.instance()
+                      .getModal(widget.modal.transactionTypeRef!.id)
+                      ?.color),
+            ),
             SizedBox(height: 10.0),
             Text(
               widget.modal.getTimeTransaction,

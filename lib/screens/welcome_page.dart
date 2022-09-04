@@ -4,6 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
+import 'package:expense_tracker/instances/account_type_instance.dart';
+import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/transaction_type_instance.dart';
+import 'package:expense_tracker/instances/user_instance.dart';
+import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/init.dart';
@@ -28,7 +33,13 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 
   Future<void> initApplication() async {
-    await Future.delayed(const Duration(seconds: 5), () {});
+    await Future.delayed(const Duration(seconds: 5), () {
+      UserInstance.instance();
+      CategoryInstance.instance();
+      TranasactionTypeInstance.instance();
+      AccountTypeInstance.instance();
+    });
+
     FirebaseAuth.instance.authStateChanges().listen((user) async {
       if (user == null) {
         RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
@@ -73,6 +84,7 @@ class _WelcomePageState extends State<WelcomePage> {
         if (fieldUser.isNotEmpty && fieldUser.first.passcode != null) {
           initUser = false;
         }
+
         RouteApplication.navigatorKey.currentState
             ?.popUntil((route) => route.isFirst);
         RouteApplication.navigatorKey.currentState?.pushReplacementNamed(

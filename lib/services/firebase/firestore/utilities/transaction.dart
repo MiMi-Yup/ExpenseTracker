@@ -20,7 +20,7 @@ class TransactionUtilities {
       if (modal.attachments != null && modal.attachments!.isNotEmpty) {
         Set<String> uploadFile = <String>{};
         for (int index = 0; index < modal.attachments!.length; index++) {
-          uploadFile.add(getPathStorage(instanceTransaction.uid, modal.id,
+          uploadFile.add(getPathStorage(instanceTransaction.user?.uid, modal.id,
               basename(modal.attachments!.elementAt(index))));
           ActionFirebaseStorage.uploadFile(
               File(modal.attachments!.elementAt(index)), uploadFile.last);

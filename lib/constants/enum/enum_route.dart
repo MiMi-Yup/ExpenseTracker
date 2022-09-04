@@ -24,5 +24,5 @@ enum ERoute {
 
   addEditAccountType,
   addEditCategoryType,
-  editTransactionType
+  editTransactionType,
 }

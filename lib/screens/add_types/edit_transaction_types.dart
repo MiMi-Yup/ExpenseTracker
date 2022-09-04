@@ -168,11 +168,10 @@ class _EditTransactionTypesState extends State<EditTransactionTypes> {
                                   );
 
                                   Future.delayed(const Duration(seconds: 1),
-                                      () async{
-                                        await InitializationFirestore().init();
-                                    // int count = 0;
-                                    // RouteApplication.navigatorKey.currentState
-                                    //     ?.popUntil((route) => count++ == 2);
+                                      () {
+                                    int count = 0;
+                                    RouteApplication.navigatorKey.currentState
+                                        ?.popUntil((route) => count++ == 2);
                                   });
                                 },
                                 background: MyColor.purple()))

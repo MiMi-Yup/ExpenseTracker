@@ -1,4 +1,8 @@
+import 'package:expense_tracker/constants/asset/background.dart';
 import 'package:expense_tracker/constants/color.dart';
+import 'package:expense_tracker/modals/modal_account.dart';
+import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
+import 'package:expense_tracker/widgets/component/account_component.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
 
@@ -11,82 +15,64 @@ class AccountPage extends StatelessWidget {
         body: Column(
       children: [
         Expanded(
-          child: CustomScrollView(
-            physics: BouncingScrollPhysics(),
-            slivers: [
-              SliverAppBar(
-                  floating: true,
-                  pinned: true,
-                  expandedHeight: MediaQuery.of(context).size.height * 0.3,
-                  leading: IconButton(
-                      onPressed: () => Navigator.pop<void>(context),
-                      icon: Icon(Icons.arrow_back_ios)),
-                  centerTitle: true,
-                  backgroundColor: MyColor.mainBackgroundColor,
-                  elevation: 0.0,
-                  flexibleSpace: FlexibleSpaceBar(
-                      background: Stack(
-                    alignment: AlignmentDirectional.center,
-                    children: [
-                      Image.asset(
-                        "asset/image/background_wallet_page.png",
-                        isAntiAlias: true,
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+          child: FutureBuilder<List<ModalAccount>>(
+            future: AccountFirestore().read(),
+            builder: (context, snapshot) {
+              Widget widget;
+              if (snapshot.hasData) {
+                widget = SliverList(
+                    delegate: SliverChildListDelegate(
+                        snapshot.data!
+                            .map((e) => AccountComponent(accoutnModal: e))
+                            .toList(),
+                        addSemanticIndexes: false));
+              } else {
+                widget = SliverToBoxAdapter(
+                  child: Padding(
+                    padding:
+                        EdgeInsets.all(MediaQuery.of(context).size.width / 4),
+                    child: LinearProgressIndicator(),
+                  ),
+                );
+              }
+              return CustomScrollView(
+                physics: BouncingScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                      floating: true,
+                      pinned: true,
+                      expandedHeight: MediaQuery.of(context).size.height * 0.3,
+                      leading: IconButton(
+                          onPressed: () => Navigator.pop<void>(context),
+                          icon: Icon(Icons.arrow_back_ios)),
+                      centerTitle: true,
+                      backgroundColor: MyColor.mainBackgroundColor,
+                      elevation: 0.0,
+                      flexibleSpace: FlexibleSpaceBar(
+                          background: Stack(
+                        alignment: AlignmentDirectional.center,
                         children: [
-                          Text("Wallet Balance",
-                              style: TextStyle(fontSize: 30)),
-                          SizedBox(
-                            height: 16.0,
+                          Image.asset(
+                            BackgroundAsset.walletBackground,
+                            isAntiAlias: true,
                           ),
-                          Text("\$6400", style: TextStyle(fontSize: 16))
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Wallet Balance",
+                                  style: TextStyle(fontSize: 30)),
+                              SizedBox(
+                                height: 16.0,
+                              ),
+                              Text("\$6400", style: TextStyle(fontSize: 16))
+                            ],
+                          )
                         ],
-                      )
-                    ],
-                  ))),
-              SliverList(
-                  delegate: SliverChildListDelegate(
-                      List.generate(
-                          50,
-                          (index) => GestureDetector(
-                                onTap: null,
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              decoration: BoxDecoration(
-                                                  color:
-                                                      MyColor.purpleTranparent,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0)),
-                                              alignment: Alignment.center,
-                                              child: Icon(
-                                                Icons.wallet,
-                                                color: MyColor.purple(),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 16.0,
-                                            ),
-                                            Text("Wallet")
-                                          ]),
-                                      Text("\$50")
-                                    ],
-                                  ),
-                                ),
-                              )),
-                      addSemanticIndexes: false))
-            ],
+                      ))),
+                  widget
+                ],
+              );
+            },
           ),
         ),
         Container(

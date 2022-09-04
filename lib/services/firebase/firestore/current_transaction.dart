@@ -23,7 +23,7 @@ class CurrentTransaction extends IFirestore {
   Future<List<ModalTransactionLog>> read() async {
     QuerySnapshot<ModalTransactionLog> snapshot = await FirebaseFirestore
         .instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .withConverter(
             fromFirestore: ModalTransactionLog.fromFirestore,
             toFirestore: (ModalTransactionLog modal, _) => modal.toFirestore())
@@ -54,7 +54,7 @@ class CurrentTransaction extends IFirestore {
 
   Stream<QuerySnapshot<ModalTransactionLog>> getStreamTransaction() {
     return FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .withConverter(
             fromFirestore: ModalTransactionLog.fromFirestore,
             toFirestore: (ModalTransactionLog modal, _) => modal.toFirestore())
@@ -67,7 +67,7 @@ class CurrentTransaction extends IFirestore {
 
     DocumentSnapshot<ModalTransactionLog> snapshot = await FirebaseFirestore
         .instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .doc(modal.id)
         .withConverter(
             fromFirestore: ModalTransactionLog.fromFirestore,
@@ -76,7 +76,7 @@ class CurrentTransaction extends IFirestore {
     if (snapshot.exists) return snapshot.data();
 
     QuerySnapshot<ModalTransactionLog> query = await FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .where('last_transaction_ref', isEqualTo: modal.transactionRef)
         .withConverter(
             fromFirestore: ModalTransactionLog.fromFirestore,

@@ -24,7 +24,7 @@ class TransactionFirestore extends IFirestore {
   @override
   Future<void> insert(IModal modal) async {
     return FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .add(modal.toFirestore())
         .then((value) {
       modal.id = value.id;
@@ -34,7 +34,7 @@ class TransactionFirestore extends IFirestore {
   @override
   Future<List<ModalTransaction>> read() async {
     QuerySnapshot<Map<String, dynamic>> collection =
-        await FirebaseFirestore.instance.collection(getPath(uid)).get();
+        await FirebaseFirestore.instance.collection(getPath(user?.uid)).get();
     return collection.docs
         .map((snapshot) => ModalTransaction.fromFirestore(snapshot, null))
         .toList();
@@ -42,7 +42,7 @@ class TransactionFirestore extends IFirestore {
 
   Future<void> override_(IModal modal) async {
     return FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .doc(modal.id)
         .set(modal.toFirestore());
   }
@@ -50,7 +50,7 @@ class TransactionFirestore extends IFirestore {
   Future<bool> checkTransactionTypeExists(ModalTransactionType modal) async {
     bool exist = false;
     await FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .where('transaction_type_ref',
             isEqualTo: TransactionTypeFirestore().getRef(modal))
         .get()
@@ -61,7 +61,7 @@ class TransactionFirestore extends IFirestore {
   Future<bool> checkAccountExists(ModalAccount modal) async {
     bool exist = false;
     await FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .where('account_ref', isEqualTo: AccountFirestore().getRef(modal))
         .get()
         .then((value) => exist = value.size > 0, onError: (e) => print(e));
@@ -71,7 +71,7 @@ class TransactionFirestore extends IFirestore {
   Future<bool> checkCategoryTypeExists(ModalCategoryType modal) async {
     bool exist = false;
     await FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .where('category_type_ref',
             isEqualTo: CategoryTypeFirebase().getRef(modal))
         .get()
@@ -82,7 +82,7 @@ class TransactionFirestore extends IFirestore {
   Future<DocumentReference> getTransactionRef(ModalTransaction modal) async {
     DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore
         .instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .doc(modal.id)
         .get();
     return doc.data()?['transaction_ref'];
@@ -93,7 +93,7 @@ class TransactionFirestore extends IFirestore {
 
   @override
   Future<ModalTransaction?> getModalFromRef(
-      DocumentReference<Map<String, dynamic>> ref) async {
+      DocumentReference<Object?> ref) async {
     DocumentSnapshot<ModalTransaction> snapshot = await ref
         .withConverter(
             fromFirestore: ModalTransaction.fromFirestore,

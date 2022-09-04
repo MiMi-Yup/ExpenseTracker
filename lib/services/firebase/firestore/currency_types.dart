@@ -16,7 +16,7 @@ class CurrencyTypesFirestore extends IFirestore {
   @override
   Future<List<ModalCurrencyType>> read() async {
     QuerySnapshot<ModalCurrencyType> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .withConverter(
             fromFirestore: ModalCurrencyType.fromFirestore,
             toFirestore: (ModalCurrencyType currency, _) =>

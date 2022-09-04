@@ -22,7 +22,7 @@ class CategoryTypeFirebase extends IFirestore {
 
     if (!(budgetExist || transactionExist)) {
       return FirebaseFirestore.instance
-          .collection(getPath(uid))
+          .collection(getPath(user?.uid))
           .doc(modal.id)
           .delete();
     }
@@ -31,7 +31,7 @@ class CategoryTypeFirebase extends IFirestore {
   @override
   Future<List<ModalCategoryType>> read() async {
     QuerySnapshot<ModalCategoryType> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .withConverter(
             fromFirestore: ModalCategoryType.fromFirestore,
             toFirestore: (ModalCategoryType modal, _) => modal.toFirestore())

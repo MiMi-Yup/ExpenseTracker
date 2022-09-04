@@ -15,7 +15,7 @@ class AccountTypeUtilities {
     AccountTypeFirestore instance = AccountTypeFirestore();
     String? id = modal.id ??= modal.name?.replaceAll(' ', '_');
     String nameFile = basename(file.path);
-    String pathStorage = getPathStorage(instance.uid, id, nameFile);
+    String pathStorage = getPathStorage(instance.user?.uid, id, nameFile);
 
     Stream<TaskSnapshot> task =
         ActionFirebaseStorage.uploadFile(file, pathStorage).snapshotEvents;

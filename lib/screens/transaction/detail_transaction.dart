@@ -20,6 +20,7 @@ class _DetailTransactionState extends State<DetailTransaction> {
   late bool isEditable = (arguments?[1] as bool?) ?? false;
 
   final heightAnchor = 75.0;
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;

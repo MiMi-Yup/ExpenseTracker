@@ -3,6 +3,7 @@ import 'package:expense_tracker/modals/modal.dart';
 import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserFirestore extends IFirestore {
   @override
@@ -17,33 +18,37 @@ class UserFirestore extends IFirestore {
   @override
   Future<void> insert(IModal modal) {
     return FirebaseFirestore.instance
-        .doc(getPath(uid))
+        .doc(getPath(user?.uid))
         .set(modal.toFirestore());
   }
 
   @override
   Future<void> update(IModal? was, IModal update) {
     return FirebaseFirestore.instance
-        .doc(getPath(uid))
+        .doc(getPath(user?.uid))
         .update(update.updateFirestore());
   }
 
   @override
   DocumentReference<Map<String, dynamic>> getRef(IModal modal) {
-    return FirebaseFirestore.instance.doc(getPath(uid));
+    return FirebaseFirestore.instance.doc(getPath(user?.uid));
   }
 
   @override
   Future<List<ModalUser>> read() async {
     DocumentSnapshot<ModalUser> snapshot = await FirebaseFirestore.instance
-        .doc(getPath(uid))
+        .doc(getPath(user?.uid))
         .withConverter(
             fromFirestore: ModalUser.fromFirestore,
             toFirestore: (ModalUser user, _) => user.toFirestore())
         .get();
     ModalUser? modal = snapshot.data();
     if (modal != null) {
-      modal.id = snapshot.id;
+      modal.displayName = user?.displayName;
+      modal.email = user?.email;
+      modal.emailVerified = user?.emailVerified;
+      modal.phoneNumber = user?.phoneNumber;
+      modal.photoURL = user?.photoURL;
       return [modal];
     }
     return [];
@@ -60,11 +65,17 @@ class UserFirestore extends IFirestore {
     return snapshot.data();
   }
 
-  Future<ModalCurrencyType?> getMainCurrencyAccount() async {
-    List<ModalUser> modals = await read();
-    if (modals.isNotEmpty) {
-      DocumentSnapshot<ModalCurrencyType> snapshot = await modals
-          .first.currencyTypeRef!
+  Future<ModalCurrencyType?> getMainCurrencyAccount({ModalUser? modal}) async {
+    if (modal == null) {
+      List<ModalUser> modals = await read();
+      if (modals.isNotEmpty) {
+        modal = modals.first;
+      }
+    }
+
+    if (modal != null) {
+      DocumentSnapshot<ModalCurrencyType> snapshot = await modal
+          .currencyTypeRef!
           .withConverter(
               fromFirestore: ModalCurrencyType.fromFirestore,
               toFirestore: (ModalCurrencyType modal, _) => modal.toFirestore())
@@ -76,7 +87,7 @@ class UserFirestore extends IFirestore {
 
   Future<bool> checkUserExists() {
     return FirebaseFirestore.instance
-        .doc(getPath(uid))
+        .doc(getPath(user?.uid))
         .get()
         .then<bool>((value) => value.exists);
   }

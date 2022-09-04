@@ -18,7 +18,7 @@ class TransactionTypeFirestore extends IFirestore {
     bool exist = await TransactionFirestore().checkTransactionTypeExists(modal);
     if (!exist) {
       return FirebaseFirestore.instance
-          .collection(getPath(uid))
+          .collection(getPath(user?.uid))
           .doc(modal.id)
           .delete();
     }
@@ -28,7 +28,7 @@ class TransactionTypeFirestore extends IFirestore {
   Future<List<ModalTransactionType>> read() async {
     QuerySnapshot<ModalTransactionType> snapshot = await FirebaseFirestore
         .instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .withConverter(
             fromFirestore: ModalTransactionType.fromFirestore,
             toFirestore: (ModalTransactionType transactionType, _) =>

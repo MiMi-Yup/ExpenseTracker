@@ -13,7 +13,7 @@ class BudgetFirestore extends IFirestore {
     }
 
     return FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .doc(modal.id)
         .delete();
   }
@@ -21,7 +21,7 @@ class BudgetFirestore extends IFirestore {
   @override
   Future<List<ModalBudget>> read() async {
     QuerySnapshot<Map<String, dynamic>> collection =
-        await FirebaseFirestore.instance.collection(getPath(uid)).get();
+        await FirebaseFirestore.instance.collection(getPath(user?.uid)).get();
     return collection.docs
         .map((snapshot) => ModalBudget.fromFirestore(snapshot, null))
         .toList();
@@ -30,7 +30,7 @@ class BudgetFirestore extends IFirestore {
   Future<bool> checkCategoryTypeExists(ModalCategoryType modal) async {
     bool exist = false;
     await FirebaseFirestore.instance
-        .collection(getPath(uid))
+        .collection(getPath(user?.uid))
         .where('category_type_ref',
             isEqualTo: CategoryTypeFirebase().getRef(modal))
         .get()
@@ -42,7 +42,8 @@ class BudgetFirestore extends IFirestore {
   String getPath(String? uid) => 'users/user_$uid/budgets';
 
   @override
-  Future<ModalBudget?> getModalFromRef(DocumentReference<Map<String, dynamic>> ref) async {
+  Future<ModalBudget?> getModalFromRef(
+      DocumentReference<Map<String, dynamic>> ref) async {
     DocumentSnapshot<ModalBudget> snapshot = await ref
         .withConverter(
             fromFirestore: ModalBudget.fromFirestore,
