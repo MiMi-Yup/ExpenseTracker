@@ -332,21 +332,24 @@ class _TransactionPageState extends State<TransactionPage>
     Map<String, List<ModalTransaction>?> result =
         <String, List<ModalTransaction>?>{};
 
-    Iterable<DocumentReference<Object?>> iterable =
-        querySnapshot.docs.map<DocumentReference<Object?>>((e) {
-      ModalTransactionLog log = e.data();
-      return log.lastTransactionRef ?? log.firstTransactionRef!;
-    });
+    Iterable<ModalTransactionLog?> iterable =
+        querySnapshot.docs.map<ModalTransactionLog?>((e) => e.data());
 
     for (int index = 0; index < iterable.length; index++) {
-      ModalTransaction? modal =
-          await service.getModalFromRef(iterable.elementAt(index));
-      String key = _getDate(modal!.timeCreate!);
+      ModalTransaction? currerntModal =
+          iterable.elementAt(index)!.lastTransactionRef == null
+              ? null
+              : await service.getModalFromRef(
+                  iterable.elementAt(index)!.lastTransactionRef!);
+      ModalTransaction? firstModal = await service
+          .getModalFromRef(iterable.elementAt(index)!.firstTransactionRef!);
+      ModalTransaction push = currerntModal ?? firstModal!;
+      String key = _getDate(firstModal!.timeCreate!);
       if (result.containsKey(key)) {
-        result[key]!.add(modal);
+        result[key]!.add(push);
       } else {
         result.addAll({
-          key: [modal]
+          key: [push]
         });
       }
     }

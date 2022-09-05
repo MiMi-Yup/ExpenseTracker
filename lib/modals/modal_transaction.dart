@@ -183,5 +183,5 @@ class ModalTransaction extends IModal {
       : "";
 
   String getMoney(String currencyCode) =>
-      money != null ? "$currencyCode${money!.toStringAsFixed(3)}" : "";
+      money != null ? "$currencyCode ${money!.toStringAsFixed(2)}" : "";
 }

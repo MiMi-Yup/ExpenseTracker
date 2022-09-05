@@ -1,18 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_tracker/constants/asset/category.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/constants/enum/enum_transaction.dart';
+import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
+import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
 import 'package:expense_tracker/widgets/component/overview_transaction_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
-import 'package:expense_tracker/widgets/overview_transaction.dart';
 import 'package:expense_tracker/widgets/section.dart';
 import 'package:expense_tracker/widgets/transaction_chart.dart';
 import 'package:flutter/material.dart';
@@ -37,17 +36,14 @@ class _HomePageState extends State<HomePage>
   ];
   int _currentIndex = 0;
   late double height = MediaQuery.of(context).size.height;
-  // final List<OverviewTransactionComponent> overview_transaction = [
-  //   OverviewTransactionComponent(
-  //       typeTransaction: ETypeTransaction.income, currency: "\$", money: 5000),
-  //   OverviewTransactionComponent(
-  //       typeTransaction: ETypeTransaction.expense, currency: "\$", money: 3000)
-  // ];
 
-  final List<OverviewTransactionComponent> overview_transaction = [
-    OverviewTransactionComponent(transactionTypeRef: null),
-    OverviewTransactionComponent(transactionTypeRef: null)
-  ];
+  final List<OverviewTransactionComponent> overview_transaction =
+      TranasactionTypeInstance.instance()
+          .modals!
+          .map((e) => OverviewTransactionComponent(
+              transactionTypeRef: TransactionTypeFirestore().getRef(e!),
+              money: 3000))
+          .toList();
 
   @override
   void initState() {
@@ -116,7 +112,7 @@ class _HomePageState extends State<HomePage>
                 style: TextStyle(fontSize: 30.0),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children:
