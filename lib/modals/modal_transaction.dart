@@ -113,7 +113,8 @@ class ModalTransaction extends IModal {
   ModalTransaction.clone(ModalTransaction clone) : super(id: '') {
     id = clone.id;
     accountRef = clone.accountRef;
-    attachments = clone.attachments;
+    attachments =
+        clone.attachments == null ? null : Set<String>.from(clone.attachments!);
     categoryTypeRef = clone.categoryTypeRef;
     description = clone.description;
     money = clone.money;

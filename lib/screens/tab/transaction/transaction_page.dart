@@ -283,7 +283,8 @@ class _TransactionPageState extends State<TransactionPage>
                                                                           ERoute.detailTransaction),
                                                                       arguments: [
                                                                         modal,
-                                                                        true
+                                                                        true,
+                                                                        false
                                                                       ]);
                                                                   setState(
                                                                       () {});
@@ -384,7 +385,6 @@ class _TransactionPageState extends State<TransactionPage>
         await mappingCompareTimeCreate(result);
 
     //sort group by timeCreate
-    CurrentTransaction serviceLog = CurrentTransaction();
     for (String element in result.keys) {
       result[element]!.sort((modal1, modal2) {
         ModalTransaction? compare1 = mapCompare[modal1];

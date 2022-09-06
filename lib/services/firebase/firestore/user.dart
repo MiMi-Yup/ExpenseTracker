@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/modals/modal.dart';
 import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
+import 'package:expense_tracker/services/firebase/firestore/currency_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -90,5 +91,14 @@ class UserFirestore extends IFirestore {
         .doc(getPath(user?.uid))
         .get()
         .then<bool>((value) => value.exists);
+  }
+
+  Future<bool> checkCurrencyTypeExists(ModalCurrencyType modal) async {
+    QuerySnapshot<Map<String, dynamic>> query = await FirebaseFirestore.instance
+        .collection('users')
+        .where('currency_type_ref',
+            isEqualTo: CurrencyTypesFirestore().getRef(modal))
+        .get();
+    return query.size == 0 ? true : false;
   }
 }

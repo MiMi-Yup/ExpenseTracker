@@ -16,9 +16,15 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class TransactionFirestore extends IFirestore {
   @override
-  Future<void> delete(IModal modal) {
-    // TODO: implement delete
-    throw UnimplementedError();
+  Future<void> delete(IModal modal) async {
+    if (modal is! ModalTransaction) {
+      throw ArgumentError('Request ModalTransaction');
+    }
+
+    return FirebaseFirestore.instance
+        .collection(getPath(user?.uid))
+        .doc(modal.id)
+        .delete();
   }
 
   @override
@@ -79,15 +85,6 @@ class TransactionFirestore extends IFirestore {
         .get()
         .then((value) => exist = value.size > 0, onError: (e) => print(e));
     return exist;
-  }
-
-  Future<DocumentReference> getTransactionRef(ModalTransaction modal) async {
-    DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore
-        .instance
-        .collection(getPath(user?.uid))
-        .doc(modal.id)
-        .get();
-    return doc.data()?['transaction_ref'];
   }
 
   @override

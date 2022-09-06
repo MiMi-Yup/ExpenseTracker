@@ -215,7 +215,8 @@ class _HomePageState extends State<HomePage>
                                                             .detailTransaction),
                                                     arguments: [
                                                       snapshot.data!,
-                                                      true
+                                                      true,
+                                                      false
                                                     ]);
                                                 setState(() {});
                                               },

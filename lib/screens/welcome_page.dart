@@ -129,7 +129,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 opacity: opacityLevel,
                 child: Center(
                   child: Text(
-                    "montra",
+                    "ET",
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

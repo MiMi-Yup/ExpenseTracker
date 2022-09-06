@@ -6,9 +6,15 @@ import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 
 class CurrentTransaction extends IFirestore {
   @override
-  Future<void> delete(IModal modal) {
-    // TODO: implement delete
-    throw UnimplementedError();
+  Future<void> delete(IModal modal) async {
+    if (modal is! ModalTransaction) {
+      throw ArgumentError('Request ModalTransaction');
+    }
+
+    return FirebaseFirestore.instance
+        .collection(getPath(user?.uid))
+        .doc(modal.id)
+        .delete();
   }
 
   @override

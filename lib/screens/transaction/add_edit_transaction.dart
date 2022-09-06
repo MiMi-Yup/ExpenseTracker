@@ -354,24 +354,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                                       modal.attachments
                                                           ?.remove(e);
                                                     }),
-                                                child: originModal != null &&
-                                                        originModal!
-                                                                .attachments !=
-                                                            null
-                                                    ? FutureBuilder<Uint8List?>(
-                                                        future:
-                                                            ActionFirebaseStorage
-                                                                .downloadFile(
-                                                                    e),
-                                                        builder: (context,
-                                                                snapshot) =>
-                                                            snapshot.hasData
-                                                                ? Image.memory(
-                                                                    snapshot
-                                                                        .data!)
-                                                                : SizedBox(),
-                                                      )
-                                                    : Image.file(File(e))))
+                                                child: showImageAttachments(e)))
                                             .toList()
                                           ..add(GestureDetector(
                                             onTap: () async {
@@ -667,6 +650,18 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
             : Center(
                 child: Text("Wait"),
               ));
+  }
+
+  Widget showImageAttachments(String path) {
+    if (File(path).existsSync()) {
+      return Image.file(File(path));
+    } else {
+      return FutureBuilder<Uint8List?>(
+        future: ActionFirebaseStorage.downloadFile(path),
+        builder: (context, snapshot) =>
+            snapshot.hasData ? Image.memory(snapshot.data!) : SizedBox(),
+      );
+    }
   }
 
   String? uid = FirebaseAuth.instance.currentUser?.uid;

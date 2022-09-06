@@ -1,16 +1,20 @@
+import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
+import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/timelines/timelines.dart';
 import 'package:flutter/material.dart';
 
 class TimelineModiedTransaction extends StatelessWidget {
-  TimelineModiedTransaction({Key? key, required this.timelineModiedTransaction})
-      : super(key: key) {
-    timelineModiedTransaction.add(timelineModiedTransaction.last);
-  }
+  TimelineModiedTransaction(
+      {Key? key,
+      required this.timelineModiedTransaction,
+      required this.indicatorModal})
+      : super(key: key);
 
   final List<ModalTransaction> timelineModiedTransaction;
+  final ModalTransaction indicatorModal;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +41,6 @@ class TimelineModiedTransaction extends StatelessWidget {
             connectionDirection: ConnectionDirection.before,
             itemCount: timelineModiedTransaction.length,
             contentsBuilder: (_, index) {
-              if (index == timelineModiedTransaction.length - 1) return null;
-
               return Padding(
                 padding: EdgeInsets.only(left: 8.0),
                 child: Column(
@@ -55,15 +57,37 @@ class TimelineModiedTransaction extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: TransactionComponent(
                           modal: timelineModiedTransaction[index],
-                          isEditable: false),
+                          isEditable: false,
+                          onTap: () => RouteApplication
+                                  .navigatorKey.currentState
+                                  ?.pushNamed(
+                                      RouteApplication.getRoute(
+                                          ERoute.detailTransaction),
+                                      arguments: [
+                                    timelineModiedTransaction[index],
+                                    false,
+                                    true
+                                  ])),
                     )
                   ],
                 ),
               );
             },
             indicatorBuilder: (_, index) {
-              if (identical(timelineModiedTransaction[index],
-                  timelineModiedTransaction.first)) {
+              if (timelineModiedTransaction[index].id == indicatorModal.id) {
+                return DotIndicator(
+                  color: TranasactionTypeInstance.instance()
+                      .getModal(timelineModiedTransaction
+                          .first.transactionTypeRef!.id)
+                      ?.color,
+                  child: Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 12.0,
+                  ),
+                );
+              }
+              if (index == 0) {
                 return DotIndicator(
                   color: TranasactionTypeInstance.instance()
                       .getModal(timelineModiedTransaction
@@ -75,15 +99,25 @@ class TimelineModiedTransaction extends StatelessWidget {
                     size: 12.0,
                   ),
                 );
-              } else {
-                return OutlinedDotIndicator(
-                    borderWidth: 2.5,
-                    color: TranasactionTypeInstance.instance()
-                        .getModal(timelineModiedTransaction[index]
-                            .transactionTypeRef!
-                            .id)
-                        ?.color);
               }
+              if (index == timelineModiedTransaction.length - 1) {
+                return ContainerIndicator(
+                  child: Container(
+                      width: 12.0,
+                      height: 12.0,
+                      color: TranasactionTypeInstance.instance()
+                          .getModal(timelineModiedTransaction
+                              .first.transactionTypeRef!.id)
+                          ?.color),
+                );
+              }
+              return OutlinedDotIndicator(
+                  borderWidth: 2.5,
+                  color: TranasactionTypeInstance.instance()
+                      .getModal(timelineModiedTransaction[index]
+                          .transactionTypeRef!
+                          .id)
+                      ?.color);
             },
             connectorBuilder: (_, index, ___) => SolidLineConnector(
               color: TranasactionTypeInstance.instance()

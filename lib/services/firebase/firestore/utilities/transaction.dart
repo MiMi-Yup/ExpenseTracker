@@ -68,19 +68,65 @@ class TransactionUtilities {
     }
   }
 
+  Future<bool> delete(ModalTransaction modal) async {
+    CurrentTransaction serviceLog = CurrentTransaction();
+    TransactionFirestore serviceTransaction = TransactionFirestore();
+    ModalTransactionLog? log = await serviceLog.findTransactionLog(modal);
+    if (log == null) {
+      return true;
+    } else {
+      DocumentReference ref =
+          log.lastTransactionRef ?? log.firstTransactionRef!;
+      ModalTransaction? iterable =
+          await serviceTransaction.getModalFromRef(ref);
+      while (iterable != null) {
+        if (iterable.attachments != null) {
+          List<String> deleteAttachments = iterable.attachments!
+              .where((element) => element.contains(getPathStorage(
+                  serviceTransaction.user?.uid, iterable?.id, '')))
+              .toList();
+
+          for (String element in deleteAttachments) {
+            await ActionFirebaseStorage.deleteFile(element);
+          }
+        }
+
+        serviceTransaction.delete(iterable);
+        if (iterable.transactionRef != null) {
+          iterable = await serviceTransaction
+              .getModalFromRef(iterable.transactionRef!);
+        } else {
+          break;
+        }
+      }
+
+      await serviceLog.delete(iterable!);
+
+      return true;
+    }
+  }
+
   Future<List<ModalTransaction>?> timelineEditTransaction(
       ModalTransaction modal) async {
     List<ModalTransaction>? timeline = [];
-    ModalTransaction? iterableModal = modal;
-    TransactionFirestore service = TransactionFirestore();
-
-    while (iterableModal!.transactionRef != null) {
-      timeline.add(iterableModal);
-      iterableModal =
-          await service.getModalFromRef(iterableModal.transactionRef!);
+    TransactionFirestore serviceTransaction = TransactionFirestore();
+    CurrentTransaction serviceLog = CurrentTransaction();
+    ModalTransaction? iterableModal;
+    ModalTransactionLog? log = await serviceLog.findTransactionLog(modal);
+    if (log != null) {
+      iterableModal = await serviceTransaction
+          .getModalFromRef(log.lastTransactionRef ?? log.firstTransactionRef!);
     }
 
-    timeline.add(iterableModal);
+    if (iterableModal != null) {
+      while (iterableModal!.transactionRef != null) {
+        timeline.add(iterableModal);
+        iterableModal = await serviceTransaction
+            .getModalFromRef(iterableModal.transactionRef!);
+      }
+
+      timeline.add(iterableModal);
+    }
 
     return timeline;
   }

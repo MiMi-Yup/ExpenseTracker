@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:expense_tracker/constants/asset/icon.dart';
-import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/instances/account_type_instance.dart';
 import 'package:expense_tracker/instances/category_instance.dart';
@@ -13,9 +12,7 @@ import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/component/timeline_modified_transaction.dart';
-import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
-import 'package:expense_tracker/widgets/timelines/timelines.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -33,6 +30,7 @@ class _DetailTransactionState extends State<DetailTransaction>
       ModalRoute.of(context)?.settings.arguments as List<Object>?;
   late ModalTransaction modal = arguments?[0] as ModalTransaction;
   late bool isEditable = (arguments?[1] as bool?) ?? false;
+  late bool isShowTimelineModified = arguments?[2] as bool;
 
   GlobalKey keyAppBar = GlobalKey();
   GlobalKey scrollTimeline = GlobalKey();
@@ -48,8 +46,10 @@ class _DetailTransactionState extends State<DetailTransaction>
   @override
   void initState() {
     super.initState();
-    _animatedContainer =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    _animatedContainer = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 500),
+        reverseDuration: const Duration(milliseconds: 500));
     _scrollController = ItemScrollController();
     animateOpacityFloatingActionButton = StreamController();
     animateOpacityFloatingActionButton?.sink.add(false);
@@ -101,8 +101,6 @@ class _DetailTransactionState extends State<DetailTransaction>
             alignment: Alignment.center,
             height: size.height / 3,
             child: ListView(
-              physics: BouncingScrollPhysics(),
-              shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               children: modal.attachments!
                   .map((e) => FutureBuilder<Uint8List?>(
@@ -123,7 +121,7 @@ class _DetailTransactionState extends State<DetailTransaction>
                             )))
                   .toList(),
             )),
-      if (modal.transactionRef != null)
+      if (modal.transactionRef != null || isShowTimelineModified)
         Column(
           children: [
             GestureDetector(
@@ -132,12 +130,12 @@ class _DetailTransactionState extends State<DetailTransaction>
                   _animatedContainer?.forward();
                   _scrollController?.scrollTo(
                       index: itemListView.length - 2,
-                      duration: const Duration(seconds: 1));
+                      duration: const Duration(milliseconds: 500));
                   animateOpacityFloatingActionButton?.sink.add(true);
                 } else {
                   _animatedContainer?.reverse();
                   _scrollController?.scrollTo(
-                      index: 0, duration: const Duration(seconds: 1));
+                      index: 0, duration: const Duration(milliseconds: 500));
                   animateOpacityFloatingActionButton?.sink.add(false);
                 }
               },
@@ -178,6 +176,7 @@ class _DetailTransactionState extends State<DetailTransaction>
             builder: (context, snapshot) => snapshot.hasData
                 ? TimelineModiedTransaction(
                     timelineModiedTransaction: snapshot.data!,
+                    indicatorModal: modal,
                   )
                 : Container(
                     padding: EdgeInsets.all(size.height * 0.1),
@@ -194,18 +193,19 @@ class _DetailTransactionState extends State<DetailTransaction>
               .getModal(modal.transactionTypeRef!.id)
               ?.color,
           leading: IconButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () =>
+                  RouteApplication.navigatorKey.currentState?.pop(),
               icon: Icon(Icons.arrow_back_ios)),
           title: Text("Detail Transaction"),
           actions: isEditable
               ? [
                   IconButton(
                       onPressed: () async {
-                        await Navigator.pushNamed(
-                            context,
-                            RouteApplication.getRoute(
-                                ERoute.addEditTransaction),
-                            arguments: modal);
+                        await RouteApplication.navigatorKey.currentState
+                            ?.pushNamed(
+                                RouteApplication.getRoute(
+                                    ERoute.addEditTransaction),
+                                arguments: modal);
                         setState(() {});
                       },
                       icon: Icon(Icons.edit)),
@@ -242,7 +242,10 @@ class _DetailTransactionState extends State<DetailTransaction>
                                                 background: Colors.grey,
                                                 text: "No",
                                                 onPressed: () =>
-                                                    Navigator.pop(context)),
+                                                    RouteApplication
+                                                        .navigatorKey
+                                                        .currentState
+                                                        ?.pop()),
                                           ),
                                           SizedBox(
                                             width: 10.0,
@@ -250,9 +253,13 @@ class _DetailTransactionState extends State<DetailTransaction>
                                           Expanded(
                                             child: largestButton(
                                                 text: "Yes",
-                                                onPressed: () {
-                                                  isRemove = true;
-                                                  Navigator.pop(context);
+                                                onPressed: () async {
+                                                  isRemove =
+                                                      await TransactionUtilities()
+                                                          .delete(modal);
+                                                  RouteApplication
+                                                      .navigatorKey.currentState
+                                                      ?.pop();
                                                 }),
                                           )
                                         ],
@@ -261,7 +268,7 @@ class _DetailTransactionState extends State<DetailTransaction>
                                   ),
                                 ));
                         isRemove != null && isRemove == true
-                            ? await showDialog(
+                            ? showDialog(
                                 builder: (context) => Dialog(
                                   shape: RoundedRectangleBorder(
                                       borderRadius:
@@ -285,6 +292,11 @@ class _DetailTransactionState extends State<DetailTransaction>
                                 context: context,
                               )
                             : null;
+                        int count = 0;
+                        Future.delayed(const Duration(seconds: 1), () {
+                          RouteApplication.navigatorKey.currentState
+                              ?.popUntil((_) => count++ == 2);
+                        });
                       },
                       icon: Icon(Icons.delete_forever_rounded))
                 ]
@@ -297,12 +309,12 @@ class _DetailTransactionState extends State<DetailTransaction>
             if (snapshot.hasData || snapshot.data == true) {
               return AnimatedOpacity(
                 opacity: snapshot.data == true ? 1 : 0,
-                duration: const Duration(seconds: 1),
+                duration: const Duration(milliseconds: 500),
                 child: FloatingActionButton(
                   onPressed: () {
                     animateOpacityFloatingActionButton?.sink.add(false);
                     _scrollController?.scrollTo(
-                        index: 0, duration: const Duration(seconds: 1));
+                        index: 0, duration: const Duration(milliseconds: 500));
                   },
                   child: Icon(Icons.arrow_upward),
                 ),

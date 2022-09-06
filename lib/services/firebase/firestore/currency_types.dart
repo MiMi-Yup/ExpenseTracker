@@ -2,13 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/modals/modal.dart';
 import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
+import 'package:expense_tracker/services/firebase/firestore/user.dart';
 
 class CurrencyTypesFirestore extends IFirestore {
   @override
-  Future<void> delete(IModal modal) {
-    // TODO: implement delete
-    throw UnimplementedError();
-  }
+  Future<void> delete(IModal modal) async {}
 
   @override
   String getPath(String? uid) => 'currency_types';

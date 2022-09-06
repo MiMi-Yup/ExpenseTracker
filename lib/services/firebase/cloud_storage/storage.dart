@@ -11,4 +11,8 @@ class ActionFirebaseStorage {
   static Future<Uint8List?> downloadFile(String pathStorage) {
     return FirebaseStorage.instance.ref().child(pathStorage).getData();
   }
+
+  static Future<void> deleteFile(String pathStorage) {
+    return FirebaseStorage.instance.ref().child(pathStorage).delete();
+  }
 }
