@@ -109,11 +109,11 @@ class _AddNewAccountState extends State<AddNewAccount> {
                         choseValue: _chosenValue,
                         onChanged: (itemSelected) {
                           _chosenValue = itemSelected;
-                          setState(() => itemSelected == _addWallet
+                          itemSelected == _addWallet
                               ? setWallet = true
-                              : setWallet = false);
+                              : setWallet = false;
                         },
-                      )),
+                      ).builder()),
                   Visibility(
                     visible: setWallet,
                     child: Wrap(

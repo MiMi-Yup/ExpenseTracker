@@ -87,6 +87,7 @@ class _IntroductionState extends State<Introduction> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(introductions[index].title,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 50,
@@ -95,6 +96,7 @@ class _IntroductionState extends State<Introduction> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(introductions[index].subTitle,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                             color: Colors.grey,
                             fontSize: 25,

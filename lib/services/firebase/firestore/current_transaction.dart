@@ -2,6 +2,7 @@ import 'package:expense_tracker/modals/modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
+import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 
 class CurrentTransaction extends IFirestore {
   @override
@@ -61,10 +62,19 @@ class CurrentTransaction extends IFirestore {
         .snapshots(includeMetadataChanges: true);
   }
 
+  Future<ModalTransaction?> findFirstTransaction(ModalTransaction modal) async {
+    ModalTransactionLog? log = await findTransactionLog(modal);
+
+    return log != null
+        ? await TransactionFirestore().getModalFromRef(log.firstTransactionRef!)
+        : modal;
+  }
+
   Future<ModalTransactionLog?> findTransactionLog(
       ModalTransaction modal) async {
-    if (modal.transactionRef == null) return null;
+    TransactionFirestore service = TransactionFirestore();
 
+    //modal is first transaction ref = id document
     DocumentSnapshot<ModalTransactionLog> snapshot = await FirebaseFirestore
         .instance
         .collection(getPath(user?.uid))
@@ -73,16 +83,32 @@ class CurrentTransaction extends IFirestore {
             fromFirestore: ModalTransactionLog.fromFirestore,
             toFirestore: (ModalTransactionLog modal, _) => modal.toFirestore())
         .get();
-    if (snapshot.exists) return snapshot.data();
+    if (snapshot.exists) {
+      return snapshot.data();
+    } else if (modal.transactionRef == null) {
+      //modal isn't first transaction ref and no ref to other modal => no exist in log
+      return null;
+    }
 
+    //modal is current transaction (last transaction ref)
     QuerySnapshot<ModalTransactionLog> query = await FirebaseFirestore.instance
         .collection(getPath(user?.uid))
-        .where('last_transaction_ref', isEqualTo: modal.transactionRef)
+        .where('last_transaction_ref', isEqualTo: service.getRef(modal))
         .withConverter(
             fromFirestore: ModalTransactionLog.fromFirestore,
             toFirestore: (ModalTransactionLog modal, _) => modal.toFirestore())
         .get();
     if (query.size == 1) return query.docs.first.data();
+
+    //modal in middle linked list log
+    ModalTransaction? iterableModal = modal;
+    while (iterableModal != null && iterableModal.transactionRef != null) {
+      iterableModal =
+          await service.getModalFromRef(iterableModal.transactionRef!);
+    }
+    if (iterableModal != null) {
+      return await findTransactionLog(iterableModal);
+    }
 
     throw FirebaseException(plugin: 'Structure firestore error');
   }

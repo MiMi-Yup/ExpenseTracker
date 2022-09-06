@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       routes: RouteApplication.routes,
       initialRoute: RouteApplication.getRoute(ERoute.welcome),
-      //home: AddEditAccountTypes(),
     );
   }
 }

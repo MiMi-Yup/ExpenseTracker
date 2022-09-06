@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
@@ -8,9 +10,15 @@ import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
+import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
+import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
+import 'package:expense_tracker/widgets/component/timeline_modified_transaction.dart';
+import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
+import 'package:expense_tracker/widgets/timelines/timelines.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class DetailTransaction extends StatefulWidget {
   DetailTransaction({Key? key}) : super(key: key);
@@ -19,20 +27,32 @@ class DetailTransaction extends StatefulWidget {
   State<DetailTransaction> createState() => _DetailTransactionState();
 }
 
-class _DetailTransactionState extends State<DetailTransaction> {
+class _DetailTransactionState extends State<DetailTransaction>
+    with TickerProviderStateMixin {
   late List<Object>? arguments =
       ModalRoute.of(context)?.settings.arguments as List<Object>?;
   late ModalTransaction modal = arguments?[0] as ModalTransaction;
   late bool isEditable = (arguments?[1] as bool?) ?? false;
 
   GlobalKey keyAppBar = GlobalKey();
+  GlobalKey scrollTimeline = GlobalKey();
 
   Size sizeAppBar = Size.zero;
   Offset position = Offset.zero;
 
+  AnimationController? _animatedContainer;
+  ItemScrollController? _scrollController;
+
+  StreamController<bool>? animateOpacityFloatingActionButton;
+
   @override
   void initState() {
     super.initState();
+    _animatedContainer =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    _scrollController = ItemScrollController();
+    animateOpacityFloatingActionButton = StreamController();
+    animateOpacityFloatingActionButton?.sink.add(false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final RenderBox box =
           keyAppBar.currentContext?.findRenderObject() as RenderBox;
@@ -44,9 +64,128 @@ class _DetailTransactionState extends State<DetailTransaction> {
   }
 
   @override
+  void dispose() {
+    _animatedContainer?.dispose();
+    animateOpacityFloatingActionButton?.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final sizeTypeContainer = size.height / 10;
+
+    List<Widget> itemListView = [];
+
+    itemListView = [
+      Text(
+        "Description",
+        style: TextStyle(color: Colors.white70),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Text(
+          "${modal.description}",
+          maxLines: 5,
+          style: TextStyle(fontSize: 18),
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10.0),
+        child: Text("Attachment", style: TextStyle(color: Colors.white70)),
+      ),
+      if (modal.attachments != null)
+        Container(
+            alignment: Alignment.center,
+            height: size.height / 3,
+            child: ListView(
+              physics: BouncingScrollPhysics(),
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              children: modal.attachments!
+                  .map((e) => FutureBuilder<Uint8List?>(
+                      future: ActionFirebaseStorage.downloadFile(e),
+                      initialData: null,
+                      builder: (context, snapshot) => snapshot.hasData
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.memory(
+                                snapshot.data!,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                          : Container(
+                              padding: EdgeInsets.all(size.height * 0.1),
+                              width: size.height / 3,
+                              child: CircularProgressIndicator(),
+                            )))
+                  .toList(),
+            )),
+      if (modal.transactionRef != null)
+        Column(
+          children: [
+            GestureDetector(
+              onTap: () {
+                if (_animatedContainer?.isDismissed == true) {
+                  _animatedContainer?.forward();
+                  _scrollController?.scrollTo(
+                      index: itemListView.length - 2,
+                      duration: const Duration(seconds: 1));
+                  animateOpacityFloatingActionButton?.sink.add(true);
+                } else {
+                  _animatedContainer?.reverse();
+                  _scrollController?.scrollTo(
+                      index: 0, duration: const Duration(seconds: 1));
+                  animateOpacityFloatingActionButton?.sink.add(false);
+                }
+              },
+              child: ColoredBox(
+                color: Colors.transparent,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Transaction history mofied'),
+                        SizedBox(
+                          height: 4.0,
+                        ),
+                        Text(
+                            'Last date: ${modal.getDateTransaction} ${modal.getTimeTransaction}')
+                      ],
+                    ),
+                    Text(
+                      'Show all',
+                      style: TextStyle(color: Colors.blue),
+                    )
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      SizeTransition(
+        key: scrollTimeline,
+        sizeFactor: CurvedAnimation(
+          curve: Curves.linear,
+          parent: _animatedContainer!,
+        ),
+        child: FutureBuilder<List<ModalTransaction>?>(
+            future: TransactionUtilities().timelineEditTransaction(modal),
+            builder: (context, snapshot) => snapshot.hasData
+                ? TimelineModiedTransaction(
+                    timelineModiedTransaction: snapshot.data!,
+                  )
+                : Container(
+                    padding: EdgeInsets.all(size.height * 0.1),
+                    width: size.height / 3,
+                    child: CircularProgressIndicator(),
+                  )),
+      )
+    ];
 
     return Scaffold(
         appBar: AppBar(
@@ -60,6 +199,16 @@ class _DetailTransactionState extends State<DetailTransaction> {
           title: Text("Detail Transaction"),
           actions: isEditable
               ? [
+                  IconButton(
+                      onPressed: () async {
+                        await Navigator.pushNamed(
+                            context,
+                            RouteApplication.getRoute(
+                                ERoute.addEditTransaction),
+                            arguments: modal);
+                        setState(() {});
+                      },
+                      icon: Icon(Icons.edit)),
                   IconButton(
                       onPressed: () async {
                         bool? isRemove;
@@ -142,6 +291,26 @@ class _DetailTransactionState extends State<DetailTransaction> {
               : null,
           centerTitle: true,
         ),
+        floatingActionButton: StreamBuilder<bool>(
+          stream: animateOpacityFloatingActionButton?.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData || snapshot.data == true) {
+              return AnimatedOpacity(
+                opacity: snapshot.data == true ? 1 : 0,
+                duration: const Duration(seconds: 1),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    animateOpacityFloatingActionButton?.sink.add(false);
+                    _scrollController?.scrollTo(
+                        index: 0, duration: const Duration(seconds: 1));
+                  },
+                  child: Icon(Icons.arrow_upward),
+                ),
+              );
+            } else
+              return SizedBox();
+          },
+        ),
         body: Stack(children: [
           Column(
             children: [
@@ -177,10 +346,15 @@ class _DetailTransactionState extends State<DetailTransaction> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "${modal.getDateTransaction} ${modal.getTimeTransaction}",
-                        style: TextStyle(fontSize: 16, color: Colors.white70),
-                      ),
+                      child: FutureBuilder<ModalTransaction?>(
+                          future:
+                              CurrentTransaction().findFirstTransaction(modal),
+                          builder: (context, snapshot) => Text(
+                                snapshot.hasData
+                                    ? '${snapshot.data!.getDateTransaction} ${snapshot.data!.getTimeTransaction}'
+                                    : '',
+                                style: TextStyle(color: Colors.white70),
+                              )),
                     ),
                   ],
                 ),
@@ -202,84 +376,14 @@ class _DetailTransactionState extends State<DetailTransaction> {
                 ),
               ),
               Expanded(
-                child: ListView(
-                  padding: EdgeInsets.all(16.0),
+                child: ScrollablePositionedList.builder(
+                  itemScrollController: _scrollController,
                   physics: BouncingScrollPhysics(),
-                  children: [
-                    Text(
-                      "Description",
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(
-                        "${modal.description}",
-                        maxLines: 5,
-                        style: TextStyle(fontSize: 18),
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10.0),
-                      child: Text("Attachment",
-                          style: TextStyle(color: Colors.white70)),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      height: size.height / 3,
-                      child: modal.attachments != null
-                          ? ListView(
-                              physics: BouncingScrollPhysics(),
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              children: modal.attachments!
-                                  .map((e) => FutureBuilder<Uint8List?>(
-                                      future:
-                                          ActionFirebaseStorage.downloadFile(e),
-                                      initialData: null,
-                                      builder: (context, snapshot) =>
-                                          snapshot.hasData
-                                              ? Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Image.memory(
-                                                    snapshot.data!,
-                                                    fit: BoxFit.contain,
-                                                  ),
-                                                )
-                                              : Container(
-                                                  padding: EdgeInsets.all(
-                                                      size.height * 0.1),
-                                                  width: size.height / 3,
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                )))
-                                  .toList(),
-                            )
-                          : null,
-                    ),
-                    if (modal.transactionRef != null) Text("data"),
-                  ],
+                  padding: EdgeInsets.all(16.0),
+                  itemCount: itemListView.length,
+                  itemBuilder: (context, index) => itemListView[index],
                 ),
               ),
-              if (isEditable)
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                      width: double.maxFinite,
-                      padding: EdgeInsets.all(10.0),
-                      child: largestButton(
-                          text: "Edit",
-                          onPressed: () async {
-                            await Navigator.pushNamed(
-                                context,
-                                RouteApplication.getRoute(
-                                    ERoute.addEditTransaction),
-                                arguments: modal);
-                            setState(() {});
-                          })),
-                )
             ],
           ),
           Positioned(

@@ -38,7 +38,7 @@ class ExportPage extends StatelessWidget {
                   hint: "Type transaction export",
                   items: ["All", "Income", "Expense"],
                   choseValue: "All",
-                  onChanged: (value) => null),
+                  onChanged: (value) => null).builder(),
             ),
             Text("When date range?"),
             Container(
@@ -57,7 +57,7 @@ class ExportPage extends StatelessWidget {
                       "Last nearly year"
                     ],
                     choseValue: "Last 30 days",
-                    onChanged: (value) => null)),
+                    onChanged: (value) => null).builder()),
             Text("What format do you want to export?"),
             Container(
                 margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -71,7 +71,7 @@ class ExportPage extends StatelessWidget {
                     hint: "Extension files export",
                     items: ["CSV", "Excel", "SpreadSheet"],
                     choseValue: "CSV",
-                    onChanged: (value) => null)),
+                    onChanged: (value) => null).builder()),
             Expanded(
                 child: Align(
               alignment: Alignment.bottomCenter,

@@ -27,8 +27,7 @@ class CategoryInstance {
               .getFirebaseRef()
               .snapshots(includeMetadataChanges: true)
               .listen((event) async {
-            _modals = null;
-            _modals ??= await _service!.read();
+            _modals = await _service!.read();
           });
         }
       });
@@ -41,7 +40,7 @@ class CategoryInstance {
       HintCategoryComponent(modal: getModal(id)!);
 
   ModalCategoryType? getModal(String id) =>
-      _modals!.singleWhere((element) => element?.id == id);
+      _modals?.singleWhere((element) => element?.id == id);
 
   List<ModalCategoryType?>? get modals => _modals;
 }

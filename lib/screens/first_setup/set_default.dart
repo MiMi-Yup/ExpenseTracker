@@ -136,12 +136,9 @@ class _SetDefaultState extends State<SetDefault> {
                                 hint: "Choose account type",
                                 items: snapshot.data!,
                                 choseValue: choseAccountType,
-                                onChanged: (itemSelected) {
-                                  setState(() {
-                                    choseAccountType = itemSelected;
-                                  });
-                                },
-                              ),
+                                onChanged: (itemSelected) =>
+                                    choseAccountType = itemSelected,
+                              ).builder(),
                             )),
                       ),
                       TextButton(
@@ -168,12 +165,9 @@ class _SetDefaultState extends State<SetDefault> {
                           hint: "Choose currency type",
                           items: snapshot.data!,
                           choseValue: choseCurrency,
-                          onChanged: (itemSelected) {
-                            setState(() {
-                              choseCurrency = itemSelected;
-                            });
-                          },
-                        ),
+                          onChanged: (itemSelected) =>
+                              choseCurrency = itemSelected,
+                        ).builder(),
                       )),
                   Visibility(
                     visible: setWallet,

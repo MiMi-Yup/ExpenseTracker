@@ -44,6 +44,7 @@ dependencies:
   shared_preferences: ^2.0.15
   local_auth: ^2.1.2
   flutter_colorpicker: ^1.0.3
+  scrollable_positioned_list: ^0.3.2
 
   #Firebase services
   firebase_core: ^1.21.1

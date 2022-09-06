@@ -11,40 +11,77 @@ import 'package:path/path.dart';
 class TransactionUtilities {
   String getPathStorage(String? uid, String? id, String? nameFile) =>
       'attachments/user_$uid/$id/$nameFile';
-  Future<bool> add(ModalTransaction modal) async {
+
+  Future<bool> add(ModalTransaction modal,
+      {ModalTransaction? didEditModal}) async {
     try {
-      TransactionFirestore instanceTransaction = TransactionFirestore();
-      CurrentTransaction instanceTransactionLog = CurrentTransaction();
-      await instanceTransaction.insert(modal);
+      TransactionFirestore serviceTransaction = TransactionFirestore();
+      CurrentTransaction serviceLog = CurrentTransaction();
+
+      if (didEditModal != null) {
+        modal.transactionRef = serviceTransaction.getRef(didEditModal);
+      }
+
+      await serviceTransaction.insert(modal);
 
       if (modal.attachments != null && modal.attachments!.isNotEmpty) {
-        Set<String> uploadFile = <String>{};
-        for (int index = 0; index < modal.attachments!.length; index++) {
-          uploadFile.add(getPathStorage(instanceTransaction.user?.uid, modal.id,
-              basename(modal.attachments!.elementAt(index))));
-          ActionFirebaseStorage.uploadFile(
-              File(modal.attachments!.elementAt(index)), uploadFile.last);
+        Set<String> existOnFireStorage = {};
+        Set<String> uploadFiles = Set.from(modal.attachments!);
+
+        if (didEditModal != null &&
+            didEditModal.attachments != null &&
+            didEditModal.attachments!.isNotEmpty) {
+          existOnFireStorage =
+              uploadFiles.intersection(didEditModal.attachments!);
+          uploadFiles.removeAll(existOnFireStorage);
         }
 
-        modal.attachments = uploadFile;
+        for (int index = 0; index < uploadFiles.length; index++) {
+          String pathFileUpload = uploadFiles.elementAt(index);
 
-        await instanceTransaction.override_(modal);
+          existOnFireStorage.add(getPathStorage(serviceTransaction.user?.uid,
+              modal.id, basename(pathFileUpload)));
+
+          ActionFirebaseStorage.uploadFile(
+              File(pathFileUpload), existOnFireStorage.last);
+        }
+
+        modal.attachments =
+            existOnFireStorage.isEmpty ? null : existOnFireStorage;
+        await serviceTransaction.override_(modal);
       }
-      ModalTransactionLog? log =
-          await instanceTransactionLog.findTransactionLog(modal);
+
+      ModalTransactionLog? log = await serviceLog.findTransactionLog(modal);
       if (log == null) {
-        instanceTransactionLog.insert(ModalTransactionLog(
+        serviceLog.insert(ModalTransactionLog(
             id: modal.id,
-            firstTransactionRef: instanceTransaction.getRef(modal),
+            firstTransactionRef: serviceTransaction.getRef(modal),
             lastTransactionRef: null));
       } else {
-        log.lastTransactionRef = instanceTransaction.getRef(modal);
-        instanceTransactionLog.update(log, log);
+        log.lastTransactionRef = serviceTransaction.getRef(modal);
+        serviceLog.update(log, log);
       }
 
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  Future<List<ModalTransaction>?> timelineEditTransaction(
+      ModalTransaction modal) async {
+    List<ModalTransaction>? timeline = [];
+    ModalTransaction? iterableModal = modal;
+    TransactionFirestore service = TransactionFirestore();
+
+    while (iterableModal!.transactionRef != null) {
+      timeline.add(iterableModal);
+      iterableModal =
+          await service.getModalFromRef(iterableModal.transactionRef!);
+    }
+
+    timeline.add(iterableModal);
+
+    return timeline;
   }
 }

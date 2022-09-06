@@ -22,12 +22,16 @@ class BottomAppBarComponent {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: navActions.entries
               .map((e) => TextButton(
-                    onPressed: () {
-                      setState(() => currentIndex = e.value!.index);
-                      if (e.value?.toPage != null) {
-                        e.value!.toPage!(e.value!.index);
-                      }
-                    },
+                    onPressed: e.value!.index >= 0
+                        ? () {
+                            if (e.value!.index >= 0) {
+                              setState(() => currentIndex = e.value!.index);
+                              if (e.value?.toPage != null) {
+                                e.value!.toPage!(e.value!.index);
+                              }
+                            }
+                          }
+                        : null,
                     child: SizedBox(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -40,7 +44,10 @@ class BottomAppBarComponent {
                                 : Colors.grey,
                           ),
                           Visibility(
-                            child: Text(e.value?.label ?? "", style: TextStyle(color: Colors.white),),
+                            child: Text(
+                              e.value?.label ?? "",
+                              style: TextStyle(color: Colors.white),
+                            ),
                             visible: currentIndex == e.value!.index,
                           ),
                         ],

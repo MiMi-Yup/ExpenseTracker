@@ -33,11 +33,13 @@ class TransactionFirestore extends IFirestore {
 
   @override
   Future<List<ModalTransaction>> read() async {
-    QuerySnapshot<Map<String, dynamic>> collection =
-        await FirebaseFirestore.instance.collection(getPath(user?.uid)).get();
-    return collection.docs
-        .map((snapshot) => ModalTransaction.fromFirestore(snapshot, null))
-        .toList();
+    QuerySnapshot<ModalTransaction> snapshot = await FirebaseFirestore.instance
+        .collection(getPath(user?.uid))
+        .withConverter(
+            fromFirestore: ModalTransaction.fromFirestore,
+            toFirestore: (ModalTransaction modal, _) => modal.toFirestore())
+        .get();
+    return snapshot.docs.map((e) => e.data()).toList();
   }
 
   Future<void> override_(IModal modal) async {

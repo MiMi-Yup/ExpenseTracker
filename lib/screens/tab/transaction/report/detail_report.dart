@@ -60,7 +60,7 @@ class _DetailReportState extends State<DetailReport> {
                     hint: "Time",
                     items: ["Day", "Month", "Year"],
                     choseValue: null,
-                    onChanged: (value) => null),
+                    onChanged: (value) => null).builder(),
                 Stack(
                   children: [
                     Container(
@@ -159,8 +159,7 @@ class _DetailReportState extends State<DetailReport> {
                     hint: "View",
                     items: ["Transaction", "Category"],
                     choseValue: indexTypeCategory,
-                    onChanged: (value) =>
-                        setState(() => indexTypeCategory = value)),
+                    onChanged: (value) => indexTypeCategory = value).builder(),
                 IconButton(onPressed: null, icon: Icon(Icons.filter_list))
               ],
             ),

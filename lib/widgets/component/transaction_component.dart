@@ -8,11 +8,13 @@ import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/services/firebase/firestore/category_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TransactionComponent extends StatefulWidget {
+  bool showModalTimeCreate;
   ModalTransaction modal;
   bool isEditable;
   AnimationController? parentController;
@@ -23,6 +25,7 @@ class TransactionComponent extends StatefulWidget {
       {Key? key,
       required this.modal,
       required this.isEditable,
+      this.showModalTimeCreate = false,
       this.parentController,
       this.onTap,
       this.editSlidableAction,
@@ -103,10 +106,20 @@ class _TransactionComponentState extends State<TransactionComponent>
                       ?.color),
             ),
             SizedBox(height: 10.0),
-            Text(
-              widget.modal.getTimeTransaction,
-              style: TextStyle(color: Colors.grey),
-            )
+            widget.showModalTimeCreate
+                ? Text(
+                    widget.modal.getTimeTransaction,
+                    style: TextStyle(color: Colors.grey),
+                  )
+                : FutureBuilder<ModalTransaction?>(
+                    future:
+                        CurrentTransaction().findFirstTransaction(widget.modal),
+                    builder: (context, snapshot) => Text(
+                          snapshot.hasData
+                              ? snapshot.data!.getTimeTransaction
+                              : '',
+                          style: TextStyle(color: Colors.grey),
+                        ))
           ],
         ),
       ]),
@@ -157,6 +170,7 @@ class _TransactionComponentState extends State<TransactionComponent>
                     )
                   : content)),
     );
+
     return widget.parentController == null
         ? slidable
         : SizeTransition(

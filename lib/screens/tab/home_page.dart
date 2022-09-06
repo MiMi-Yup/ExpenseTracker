@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage>
                     isExpanded: false,
                     items: ["1", "2", "3"],
                     choseValue: null,
-                    onChanged: (p0) => null),
+                    onChanged: (p0) => null).builder(),
                 actions: [
                   IconButton(
                       onPressed: () => Navigator.pushNamed(context,

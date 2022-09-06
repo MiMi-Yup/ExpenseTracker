@@ -92,7 +92,7 @@ class _AddEditBudgetState extends State<AddEditBudget> {
                         hint: "Category",
                         items: ["Shopping", "Eat"],
                         choseValue: null,
-                        onChanged: (value) => null),
+                        onChanged: (value) => null).builder(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

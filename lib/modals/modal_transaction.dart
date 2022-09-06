@@ -60,9 +60,12 @@ class ModalTransaction extends IModal {
       : super.fromFirestore(snapshot, options) {
     Map<String, dynamic>? data = snapshot.data();
     accountRef = data?['account_ref'];
+
     attachments = data?['attachments'] == null
         ? null
         : Set<String>.from(data?['attachments']);
+    if (attachments != null && attachments!.isEmpty) attachments = null;
+
     categoryTypeRef = data?['category_type_ref'];
     description = data?['description'];
     money = data?['money'];
@@ -174,6 +177,19 @@ class ModalTransaction extends IModal {
       hour = hour > 12 ? hour - 12 : hour;
 
       return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute} ${isPM ? "PM" : "AM"}";
+    }
+    return "";
+  }
+
+  String get getFullTimeTransaction {
+    if (timeCreate != null) {
+      int hour = timeCreate!.hour;
+      int minute = timeCreate!.minute;
+      int second = timeCreate!.second;
+      bool isPM = hour >= 12;
+      hour = hour > 12 ? hour - 12 : hour;
+
+      return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute}:${second < 10 ? "0$second" : second} ${isPM ? "PM" : "AM"}";
     }
     return "";
   }

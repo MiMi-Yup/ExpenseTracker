@@ -69,11 +69,15 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
         style: TextStyle(color: colorTitle),
       )
     ];
-    if (subTitle != null)
-      items.add(Text(
-        subTitle,
-        style: TextStyle(color: colorSubTitle),
-      ));
+    if (subTitle != null) {
+      items.addAll([
+        SizedBox(height: 4.0),
+        Text(
+          subTitle,
+          style: TextStyle(color: colorSubTitle),
+        )
+      ]);
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,8 +155,8 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                       choseValue: snapshot.hasData
                                           ? choseFrequencyType
                                           : null,
-                                      onChanged: (value) => setState(
-                                          () => choseFrequencyType = value)),
+                                      onChanged: (value) =>
+                                          choseFrequencyType = value).builder(),
                             ),
                             Text(
                               "End after",
@@ -191,16 +195,21 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
           };
   }
 
+  bool? isLoaded;
+
   Future<bool> loadData() async {
-    modalTransactionType = TranasactionTypeInstance.instance()
-        .getModal(modal.transactionTypeRef!.id);
-    if (originModal != null) {
-      choseAccount =
-          await AccountFirestore().getModalFromRef(modal.accountRef!);
-      choseCategoryType =
-          CategoryInstance.instance().getModal(modal.categoryTypeRef!.id);
+    if (isLoaded == null) {
+      isLoaded = true;
+      modalTransactionType = TranasactionTypeInstance.instance()
+          .getModal(modal.transactionTypeRef!.id);
+      if (originModal != null) {
+        choseAccount =
+            await AccountFirestore().getModalFromRef(modal.accountRef!);
+        choseCategoryType =
+            CategoryInstance.instance().getModal(modal.categoryTypeRef!.id);
+      }
     }
-    return true;
+    return isLoaded!;
   }
 
   @override
@@ -264,6 +273,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                   fillText: modal.purpose,
                                   labelText: "Purpose",
                                   hintText: "Purpose"),
+                              SizedBox(height: 8.0),
                               EditText(
                                   onChanged: (value) =>
                                       modal.description = value,
@@ -275,22 +285,23 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                 initialData: [],
                                 builder: (context, snapshot) =>
                                     DropDown<ModalCategoryType>(
-                                        hint: "Choose category",
-                                        items: snapshot.data!,
-                                        choseValue: choseCategoryType,
-                                        onChanged: (value) => setState(
-                                            () => choseCategoryType = value)),
+                                            hint: "Choose category",
+                                            items: snapshot.data!,
+                                            choseValue: choseCategoryType,
+                                            onChanged: (value) =>
+                                                choseCategoryType = value)
+                                        .builder(),
                               ),
                               FutureBuilder<List<ModalAccount>>(
                                 future: AccountFirestore().read(),
                                 initialData: [],
-                                builder: (context, snapshot) => DropDown<
-                                        ModalAccount>(
-                                    hint: "Choose account",
-                                    items: snapshot.data!,
-                                    choseValue: choseAccount,
-                                    onChanged: (value) =>
-                                        setState(() => choseAccount = value)),
+                                builder: (context, snapshot) =>
+                                    DropDown<ModalAccount>(
+                                        hint: "Choose account",
+                                        items: snapshot.data!,
+                                        choseValue: choseAccount,
+                                        onChanged: (value) =>
+                                            choseAccount = value).builder(),
                               ),
                               (modal.attachments == null ||
                                       modal.attachments!.isEmpty)
@@ -335,6 +346,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                   : SizedBox(
                                       height: height / 5,
                                       child: ListView(
+                                        physics: BouncingScrollPhysics(),
                                         scrollDirection: Axis.horizontal,
                                         children: modal.attachments!
                                             .map<Widget>((e) => GestureDetector(
@@ -342,9 +354,11 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                                       modal.attachments
                                                           ?.remove(e);
                                                     }),
-                                                child: originModal == null
-                                                    ? Image.file(File(e))
-                                                    : FutureBuilder<Uint8List?>(
+                                                child: originModal != null &&
+                                                        originModal!
+                                                                .attachments !=
+                                                            null
+                                                    ? FutureBuilder<Uint8List?>(
                                                         future:
                                                             ActionFirebaseStorage
                                                                 .downloadFile(
@@ -356,7 +370,8 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                                                     snapshot
                                                                         .data!)
                                                                 : SizedBox(),
-                                                      )))
+                                                      )
+                                                    : Image.file(File(e))))
                                             .toList()
                                           ..add(GestureDetector(
                                             onTap: () async {
@@ -428,6 +443,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text("Repeat"),
+                                      SizedBox(height: 4.0),
                                       Text(
                                         "Repeat transaction, set your own time",
                                         style: TextStyle(
@@ -441,13 +457,14 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                         if (modal.repeat == null) {
                                           modal.repeat = await _setRepeat(
                                               context: context);
-                                          if (modal.repeat == null)
+                                          if (modal.repeat == null) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(SnackBar(
                                                     duration: const Duration(
                                                         seconds: 1),
                                                     content: Text(
                                                         "Frequency hasn't selected yet")));
+                                          }
                                         } else {
                                           modal.repeat = null;
                                         }
@@ -484,7 +501,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                                           context: context,
                                                           preData:
                                                               modal.repeat);
-                                                  if (modal.repeat == null)
+                                                  if (modal.repeat == null) {
                                                     ScaffoldMessenger.of(
                                                             context)
                                                         .showSnackBar(SnackBar(
@@ -493,6 +510,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                                                     seconds: 1),
                                                             content: Text(
                                                                 "Frequency hasn't selected yet")));
+                                                  }
                                                   setState(() {});
                                                 },
                                                 child: Text("Edit"))
@@ -521,7 +539,12 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                                   .getRef(choseCategoryType!);
                                           modal.timeCreate = DateTime.now();
 
-                                          TransactionUtilities().add(modal);
+                                          bool isSuccess =
+                                              await TransactionUtilities().add(
+                                                  modal,
+                                                  didEditModal: originModal);
+
+                                          originModal?.override_(modal);
                                         }
                                         // File image = File(pathImage!);
                                         // await showDialog(
