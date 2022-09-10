@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_category.dart';
+import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
+import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/services/firebase/firestore/budget.dart';
 import 'package:expense_tracker/widgets/component/budget_component.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +18,6 @@ class BudgetPage extends StatefulWidget {
 
 class _BudgetPageState extends State<BudgetPage>
     with AutomaticKeepAliveClientMixin {
-  bool hasData = true;
-  int lengthListView = 20;
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -43,57 +44,75 @@ class _BudgetPageState extends State<BudgetPage>
                   topRight: Radius.circular(16.0))),
           child: Column(
             children: [
-              // Expanded(
-              //     child: hasData
-              //         ? MediaQuery.removePadding(
-              //             context: context,
-              //             removeTop: true,
-              //             child: AnimatedList(
-              //                 shrinkWrap: true,
-              //                 initialItemCount: lengthListView,
-              //                 physics: BouncingScrollPhysics(),
-              //                 itemBuilder: (context, index, animation) {
-              //                   ModalBudget modal = ModalBudget(
-              //                       budgetMoney: 0.0,
-              //                       nowMoney: 0.0,
-              //                       isLimited: false,
-              //                       category: ECategory.shopping,
-              //                       currency: '\$');
-              //                   return SizeTransition(
-              //                     sizeFactor: animation,
-              //                     child: BudgetComponent(modal: modal).builder(
-              //                       width: MediaQuery.of(context).size.width,
-              //                       onTap: null,
-              //                       editSlidableAction: null,
-              //                       deleteSlidableAction: (context) {
-              //                         lengthListView -= 1;
-              //                         AnimatedList.of(context).removeItem(
-              //                             index,
-              //                             (_, animation) => SizeTransition(
-              //                                   sizeFactor: animation,
-              //                                   child: BudgetComponent(
-              //                                           modal: modal)
-              //                                       .builder(
-              //                                           width: MediaQuery.of(
-              //                                                   context)
-              //                                               .size
-              //                                               .width),
-              //                                 ),
-              //                             duration: const Duration(seconds: 1));
-              //                       },
-              //                     ),
-              //                   );
-              //                 }))
-              //         : Center(
-              //             child: Text(
-              //             "You don't have a budget",
-              //             style: TextStyle(color: Colors.black),
-              //           ))),
+              Expanded(
+                  child: StreamBuilder<QuerySnapshot<ModalBudget>>(
+                stream: BudgetFirestore().stream,
+                initialData: null,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    Iterable<ModalBudget> data =
+                        snapshot.data!.docs.map((e) => e.data());
+                    if (data.isEmpty) {
+                      return Center(
+                          child: Text(
+                        "You don't have a budget",
+                      ));
+                    } else {
+                      return SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          child: Column(
+                              children: data
+                                  .map((e) => BudgetComponent(
+                                      modal: e,
+                                      nowMoney: 550.0,
+                                      onTap: () => RouteApplication
+                                          .navigatorKey.currentState
+                                          ?.pushNamed(
+                                              RouteApplication.getRoute(
+                                                  ERoute.addEditBudget),
+                                              arguments: e),
+                                      editSlidableAction: (context) =>
+                                          RouteApplication
+                                              .navigatorKey.currentState
+                                              ?.pushNamed(
+                                                  RouteApplication.getRoute(
+                                                      ERoute.addEditBudget),
+                                                  arguments: e),
+                                      deleteSlidableAction: (context) {
+                                        // AnimatedList.of(context)
+                                        //     .removeItem(
+                                        //         index,
+                                        //         (_, animation) =>
+                                        //             SizeTransition(
+                                        //               sizeFactor:
+                                        //                   animation,
+                                        //               child: BudgetComponent(
+                                        //                       modal:
+                                        //                           modal)
+                                        //                   .builder(
+                                        //                       width: MediaQuery.of(
+                                        //                               context)
+                                        //                           .size
+                                        //                           .width),
+                                        //             ),
+                                        //         duration: const Duration(
+                                        //             seconds: 1));
+                                      }))
+                                  .toList()));
+                    }
+                  }
+                  return Center(child: Text("Wait for loading"));
+                },
+              )),
               Container(
                   width: double.maxFinite,
-                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom),
                   child: largestButton(
-                      text: "Create a budget", onPressed: () => null))
+                      text: "Create a budget",
+                      onPressed: () =>
+                          RouteApplication.navigatorKey.currentState?.pushNamed(
+                              RouteApplication.getRoute(ERoute.addEditBudget))))
             ],
           ),
         ))

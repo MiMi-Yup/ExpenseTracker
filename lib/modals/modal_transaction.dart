@@ -38,7 +38,7 @@ class ModalTransaction extends IModal {
   double? money;
   String? purpose;
   Map<String, dynamic>? repeat;
-  DateTime? timeCreate;
+  Timestamp? timeCreate;
   DocumentReference? transactionTypeRef;
   DocumentReference? transactionRef;
 
@@ -71,20 +71,9 @@ class ModalTransaction extends IModal {
     money = data?['money'];
     purpose = data?['purpose'];
 
-    if (data?['repeat'] != null) {
-      repeat = <String, dynamic>{};
-      (data?['repeat'] as Map<String, dynamic>).forEach((key, value) {
-        key == 'end_after'
-            ? repeat?.addAll({
-                key: DateTime.fromMillisecondsSinceEpoch(
-                    (value as Timestamp).millisecondsSinceEpoch)
-              })
-            : repeat?.addAll({key: value});
-      });
-    }
+    repeat = data?['repeat'];
 
-    timeCreate = DateTime.fromMillisecondsSinceEpoch(
-        (data?['time_create'] as Timestamp).millisecondsSinceEpoch);
+    timeCreate = data?['time_create'];
     transactionTypeRef = data?['transaction_type_ref'];
     transactionRef = data?['transaction_ref'];
   }
@@ -172,8 +161,8 @@ class ModalTransaction extends IModal {
 
   String get getTimeTransaction {
     if (timeCreate != null) {
-      int hour = timeCreate!.hour;
-      int minute = timeCreate!.minute;
+      int hour = getTimeCreate!.hour;
+      int minute = getTimeCreate!.minute;
       bool isPM = hour >= 12;
       hour = hour > 12 ? hour - 12 : hour;
 
@@ -184,9 +173,9 @@ class ModalTransaction extends IModal {
 
   String get getFullTimeTransaction {
     if (timeCreate != null) {
-      int hour = timeCreate!.hour;
-      int minute = timeCreate!.minute;
-      int second = timeCreate!.second;
+      int hour = getTimeCreate!.hour;
+      int minute = getTimeCreate!.minute;
+      int second = getTimeCreate!.second;
       bool isPM = hour >= 12;
       hour = hour > 12 ? hour - 12 : hour;
 
@@ -196,8 +185,10 @@ class ModalTransaction extends IModal {
   }
 
   String get getDateTransaction => timeCreate != null
-      ? "${timeCreate!.day}/${timeCreate!.month}/${timeCreate!.year}"
+      ? "${getTimeCreate!.day}/${getTimeCreate!.month}/${getTimeCreate!.year}"
       : "";
+
+  DateTime? get getTimeCreate => timeCreate?.toDate();
 
   String getMoney(String currencyCode) =>
       money != null ? "$currencyCode ${money!.toStringAsFixed(2)}" : "";

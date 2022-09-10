@@ -4,7 +4,7 @@ import 'package:expense_tracker/modals/modal.dart';
 class ModalBudget extends IModal {
   double? budget;
   DocumentReference? categoryTypeRef;
-  DateTime? timeCreate;
+  Timestamp? timeCreate;
   double? percentAlert;
 
   ModalBudget(
@@ -20,8 +20,7 @@ class ModalBudget extends IModal {
     Map<String, dynamic>? data = snapshot.data();
     budget = data?['budget'];
     categoryTypeRef = data?['category_type_ref'];
-    timeCreate = DateTime.fromMillisecondsSinceEpoch(
-        (data?['time_create'] as Timestamp).millisecondsSinceEpoch);
+    timeCreate = data?['time_create'];
     percentAlert = data?['percent_alert'];
   }
 
@@ -35,21 +34,31 @@ class ModalBudget extends IModal {
     };
   }
 
+  @override
   Map<String, dynamic> updateFirestore() {
     return {'budget': budget, 'percent_alert': percentAlert};
   }
 
   double remainMoney(double currentMoney) {
-    double sub = budget ?? 0 - currentMoney;
+    double sub = (budget ?? 0) - currentMoney;
     return sub < 0 ? 0 : sub;
   }
 
   double get percent => percentAlert ?? 0.0;
 
+  DateTime? get getTimeCreate => timeCreate?.toDate();
+
   bool isExceedLimit(double currentMoney) {
     if (percentAlert != null) {
       return currentMoney - (budget ?? 0.0) > 0 ? true : false;
     }
+    return false;
+  }
+
+  bool isAlert(double currentMoney) {
+    if (budget == null) return true;
+    if (percent == 0.0) return false;
+    if (currentMoney / budget! >= percent) return true;
     return false;
   }
 }

@@ -28,6 +28,7 @@ import 'package:expense_tracker/services/firebase/firestore/frequency_types.dart
 import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/user.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
+import 'package:expense_tracker/widgets/component/repeat_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/editText.dart';
 import 'package:expense_tracker/widgets/edit_date_time.dart';
@@ -93,13 +94,6 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
       hour = hour > 12 ? hour - 12 : hour;
 
       return "${hour < 10 ? "0$hour" : hour}:${minute < 10 ? "0$minute" : minute} ${isPM ? "PM" : "AM"}";
-    }
-    return '';
-  }
-
-  String convertTimeStamp(DateTime? date) {
-    if (date != null) {
-      return '${date.year}/${date.month}/${date.day} ${convertTime(TimeOfDay(hour: date.hour, minute: date.minute))}';
     }
     return '';
   }
@@ -190,8 +184,8 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
         : {
             'frequency_type_ref':
                 FrequencyTypesFirestore().getRef(choseFrequencyType!),
-            'end_after': DateTime(endDate!.year, endDate!.month, endDate!.day,
-                endTime!.hour, endTime!.minute)
+            'end_after': Timestamp.fromDate(DateTime(endDate!.year,
+                endDate!.month, endDate!.day, endTime!.hour, endTime!.minute))
           };
   }
 
@@ -462,21 +456,9 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceAround,
                                           children: [
-                                            FutureBuilder<ModalFrequencyType?>(
-                                              future: FrequencyTypesFirestore()
-                                                  .getModalFromRef(modal
-                                                          .repeat?[
-                                                      'frequency_type_ref']),
-                                              builder: (context, snapshot) =>
-                                                  _frequencyRepeat(
-                                                      title: "Frequency",
-                                                      subTitle:
-                                                          snapshot.data?.name),
-                                            ),
-                                            _frequencyRepeat(
-                                                title: "End after",
-                                                subTitle: convertTimeStamp(modal
-                                                    .repeat?['end_after'])),
+                                            if (modal.repeat != null)
+                                              RepeatComponent(
+                                                  map: modal.repeat),
                                             TextButton(
                                                 onPressed: () async {
                                                   modal.repeat =
@@ -520,7 +502,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                           modal.categoryTypeRef =
                                               CategoryTypeFirebase()
                                                   .getRef(choseCategoryType!);
-                                          modal.timeCreate = DateTime.now();
+                                          modal.timeCreate = Timestamp.now();
 
                                           bool isSuccess =
                                               await TransactionUtilities().add(

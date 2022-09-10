@@ -265,54 +265,50 @@ class _TransactionPageState extends State<TransactionPage>
                                                   physics:
                                                       NeverScrollableScrollPhysics(),
                                                   children: group.value!
-                                                      .map((modal) => Column(
-                                                            children: [
-                                                              TransactionComponent(
-                                                                parentController:
-                                                                    _sectionController![
-                                                                        group
-                                                                            .key],
-                                                                modal: modal,
-                                                                isEditable:
-                                                                    true,
-                                                                onTap:
-                                                                    () async {
-                                                                  await Navigator.pushNamed(
-                                                                      context,
-                                                                      RouteApplication.getRoute(
-                                                                          ERoute.detailTransaction),
-                                                                      arguments: [
-                                                                        modal,
-                                                                        true,
-                                                                        false
-                                                                      ]);
-                                                                  setState(
-                                                                      () {});
-                                                                },
-                                                                editSlidableAction:
-                                                                    (context) async {
-                                                                  // await Navigator.pushNamed(
-                                                                  //     context,
-                                                                  //     RouteApplication
-                                                                  //         .getRoute(ERoute
-                                                                  //             .addEditTransaction),
-                                                                  //     arguments: modal);
-                                                                  // setState(() {});
-                                                                },
-                                                                deleteSlidableAction:
-                                                                    (context) {
-                                                                  // Future.delayed(
-                                                                  //     const Duration(
-                                                                  //         milliseconds:
-                                                                  //             500),
-                                                                  //     () => DataSample
-                                                                  //             .instance()
-                                                                  //         .removeTransaction(
-                                                                  //             modal));
-                                                                },
-                                                              ),
-                                                            ],
-                                                          ))
+                                                      .map(
+                                                        (modal) =>
+                                                            TransactionComponent(
+                                                          parentController:
+                                                              _sectionController![
+                                                                  group.key],
+                                                          modal: modal,
+                                                          isEditable: true,
+                                                          onTap: () async {
+                                                            await Navigator.pushNamed(
+                                                                context,
+                                                                RouteApplication
+                                                                    .getRoute(ERoute
+                                                                        .detailTransaction),
+                                                                arguments: [
+                                                                  modal,
+                                                                  true,
+                                                                  false
+                                                                ]);
+                                                            setState(() {});
+                                                          },
+                                                          editSlidableAction:
+                                                              (context) async {
+                                                            // await Navigator.pushNamed(
+                                                            //     context,
+                                                            //     RouteApplication
+                                                            //         .getRoute(ERoute
+                                                            //             .addEditTransaction),
+                                                            //     arguments: modal);
+                                                            // setState(() {});
+                                                          },
+                                                          deleteSlidableAction:
+                                                              (context) {
+                                                            // Future.delayed(
+                                                            //     const Duration(
+                                                            //         milliseconds:
+                                                            //             500),
+                                                            //     () => DataSample
+                                                            //             .instance()
+                                                            //         .removeTransaction(
+                                                            //             modal));
+                                                          },
+                                                        ),
+                                                      )
                                                       .toList(),
                                                 ))).builder();
                                       } else {
@@ -370,7 +366,7 @@ class _TransactionPageState extends State<TransactionPage>
       ModalTransaction? firstModal = await serviceTransaction
           .getModalFromRef(element.firstTransactionRef!);
       ModalTransaction push = currerntModal ?? firstModal!;
-      String key = _getDate(firstModal!.timeCreate!);
+      String key = _getDate(firstModal!.getTimeCreate!);
       if (result.containsKey(key)) {
         result[key]!.add(push);
       } else {

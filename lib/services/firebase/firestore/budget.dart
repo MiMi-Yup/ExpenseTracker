@@ -51,4 +51,11 @@ class BudgetFirestore extends IFirestore {
         .get();
     return snapshot.data();
   }
+
+  Stream<QuerySnapshot<ModalBudget>> get stream => FirebaseFirestore.instance
+      .collection(getPath(user?.uid))
+      .withConverter(
+          fromFirestore: ModalBudget.fromFirestore,
+          toFirestore: (ModalBudget modal, _) => modal.toFirestore())
+      .snapshots(includeMetadataChanges: true);
 }

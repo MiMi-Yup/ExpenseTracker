@@ -11,6 +11,7 @@ import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
+import 'package:expense_tracker/widgets/component/repeat_component.dart';
 import 'package:expense_tracker/widgets/component/timeline_modified_transaction.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/foundation.dart';
@@ -92,35 +93,56 @@ class _DetailTransactionState extends State<DetailTransaction>
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10.0),
-        child: Text("Attachment", style: TextStyle(color: Colors.white70)),
-      ),
       if (modal.attachments != null)
-        Container(
-            alignment: Alignment.center,
-            height: size.height / 3,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: modal.attachments!
-                  .map((e) => FutureBuilder<Uint8List?>(
-                      future: ActionFirebaseStorage.downloadFile(e),
-                      initialData: null,
-                      builder: (context, snapshot) => snapshot.hasData
-                          ? Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Image.memory(
-                                snapshot.data!,
-                                fit: BoxFit.contain,
-                              ),
-                            )
-                          : Container(
-                              padding: EdgeInsets.all(size.height * 0.1),
-                              width: size.height / 3,
-                              child: CircularProgressIndicator(),
-                            )))
-                  .toList(),
-            )),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child:
+                  Text("Attachment", style: TextStyle(color: Colors.white70)),
+            ),
+            Container(
+                alignment: Alignment.center,
+                height: size.height / 3,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: modal.attachments!
+                      .map((e) => FutureBuilder<Uint8List?>(
+                          future: ActionFirebaseStorage.downloadFile(e),
+                          initialData: null,
+                          builder: (context, snapshot) => snapshot.hasData
+                              ? Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Image.memory(
+                                    snapshot.data!,
+                                    fit: BoxFit.contain,
+                                  ),
+                                )
+                              : Container(
+                                  padding: EdgeInsets.all(size.height * 0.1),
+                                  width: size.height / 3,
+                                  child: CircularProgressIndicator(),
+                                )))
+                      .toList(),
+                ))
+          ],
+        ),
+      if (modal.repeat != null)
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+              child:
+                  Text('Repeat time', style: TextStyle(color: Colors.white70)),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: RepeatComponent(map: modal.repeat),
+            ),
+          ],
+        ),
       if (modal.transactionRef != null || isShowTimelineModified)
         Column(
           children: [
@@ -147,7 +169,8 @@ class _DetailTransactionState extends State<DetailTransaction>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Transaction history mofied'),
+                        Text('Transaction history mofied',
+                            style: TextStyle(color: Colors.white70)),
                         SizedBox(
                           height: 4.0,
                         ),
