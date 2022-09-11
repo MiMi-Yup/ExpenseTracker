@@ -42,8 +42,7 @@ class BudgetFirestore extends IFirestore {
   String getPath(String? uid) => 'users/user_$uid/budgets';
 
   @override
-  Future<ModalBudget?> getModalFromRef(
-      DocumentReference<Map<String, dynamic>> ref) async {
+  Future<ModalBudget?> getModalFromRef(DocumentReference<Object?> ref) async {
     DocumentSnapshot<ModalBudget> snapshot = await ref
         .withConverter(
             fromFirestore: ModalBudget.fromFirestore,

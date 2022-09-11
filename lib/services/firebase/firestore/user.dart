@@ -56,8 +56,7 @@ class UserFirestore extends IFirestore {
   }
 
   @override
-  Future<ModalUser?> getModalFromRef(
-      DocumentReference<Map<String, dynamic>> ref) async {
+  Future<ModalUser?> getModalFromRef(DocumentReference<Object?> ref) async {
     DocumentSnapshot<ModalUser> snapshot = await ref
         .withConverter(
             fromFirestore: ModalUser.fromFirestore,

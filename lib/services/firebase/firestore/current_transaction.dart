@@ -18,8 +18,7 @@ class CurrentTransaction extends IFirestore {
   }
 
   @override
-  Future<IModal?> getModalFromRef(
-      DocumentReference<Map<String, dynamic>> ref) async {
+  Future<IModal?> getModalFromRef(DocumentReference<Object?> ref) async {
     return null;
   }
 
@@ -59,14 +58,13 @@ class CurrentTransaction extends IFirestore {
     return results;
   }
 
-  Stream<QuerySnapshot<ModalTransactionLog>> getStreamTransaction() {
-    return FirebaseFirestore.instance
-        .collection(getPath(user?.uid))
-        .withConverter(
-            fromFirestore: ModalTransactionLog.fromFirestore,
-            toFirestore: (ModalTransactionLog modal, _) => modal.toFirestore())
-        .snapshots(includeMetadataChanges: true);
-  }
+  Stream<QuerySnapshot<ModalTransactionLog>> get stream => FirebaseFirestore
+      .instance
+      .collection(getPath(user?.uid))
+      .withConverter(
+          fromFirestore: ModalTransactionLog.fromFirestore,
+          toFirestore: (ModalTransactionLog modal, _) => modal.toFirestore())
+      .snapshots(includeMetadataChanges: true);
 
   Future<ModalTransaction?> findFirstTransaction(ModalTransaction modal) async {
     ModalTransactionLog? log = await findTransactionLog(modal);

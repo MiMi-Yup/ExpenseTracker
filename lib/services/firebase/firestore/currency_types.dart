@@ -25,7 +25,7 @@ class CurrencyTypesFirestore extends IFirestore {
 
   @override
   Future<ModalCurrencyType?> getModalFromRef(
-      DocumentReference<Map<String, dynamic>> ref) async {
+      DocumentReference<Object?> ref) async {
     DocumentSnapshot<ModalCurrencyType> snapshot = await ref
         .withConverter(
             fromFirestore: ModalCurrencyType.fromFirestore,

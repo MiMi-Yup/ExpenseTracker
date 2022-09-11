@@ -32,5 +32,5 @@ abstract class IFirestore {
   Future<void> delete(IModal modal);
   String getPath(String? uid);
   Future<List<IModal>> read();
-  Future<IModal?> getModalFromRef(DocumentReference<Map<String, dynamic>> ref);
+  Future<IModal?> getModalFromRef(DocumentReference<Object?> ref);
 }

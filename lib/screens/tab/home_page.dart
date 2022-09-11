@@ -3,10 +3,12 @@ import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
+import 'package:expense_tracker/modals/modal_notification.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
+import 'package:expense_tracker/services/firebase/firestore/notification.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
@@ -107,7 +109,49 @@ class _HomePageState extends State<HomePage>
                       onPressed: () =>
                           RouteApplication.navigatorKey.currentState?.pushNamed(
                               RouteApplication.getRoute(ERoute.notification)),
-                      icon: Icon(Icons.notifications))
+                      icon: StreamBuilder<QuerySnapshot<ModalNotification>>(
+                        stream: NotificationFirestore().stream,
+                        builder: (context, snapshot) {
+                          Widget? indicator;
+                          if (snapshot.hasData) {
+                            int size = snapshot.data!.docs
+                                .where(
+                                    (element) => element.data().isRead == false)
+                                .length;
+                            if (size > 0) {
+                              indicator = Positioned(
+                                right: 0.0,
+                                child: Container(
+                                  padding: EdgeInsets.all(1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  constraints: BoxConstraints(
+                                    minWidth: 12,
+                                    minHeight: 12,
+                                  ),
+                                  child: Text(
+                                    '$size',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+
+                          return Stack(
+                            children: <Widget>[
+                              Icon(Icons.notifications),
+                              if (indicator != null) indicator
+                            ],
+                          );
+                        },
+                      ))
                 ],
               ),
               Text("Account balance"),
@@ -186,7 +230,7 @@ class _HomePageState extends State<HomePage>
                   onPressed: () => widget.toPage!(EPage.transaction),
                   content: StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
                     initialData: null,
-                    stream: CurrentTransaction().getStreamTransaction(),
+                    stream: CurrentTransaction().stream,
                     builder: (context, snapshot) {
                       QuerySnapshot<ModalTransactionLog>? query = snapshot.data;
                       return query == null
@@ -239,12 +283,6 @@ class _HomePageState extends State<HomePage>
                                                   (context) async {
                                                 await service
                                                     .delete(snapshot.data!);
-                                                // Future.delayed(
-                                                //     const Duration(
-                                                //         milliseconds: 500),
-                                                //     () => DataSample.instance()
-                                                //         .removeTransaction(
-                                                //             modal));
                                               },
                                             )
                                           : LinearProgressIndicator());

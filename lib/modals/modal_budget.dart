@@ -25,23 +25,19 @@ class ModalBudget extends IModal {
   }
 
   @override
-  Map<String, dynamic> toFirestore() {
-    return {
-      'budget': budget,
-      'category_type_ref': categoryTypeRef,
-      'time_create': timeCreate,
-      'percent_alert': percentAlert
-    };
-  }
+  Map<String, dynamic> toFirestore() => {
+        'budget': budget,
+        'category_type_ref': categoryTypeRef,
+        'time_create': timeCreate,
+        'percent_alert': percentAlert
+      };
 
   @override
-  Map<String, dynamic> updateFirestore() {
-    return {
-      'budget': budget,
-      'percent_alert': percentAlert,
-      'category_type_ref': categoryTypeRef
-    };
-  }
+  Map<String, dynamic> updateFirestore() => {
+        'budget': budget,
+        'percent_alert': percentAlert,
+        'category_type_ref': categoryTypeRef
+      };
 
   double remainMoney(double currentMoney) {
     double sub = (budget ?? 0) - currentMoney;

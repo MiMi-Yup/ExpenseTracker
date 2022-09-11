@@ -28,7 +28,7 @@ class FrequencyTypesFirestore extends IFirestore {
 
   @override
   Future<ModalFrequencyType?> getModalFromRef(
-      DocumentReference<Map<String, dynamic>> ref) async {
+      DocumentReference<Object?> ref) async {
     DocumentSnapshot<ModalFrequencyType> snapshot = await ref
         .withConverter(
             fromFirestore: ModalFrequencyType.fromFirestore,

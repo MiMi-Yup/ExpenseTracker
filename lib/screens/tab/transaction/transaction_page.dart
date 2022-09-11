@@ -203,7 +203,7 @@ class _TransactionPageState extends State<TransactionPage>
                   )),
           StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
               initialData: null,
-              stream: CurrentTransaction().getStreamTransaction(),
+              stream: CurrentTransaction().stream,
               builder: (context, snapshot) {
                 if (snapshot.data == null) {
                   //wait to loading
