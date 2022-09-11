@@ -79,8 +79,9 @@ class _SignUpState extends State<SignUp> {
                 },
                 text: "Bạn chấp nhận với những ",
                 action: GestureDetector(
-                    onTap: () => Navigator.pushNamed(context,
-                        RouteApplication.getRoute(ERoute.termOfCondition)),
+                    onTap: () => RouteApplication.navigatorKey.currentState
+                        ?.pushNamed(
+                            RouteApplication.getRoute(ERoute.termOfCondition)),
                     child: Text("Điều khoản",
                         style: TextStyle(color: MyColor.purple(alpha: 255))))),
             Container(
@@ -165,8 +166,8 @@ class _SignUpState extends State<SignUp> {
                     style: TextStyle(color: Colors.grey, fontSize: 15),
                   ),
                   GestureDetector(
-                      onTap: () => Navigator.pushNamed(
-                          context, RouteApplication.getRoute(ERoute.login)),
+                      onTap: () => RouteApplication.navigatorKey.currentState
+                          ?.pushNamed(RouteApplication.getRoute(ERoute.login)),
                       child: Text("Login",
                           style: TextStyle(color: MyColor.purple(alpha: 255))))
                 ],

@@ -142,8 +142,10 @@ class _OverviewReportState extends State<OverviewReport> {
                   padding: EdgeInsets.all(10.0),
                   child: largestButton(
                       text: "See the full detail",
-                      onPressed: () => Navigator.popAndPushNamed(context,
-                          RouteApplication.getRoute(ERoute.detailReport))))
+                      onPressed: () => RouteApplication
+                          .navigatorKey.currentState
+                          ?.popAndPushNamed(
+                              RouteApplication.getRoute(ERoute.detailReport))))
             ],
           ),
         )

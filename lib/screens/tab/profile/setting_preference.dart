@@ -1,5 +1,6 @@
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/share_pref_key.dart';
+import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
@@ -163,7 +164,7 @@ class _SettingPreferenceState extends State<SettingPreference> {
                     .map((e) => GestureDetector(
                           onTap: () {
                             selected = e;
-                            Navigator.pop(context);
+                            RouteApplication.navigatorKey.currentState?.pop();
                           },
                           child: Container(
                             height: 50.0,
@@ -242,7 +243,8 @@ class _SettingPreferenceState extends State<SettingPreference> {
                       width: double.maxFinite,
                       child: largestButton(
                         text: "Done",
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () =>
+                            RouteApplication.navigatorKey.currentState?.pop(),
                       ))
                 ],
               ),
@@ -300,7 +302,8 @@ class _SettingPreferenceState extends State<SettingPreference> {
                       width: double.maxFinite,
                       child: largestButton(
                         text: "Done",
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () =>
+                            RouteApplication.navigatorKey.currentState?.pop(),
                       ))
                 ],
               ),
@@ -314,7 +317,7 @@ class _SettingPreferenceState extends State<SettingPreference> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () => Navigator.pop<void>(context),
+            onPressed: () => RouteApplication.navigatorKey.currentState?.pop(),
             icon: Icon(Icons.arrow_back_ios)),
         title: Text("Setting"),
         centerTitle: true,

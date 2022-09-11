@@ -89,7 +89,12 @@ class _BudgetComponentState extends State<BudgetComponent>
                                 topLeft: Radius.circular(10),
                                 bottomLeft: Radius.circular(10))),
                         SlidableAction(
-                            onPressed: widget.deleteSlidableAction,
+                            onPressed: (context) async {
+                              await _controller!.forward();
+                              if (widget.deleteSlidableAction != null) {
+                                widget.deleteSlidableAction!(context);
+                              }
+                            },
                             backgroundColor: Color(0xFF0392CF),
                             foregroundColor: Colors.white,
                             icon: Icons.delete_forever,
@@ -148,7 +153,7 @@ class _BudgetComponentState extends State<BudgetComponent>
                             ),
                           ),
                           Text(
-                            "${UserInstance.instance().getCurrency().currencyCode} ${widget.nowMoney} ${widget.modal.percentAlert != null ? "of ${UserInstance.instance().getCurrency().currencyCode} ${widget.modal.budget}" : ""}",
+                            "${UserInstance.instance().getCurrency().currencyCode} ${widget.nowMoney} of ${UserInstance.instance().getCurrency().currencyCode} ${widget.modal.budget}",
                             style: TextStyle(color: Colors.grey),
                           ),
                           SizedBox(height: 10.0),

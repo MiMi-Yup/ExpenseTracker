@@ -1,6 +1,7 @@
 import 'package:expense_tracker/constants/asset/background.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/modals/modal_account.dart';
+import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/widgets/component/account_component.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
@@ -43,7 +44,8 @@ class AccountPage extends StatelessWidget {
                       pinned: true,
                       expandedHeight: MediaQuery.of(context).size.height * 0.3,
                       leading: IconButton(
-                          onPressed: () => Navigator.pop<void>(context),
+                          onPressed: () =>
+                              RouteApplication.navigatorKey.currentState?.pop(),
                           icon: Icon(Icons.arrow_back_ios)),
                       centerTitle: true,
                       backgroundColor: MyColor.mainBackgroundColor,

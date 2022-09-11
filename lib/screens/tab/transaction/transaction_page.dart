@@ -7,6 +7,7 @@ import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
+import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/overview_transaction.dart';
@@ -24,6 +25,8 @@ class TransactionPage extends StatefulWidget {
 class _TransactionPageState extends State<TransactionPage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   Map<String, AnimationController?>? _sectionController;
+
+  final TransactionUtilities service = TransactionUtilities();
 
   final List<Widget> _charts = [
     LineChartSample1(),
@@ -158,8 +161,8 @@ class _TransactionPageState extends State<TransactionPage>
             ],
           ),
           GestureDetector(
-            onTap: () => Navigator.pushNamed(
-                context, RouteApplication.getRoute(ERoute.overviewReport)),
+            onTap: () => RouteApplication.navigatorKey.currentState
+                ?.pushNamed(RouteApplication.getRoute(ERoute.overviewReport)),
             child: Container(
               padding: EdgeInsets.all(10.0),
               decoration: BoxDecoration(
@@ -274,12 +277,13 @@ class _TransactionPageState extends State<TransactionPage>
                                                           modal: modal,
                                                           isEditable: true,
                                                           onTap: () async {
-                                                            await Navigator.pushNamed(
-                                                                context,
-                                                                RouteApplication
-                                                                    .getRoute(ERoute
-                                                                        .detailTransaction),
-                                                                arguments: [
+                                                            await RouteApplication
+                                                                .navigatorKey
+                                                                .currentState
+                                                                ?.pushNamed(
+                                                                    RouteApplication.getRoute(
+                                                                        ERoute.detailTransaction),
+                                                                    arguments: [
                                                                   modal,
                                                                   true,
                                                                   false
@@ -287,25 +291,21 @@ class _TransactionPageState extends State<TransactionPage>
                                                             setState(() {});
                                                           },
                                                           editSlidableAction:
-                                                              (context) async {
-                                                            // await Navigator.pushNamed(
-                                                            //     context,
-                                                            //     RouteApplication
-                                                            //         .getRoute(ERoute
-                                                            //             .addEditTransaction),
-                                                            //     arguments: modal);
-                                                            // setState(() {});
+                                                              (context) {
+                                                            RouteApplication
+                                                                .navigatorKey
+                                                                .currentState
+                                                                ?.pushNamed(
+                                                                    RouteApplication
+                                                                        .getRoute(ERoute
+                                                                            .addEditTransaction),
+                                                                    arguments:
+                                                                        modal);
                                                           },
                                                           deleteSlidableAction:
-                                                              (context) {
-                                                            // Future.delayed(
-                                                            //     const Duration(
-                                                            //         milliseconds:
-                                                            //             500),
-                                                            //     () => DataSample
-                                                            //             .instance()
-                                                            //         .removeTransaction(
-                                                            //             modal));
+                                                              (context) async {
+                                                            await service
+                                                                .delete(modal);
                                                           },
                                                         ),
                                                       )

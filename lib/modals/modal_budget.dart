@@ -36,7 +36,11 @@ class ModalBudget extends IModal {
 
   @override
   Map<String, dynamic> updateFirestore() {
-    return {'budget': budget, 'percent_alert': percentAlert};
+    return {
+      'budget': budget,
+      'percent_alert': percentAlert,
+      'category_type_ref': categoryTypeRef
+    };
   }
 
   double remainMoney(double currentMoney) {
@@ -48,12 +52,8 @@ class ModalBudget extends IModal {
 
   DateTime? get getTimeCreate => timeCreate?.toDate();
 
-  bool isExceedLimit(double currentMoney) {
-    if (percentAlert != null) {
-      return currentMoney - (budget ?? 0.0) > 0 ? true : false;
-    }
-    return false;
-  }
+  bool isExceedLimit(double currentMoney) =>
+      currentMoney - (budget ?? 0.0) > 0 ? true : false;
 
   bool isAlert(double currentMoney) {
     if (budget == null) return true;

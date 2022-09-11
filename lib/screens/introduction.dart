@@ -132,8 +132,8 @@ class _IntroductionState extends State<Introduction> {
             margin: EdgeInsets.all(10),
             child: largestButton(
                 text: "Sign Up",
-                onPressed: () => Navigator.pushNamed(
-                    context, RouteApplication.getRoute(ERoute.signUp)),
+                onPressed: () => RouteApplication.navigatorKey.currentState
+                    ?.pushNamed(RouteApplication.getRoute(ERoute.signUp)),
                 textColor: Colors.white,
                 background: MyColor.purple(alpha: 255)),
           ),
@@ -143,8 +143,8 @@ class _IntroductionState extends State<Introduction> {
             margin: EdgeInsets.all(10),
             child: largestButton(
                 text: "Login",
-                onPressed: () => Navigator.pushNamed(
-                    context, RouteApplication.getRoute(ERoute.login)),
+                onPressed: () => RouteApplication.navigatorKey.currentState
+                    ?.pushNamed(RouteApplication.getRoute(ERoute.login)),
                 textColor: MyColor.purple(alpha: 255),
                 background: Colors.grey),
           )

@@ -17,7 +17,7 @@ class BottomAppBarComponent {
     return StatefulBuilder(builder: (context, setState) {
       return BottomAppBar(
         shape: CircularNotchedRectangle(),
-        notchMargin: 16,
+        notchMargin: 10,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: navActions.entries

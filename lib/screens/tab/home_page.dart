@@ -9,6 +9,7 @@ import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/component/overview_transaction_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
@@ -27,6 +28,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   late PageController _controller;
+
+  final TransactionUtilities service = TransactionUtilities();
 
   final List<Widget> _charts = [
     LineChartSample1(),
@@ -101,8 +104,9 @@ class _HomePageState extends State<HomePage>
                     onChanged: (p0) => null).builder(),
                 actions: [
                   IconButton(
-                      onPressed: () => Navigator.pushNamed(context,
-                          RouteApplication.getRoute(ERoute.notification)),
+                      onPressed: () =>
+                          RouteApplication.navigatorKey.currentState?.pushNamed(
+                              RouteApplication.getRoute(ERoute.notification)),
                       icon: Icon(Icons.notifications))
                 ],
               ),
@@ -208,29 +212,33 @@ class _HomePageState extends State<HomePage>
                                               modal: snapshot.data!,
                                               isEditable: true,
                                               onTap: () async {
-                                                await Navigator.pushNamed(
-                                                    context,
-                                                    RouteApplication.getRoute(
-                                                        ERoute
-                                                            .detailTransaction),
-                                                    arguments: [
+                                                await RouteApplication
+                                                    .navigatorKey.currentState
+                                                    ?.pushNamed(
+                                                        RouteApplication
+                                                            .getRoute(ERoute
+                                                                .detailTransaction),
+                                                        arguments: [
                                                       snapshot.data!,
                                                       true,
                                                       false
                                                     ]);
                                                 setState(() {});
                                               },
-                                              editSlidableAction:
-                                                  (context) async {
-                                                // await Navigator.pushNamed(
-                                                //     context,
-                                                //     RouteApplication.getRoute(
-                                                //         ERoute
-                                                //             .addEditTransaction),
-                                                //     arguments: modal);
-                                                // setState(() {});
+                                              editSlidableAction: (context) {
+                                                RouteApplication
+                                                    .navigatorKey.currentState
+                                                    ?.pushNamed(
+                                                        RouteApplication
+                                                            .getRoute(ERoute
+                                                                .addEditTransaction),
+                                                        arguments:
+                                                            snapshot.data!);
                                               },
-                                              deleteSlidableAction: (context) {
+                                              deleteSlidableAction:
+                                                  (context) async {
+                                                await service
+                                                    .delete(snapshot.data!);
                                                 // Future.delayed(
                                                 //     const Duration(
                                                 //         milliseconds: 500),

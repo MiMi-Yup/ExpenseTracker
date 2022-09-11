@@ -117,8 +117,10 @@ class ProfilePage extends StatelessWidget {
                                                       child: largestButton(
                                                           text: "No",
                                                           onPressed: () =>
-                                                              Navigator.pop(
-                                                                  context),
+                                                              RouteApplication
+                                                                  .navigatorKey
+                                                                  .currentState
+                                                                ?..pop(),
                                                           background:
                                                               Colors.grey)),
                                                   SizedBox(

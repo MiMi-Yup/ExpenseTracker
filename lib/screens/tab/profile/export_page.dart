@@ -1,4 +1,5 @@
 import 'package:expense_tracker/constants/color.dart';
+import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class ExportPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () => Navigator.pop<void>(context),
+            onPressed: () => RouteApplication.navigatorKey.currentState?.pop(),
             icon: Icon(Icons.arrow_back_ios)),
         title: Text("Export"),
         centerTitle: true,

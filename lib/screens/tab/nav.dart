@@ -80,7 +80,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
         future: TransactionTypeFirestore().read(),
         initialData: [],
         builder: (context, snapshot) => Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: snapshot.data!
@@ -121,12 +121,12 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                                     return SizedBox();
                                   }),
                           onPressed: () async {
-                            await Navigator.pushNamed(
-                                context,
-                                RouteApplication.getRoute(
-                                    ERoute.addEditTransaction),
-                                arguments:
-                                    TransactionTypeFirestore().getRef(e));
+                            await RouteApplication.navigatorKey.currentState
+                                ?.pushNamed(
+                                    RouteApplication.getRoute(
+                                        ERoute.addEditTransaction),
+                                    arguments:
+                                        TransactionTypeFirestore().getRef(e));
                             _fabController.reverse();
                           },
                         ),

@@ -72,9 +72,8 @@ class ForgotPassword extends StatelessWidget {
 
                       Future.delayed(
                           const Duration(seconds: 1),
-                          () => Navigator.popUntil(
-                              context,
-                              ModalRoute.withName(
+                          () => RouteApplication.navigatorKey.currentState
+                              ?.popUntil(ModalRoute.withName(
                                   RouteApplication.getRoute(ERoute.login))));
                     }),
               )

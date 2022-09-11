@@ -8,6 +8,7 @@ import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/budget.dart';
 import 'package:expense_tracker/services/firebase/firestore/category_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/utilities/budget.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,8 @@ class AddEditBudget extends StatefulWidget {
 
 class _AddEditBudgetState extends State<AddEditBudget> {
   bool _isAlert = false;
-  double _percentAlert = 0.5;
+
+  final BudgetUtilities service = BudgetUtilities();
 
   late Object? argument = ModalRoute.of(context)?.settings.arguments;
   late ModalBudget modal = argument != null
@@ -158,15 +160,64 @@ class _AddEditBudgetState extends State<AddEditBudget> {
                                   .getRef(choseCategoryType!);
                               modal.timeCreate = Timestamp.now();
 
-                              await BudgetFirestore().insert(modal);
+                              dynamic result = await service.add(modal);
+                              if (argument is ModalBudget &&
+                                  result is ModalBudget) {
+                                await BudgetFirestore().update(result, modal);
+                                dismissPage();
+                              } else if (result is ModalBudget) {
+                                Widget dismissBtn = TextButton(
+                                  child: Text("Dismiss"),
+                                  onPressed: () {
+                                    RouteApplication.navigatorKey.currentState
+                                        ?.popUntil(ModalRoute.withName(
+                                            RouteApplication.getRoute(
+                                                ERoute.main)));
+                                  },
+                                );
+                                Widget overrideBtn = TextButton(
+                                  child: Text("Override"),
+                                  onPressed: () async {
+                                    await service.delete(result);
+                                    await service.add(modal);
+                                    dismissPage();
+                                  },
+                                );
+                                Widget modifiedBtn = TextButton(
+                                  child: Text("Edit current budget"),
+                                  onPressed: () {
+                                    RouteApplication.navigatorKey.currentState
+                                        ?.popUntil(ModalRoute.withName(
+                                            RouteApplication.getRoute(
+                                                ERoute.main)));
+                                    RouteApplication.navigatorKey.currentState
+                                        ?.pushNamed(
+                                            RouteApplication.getRoute(
+                                                ERoute.addEditBudget),
+                                            arguments: result);
+                                  },
+                                );
 
-                              Future.delayed(
-                                  const Duration(seconds: 1),
-                                  () => Navigator.popUntil(
-                                      context,
-                                      ModalRoute.withName(
-                                          RouteApplication.getRoute(
-                                              ERoute.main))));
+                                // set up the AlertDialog
+                                AlertDialog alert = AlertDialog(
+                                  title: Text("Exist budget"),
+                                  content: Text(
+                                      "1 month allow exist only 1 budget for 1 category. What do you want?"),
+                                  actions: [
+                                    dismissBtn,
+                                    overrideBtn,
+                                    modifiedBtn,
+                                  ],
+                                );
+
+                                // show the dialog
+                                await showDialog(
+                                  context: context,
+                                  builder: (context) => alert,
+                                );
+                              } else {
+                                dismissPage();
+                              }
                             }
                           }),
                     )
@@ -176,5 +227,12 @@ class _AddEditBudgetState extends State<AddEditBudget> {
             ],
           ),
         ));
+  }
+
+  Future<void> dismissPage() {
+    return Future.delayed(
+        const Duration(seconds: 1),
+        () => RouteApplication.navigatorKey.currentState?.popUntil(
+            ModalRoute.withName(RouteApplication.getRoute(ERoute.main))));
   }
 }

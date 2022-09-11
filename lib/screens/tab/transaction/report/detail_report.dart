@@ -40,8 +40,9 @@ class _DetailReportState extends State<DetailReport> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () => Navigator.popUntil(context,
-                ModalRoute.withName(RouteApplication.getRoute(ERoute.main))),
+            onPressed: () => RouteApplication.navigatorKey.currentState
+                ?.popUntil(ModalRoute.withName(
+                    RouteApplication.getRoute(ERoute.main))),
             icon: Icon(Icons.arrow_back_ios)),
         title: Text("Financial Report"),
         centerTitle: true,

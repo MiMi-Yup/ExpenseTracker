@@ -1,4 +1,5 @@
 import 'package:expense_tracker/constants/color.dart';
+import 'package:expense_tracker/routes/route.dart';
 import 'package:flutter/material.dart';
 
 class NotificationPage extends StatefulWidget {
@@ -46,7 +47,7 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ],
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => RouteApplication.navigatorKey.currentState?.pop(),
           icon: Icon(Icons.arrow_back_ios),
         ),
         centerTitle: true,

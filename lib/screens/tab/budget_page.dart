@@ -5,6 +5,7 @@ import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/budget.dart';
+import 'package:expense_tracker/services/firebase/firestore/utilities/budget.dart';
 import 'package:expense_tracker/widgets/component/budget_component.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ class BudgetPage extends StatefulWidget {
 
 class _BudgetPageState extends State<BudgetPage>
     with AutomaticKeepAliveClientMixin {
+  final BudgetUtilities service = BudgetUtilities();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -62,41 +65,24 @@ class _BudgetPageState extends State<BudgetPage>
                           physics: BouncingScrollPhysics(),
                           child: Column(
                               children: data
-                                  .map((e) => BudgetComponent(
-                                      modal: e,
+                                  .map((modal) => BudgetComponent(
+                                      modal: modal,
                                       nowMoney: 550.0,
                                       onTap: () => RouteApplication
                                           .navigatorKey.currentState
                                           ?.pushNamed(
                                               RouteApplication.getRoute(
                                                   ERoute.addEditBudget),
-                                              arguments: e),
+                                              arguments: modal),
                                       editSlidableAction: (context) =>
                                           RouteApplication
                                               .navigatorKey.currentState
                                               ?.pushNamed(
                                                   RouteApplication.getRoute(
                                                       ERoute.addEditBudget),
-                                                  arguments: e),
-                                      deleteSlidableAction: (context) {
-                                        // AnimatedList.of(context)
-                                        //     .removeItem(
-                                        //         index,
-                                        //         (_, animation) =>
-                                        //             SizeTransition(
-                                        //               sizeFactor:
-                                        //                   animation,
-                                        //               child: BudgetComponent(
-                                        //                       modal:
-                                        //                           modal)
-                                        //                   .builder(
-                                        //                       width: MediaQuery.of(
-                                        //                               context)
-                                        //                           .size
-                                        //                           .width),
-                                        //             ),
-                                        //         duration: const Duration(
-                                        //             seconds: 1));
+                                                  arguments: modal),
+                                      deleteSlidableAction: (context) async {
+                                        await service.delete(modal);
                                       }))
                                   .toList()));
                     }

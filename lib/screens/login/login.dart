@@ -35,9 +35,8 @@ class _LoginState extends State<Login> {
       appBar: AppBar(
         title: Text("Login"),
         leading: IconButton(
-            onPressed: () => Navigator.popUntil(
-                context,
-                ModalRoute.withName(
+            onPressed: () => RouteApplication.navigatorKey.currentState
+                ?.popUntil(ModalRoute.withName(
                     RouteApplication.getRoute(ERoute.introduction))),
             icon: Icon(Icons.arrow_back_ios_new)),
         elevation: 0.0,
@@ -129,8 +128,9 @@ class _LoginState extends State<Login> {
             Container(
                 alignment: Alignment.center,
                 child: TextButton(
-                  onPressed: () => Navigator.pushNamed(context,
-                      RouteApplication.getRoute(ERoute.forgotPassword)),
+                  onPressed: () => RouteApplication.navigatorKey.currentState
+                      ?.pushNamed(
+                          RouteApplication.getRoute(ERoute.forgotPassword)),
                   child: Text("Forgot password?",
                       style: TextStyle(color: MyColor.purple(alpha: 255))),
                 )),
@@ -144,8 +144,8 @@ class _LoginState extends State<Login> {
                     style: TextStyle(color: Colors.grey, fontSize: 15),
                   ),
                   GestureDetector(
-                      onTap: () => Navigator.pushNamed(
-                          context, RouteApplication.getRoute(ERoute.signUp)),
+                      onTap: () => RouteApplication.navigatorKey.currentState
+                          ?.pushNamed(RouteApplication.getRoute(ERoute.signUp)),
                       child: Text("Sign Up",
                           style: TextStyle(color: MyColor.purple(alpha: 255))))
                 ],

@@ -214,7 +214,8 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
             ? Scaffold(
                 appBar: AppBar(
                   leading: IconButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () =>
+                          RouteApplication.navigatorKey.currentState?.pop(),
                       icon: Icon(Icons.arrow_back_ios)),
                   title: Text(modalTransactionType.toString()),
                   centerTitle: true,
@@ -609,15 +610,9 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
 
                                         Future.delayed(
                                             const Duration(seconds: 1),
-                                            () => Navigator.popUntil(
-                                                context,
-                                                ModalRoute.withName(_argument
-                                                        is ModalTransaction
-                                                    ? RouteApplication.getRoute(
-                                                        ERoute
-                                                            .detailTransaction)
-                                                    : RouteApplication.getRoute(
-                                                        ERoute.main))));
+                                            () => RouteApplication
+                                                .navigatorKey.currentState
+                                                ?.pop());
                                       },
                                       background: modalTransactionType?.color ??
                                           MyColor.purple()))
