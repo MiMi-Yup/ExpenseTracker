@@ -40,6 +40,8 @@ class _TransactionComponentState extends State<TransactionComponent>
     with SingleTickerProviderStateMixin {
   AnimationController? _controller;
 
+  final CurrentTransactionFirestore service = CurrentTransactionFirestore();
+
   @override
   void initState() {
     super.initState();
@@ -112,8 +114,7 @@ class _TransactionComponentState extends State<TransactionComponent>
                     style: TextStyle(color: Colors.grey),
                   )
                 : FutureBuilder<ModalTransaction?>(
-                    future:
-                        CurrentTransaction().findFirstTransaction(widget.modal),
+                    future: service.findFirstTransaction(widget.modal),
                     builder: (context, snapshot) => Text(
                           snapshot.hasData
                               ? snapshot.data!.getTimeTransaction

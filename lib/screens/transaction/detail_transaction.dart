@@ -33,6 +33,8 @@ class _DetailTransactionState extends State<DetailTransaction>
   late bool isEditable = (arguments?[1] as bool?) ?? false;
   late bool isShowTimelineModified = arguments?[2] as bool;
 
+  final CurrentTransactionFirestore service = CurrentTransactionFirestore();
+
   GlobalKey keyAppBar = GlobalKey();
   GlobalKey scrollTimeline = GlobalKey();
 
@@ -382,8 +384,7 @@ class _DetailTransactionState extends State<DetailTransaction>
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: FutureBuilder<ModalTransaction?>(
-                          future:
-                              CurrentTransaction().findFirstTransaction(modal),
+                          future: service.findFirstTransaction(modal),
                           builder: (context, snapshot) => Text(
                                 snapshot.hasData
                                     ? '${snapshot.data!.getDateTransaction} ${snapshot.data!.getTimeTransaction}'

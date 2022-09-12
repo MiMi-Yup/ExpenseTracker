@@ -3,13 +3,20 @@ import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
+import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/transaction_type_instance.dart';
+import 'package:expense_tracker/modals/modal.dart';
+import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
+import 'package:expense_tracker/widgets/component/fliter_month_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
+import 'package:expense_tracker/widgets/month_picker.dart';
 import 'package:expense_tracker/widgets/overview_transaction.dart';
 import 'package:expense_tracker/widgets/section.dart';
 import 'package:expense_tracker/widgets/transaction_chart.dart';
@@ -22,27 +29,24 @@ class TransactionPage extends StatefulWidget {
   State<TransactionPage> createState() => _TransactionPageState();
 }
 
+enum SortBy { money, time }
+
 class _TransactionPageState extends State<TransactionPage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   Map<String, AnimationController?>? _sectionController;
 
-  final TransactionUtilities service = TransactionUtilities();
+  final TransactionUtilities serviceTransaction = TransactionUtilities();
+  final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
 
-  final List<Widget> _charts = [
-    LineChartSample1(),
-    Text("data"),
-    Text("data"),
-    Text("data")
-  ];
-  int _currentIndex = 0;
   late double height = MediaQuery.of(context).size.height;
-  final List<OverviewTransaction> overview_transaction = [
-    OverviewTransaction("income", currency: "\$", value: 5000),
-    OverviewTransaction("expense", currency: "\$", value: 3000)
-  ];
 
   bool hasFilter = false;
   bool isExpandAll = false;
+
+  DateTime? fliterTransactionByMonth;
+  ModalCategoryType? selectedFilterCategory;
+  ModalTransactionType? selectedFilterTransactionType;
+  SortBy? sortBy;
 
   @override
   void initState() {
@@ -58,6 +62,31 @@ class _TransactionPageState extends State<TransactionPage>
     super.dispose();
   }
 
+  Widget getModalChip(
+          {required String name,
+          required Color indicatorColor,
+          double height = 10.0,
+          Color? backgroundColor}) =>
+      Container(
+        padding: EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(height * 2),
+            border: Border.all(color: indicatorColor.withAlpha(150))),
+        child: Row(
+          children: [
+            Container(
+              height: height,
+              width: height,
+              margin: EdgeInsets.only(right: 10.0),
+              decoration:
+                  BoxDecoration(color: indicatorColor, shape: BoxShape.circle),
+            ),
+            Text(name)
+          ],
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -67,95 +96,165 @@ class _TransactionPageState extends State<TransactionPage>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              DropDown<String>(
-                isExpanded: false,
-                hint: "Time",
-                items: ["1", "2"],
-                choseValue: null,
-                onChanged: (p0) => null,
-              ).builder(),
+              FilterTransactionByMonthComponent(
+                      onChanged: (value) {
+                        RouteApplication.navigatorKey.currentState?.pop();
+                        setState(() {
+                          fliterTransactionByMonth = value;
+                        });
+                      },
+                      setInitDateTime: fliterTransactionByMonth == null
+                          ? (value) => fliterTransactionByMonth = value
+                          : null,
+                      selectedDate: fliterTransactionByMonth)
+                  .builder(),
               IconButton(
-                  onPressed: () async => showModalBottomSheet(
+                  onPressed: () async {
+                    await showModalBottomSheet(
                         context: context,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(10.0),
                                 topRight: Radius.circular(10.0))),
-                        builder: (context) => Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Filter Transaction"),
-                                    TextButton(
-                                        onPressed: null, child: Text("Reset"))
-                                  ],
-                                ),
-                                Text("Fiter by"),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Wrap(
-                                    spacing: 8.0,
-                                    children: List<Widget>.generate(
-                                      3,
-                                      (int index) {
-                                        return ChoiceChip(
-                                          label: Padding(
-                                            padding: const EdgeInsets.all(5.0),
-                                            child: Text("fsdf"),
+                        builder: (context) {
+                          return StatefulBuilder(
+                              builder: (context, setState) => Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text("Filter Transaction"),
+                                              TextButton(
+                                                  onPressed: () {
+                                                    sortBy = null;
+                                                    selectedFilterCategory =
+                                                        null;
+                                                    selectedFilterTransactionType =
+                                                        null;
+                                                    setState(() {});
+                                                  },
+                                                  child: Text("Reset"))
+                                            ],
                                           ),
-                                          //selected: _value == index,
-                                          selected: false,
-                                          onSelected: (selected) {
-                                            // setState(() {
-                                            //   _value = selected ? index : null;
-                                            // });
-                                          },
-                                          selectedColor: Colors.white70,
-                                        );
-                                      },
-                                    ).toList(),
-                                  ),
-                                ),
-                                Text("Sort by"),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Wrap(
-                                    spacing: 8.0,
-                                    children: List<Widget>.generate(
-                                      5,
-                                      (int index) {
-                                        return ChoiceChip(
-                                          label: Padding(
-                                            padding: const EdgeInsets.all(5.0),
-                                            child: Text("fsdf"),
+                                          Text("Fiter by"),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: GridView.count(
+                                              crossAxisCount: 3,
+                                              mainAxisSpacing: 8.0,
+                                              crossAxisSpacing: 8.0,
+                                              childAspectRatio: 3,
+                                              shrinkWrap: true,
+                                              children: CategoryInstance
+                                                      .instance()
+                                                  .modals!
+                                                  .map<Widget>(
+                                                      (e) => GestureDetector(
+                                                            onTap: () {
+                                                              selectedFilterCategory =
+                                                                  selectedFilterCategory !=
+                                                                          e
+                                                                      ? e
+                                                                      : null;
+                                                              setState(() {});
+                                                            },
+                                                            child: CategoryInstance
+                                                                    .instance()
+                                                                .getHintCategoryComponent(
+                                                                    e!.id!)
+                                                                .getMinCategory(
+                                                                    backgroundColor: selectedFilterCategory ==
+                                                                            e
+                                                                        ? Color.fromARGB(
+                                                                            255,
+                                                                            93,
+                                                                            0,
+                                                                            255)
+                                                                        : null),
+                                                          ))
+                                                  .toList()
+                                                ..addAll(
+                                                    TranasactionTypeInstance
+                                                            .instance()
+                                                        .modals!
+                                                        .map<Widget>((e) =>
+                                                            GestureDetector(
+                                                              onTap: () {
+                                                                selectedFilterTransactionType =
+                                                                    selectedFilterTransactionType !=
+                                                                            e
+                                                                        ? e
+                                                                        : null;
+                                                                setState(() {});
+                                                              },
+                                                              child: getModalChip(
+                                                                  name:
+                                                                      e!.name!,
+                                                                  indicatorColor:
+                                                                      e.color!,
+                                                                  backgroundColor: selectedFilterTransactionType ==
+                                                                          e
+                                                                      ? Color.fromARGB(
+                                                                          255,
+                                                                          93,
+                                                                          0,
+                                                                          255)
+                                                                      : null),
+                                                            ))),
+                                            ),
                                           ),
-                                          //selected: _value == index,
-                                          selected: false,
-                                          onSelected: (selected) {
-                                            // setState(() {
-                                            //   _value = selected ? index : null;
-                                            // });
-                                          },
-                                          selectedColor: Colors.white70,
-                                        );
-                                      },
-                                    ).toList(),
-                                  ),
-                                ),
-                                Text("Category"),
-                                Visibility(
-                                    child: Container(
-                                  color: Colors.yellow,
-                                )),
-                              ]),
-                        ),
-                      ),
+                                          Text("Sort by"),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: GridView.count(
+                                              crossAxisCount: 3,
+                                              mainAxisSpacing: 8.0,
+                                              crossAxisSpacing: 8.0,
+                                              childAspectRatio: 3,
+                                              shrinkWrap: true,
+                                              children: SortBy.values
+                                                  .map((e) => GestureDetector(
+                                                      onTap: () {
+                                                        if (sortBy == e) {
+                                                          sortBy = null;
+                                                        } else {
+                                                          sortBy = e;
+                                                        }
+                                                        setState(() {});
+                                                      },
+                                                      child: getModalChip(
+                                                          name: e.name,
+                                                          indicatorColor:
+                                                              Colors.grey,
+                                                          backgroundColor:
+                                                              sortBy == e
+                                                                  ? Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          93,
+                                                                          0,
+                                                                          255)
+                                                                  : null)))
+                                                  .toList(),
+                                            ),
+                                          ),
+                                          Text("Category"),
+                                          Visibility(
+                                              child: Container(
+                                            color: Colors.yellow,
+                                          )),
+                                        ]),
+                                  ));
+                        });
+
+                    setState(() {});
+                  },
                   icon: Icon(Icons.sort,
                       color: hasFilter ? MyColor.purple() : null))
             ],
@@ -203,7 +302,7 @@ class _TransactionPageState extends State<TransactionPage>
                   )),
           StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
               initialData: null,
-              stream: CurrentTransaction().stream,
+              stream: serviceLog.stream,
               builder: (context, snapshot) {
                 if (snapshot.data == null) {
                   //wait to loading
@@ -217,105 +316,117 @@ class _TransactionPageState extends State<TransactionPage>
                     return FutureBuilder<
                             SplayTreeMap<String, List<ModalTransaction>?>>(
                         initialData: null,
-                        future: filterTransactionByDateTime(snapshot.data!),
+                        future: filterTransaction(snapshot.data!),
                         builder: (context, snapshot) => snapshot.hasData
-                            ? Expanded(
-                                child: CustomScrollView(
-                                    physics: BouncingScrollPhysics(),
-                                    slivers:
-                                        snapshot.data!.entries.map((group) {
-                                      if (group.value!.isNotEmpty) {
-                                        if (!_sectionController!
-                                            .containsKey(group.key)) {
-                                          _sectionController!.addAll({
-                                            group.key: AnimationController(
-                                                vsync: this,
-                                                duration: const Duration(
-                                                    milliseconds: 500))
-                                          });
-                                        }
-                                        return Section(
-                                            headerColor:
-                                                MyColor.mainBackgroundColor,
-                                            titleColor: Colors.white,
-                                            title:
-                                                "${group.key} (${group.value!.length}) transactions",
-                                            controller:
-                                                _sectionController![group.key],
-                                            headerPressable: true,
-                                            onPressed: () {
-                                              if (_sectionController![
-                                                      group.key] !=
-                                                  null) {
-                                                _sectionController![group.key]!
-                                                        .isDismissed
-                                                    ? _sectionController![
-                                                            group.key]!
-                                                        .forward()
-                                                    : _sectionController![
-                                                            group.key]!
-                                                        .reverse();
-                                              }
-                                            },
-                                            content: MediaQuery.removePadding(
-                                                context: context,
-                                                removeTop: true,
-                                                removeBottom: snapshot
-                                                        .data!.entries.last !=
-                                                    group,
-                                                child: ListView(
-                                                  shrinkWrap: true,
-                                                  physics:
-                                                      NeverScrollableScrollPhysics(),
-                                                  children: group.value!
-                                                      .map(
-                                                        (modal) =>
-                                                            TransactionComponent(
-                                                          parentController:
-                                                              _sectionController![
-                                                                  group.key],
-                                                          modal: modal,
-                                                          isEditable: true,
-                                                          onTap: () async {
-                                                            await RouteApplication
-                                                                .navigatorKey
-                                                                .currentState
-                                                                ?.pushNamed(
-                                                                    RouteApplication.getRoute(
-                                                                        ERoute.detailTransaction),
-                                                                    arguments: [
-                                                                  modal,
-                                                                  true,
-                                                                  false
-                                                                ]);
-                                                            setState(() {});
-                                                          },
-                                                          editSlidableAction:
-                                                              (context) {
-                                                            RouteApplication
-                                                                .navigatorKey
-                                                                .currentState
-                                                                ?.pushNamed(
+                            ? snapshot.data!.isNotEmpty
+                                ? Expanded(
+                                    child: CustomScrollView(
+                                        physics: BouncingScrollPhysics(),
+                                        slivers:
+                                            snapshot.data!.entries.map((group) {
+                                          if (group.value!.isNotEmpty) {
+                                            if (!_sectionController!
+                                                .containsKey(group.key)) {
+                                              _sectionController!.addAll({
+                                                group.key: AnimationController(
+                                                    vsync: this,
+                                                    duration: const Duration(
+                                                        milliseconds: 500))
+                                              });
+                                            }
+                                            return Section(
+                                                headerColor:
+                                                    MyColor.mainBackgroundColor,
+                                                titleColor: Colors.white,
+                                                title:
+                                                    "${group.key} (${group.value!.length}) transactions",
+                                                controller: _sectionController![
+                                                    group.key],
+                                                headerPressable: true,
+                                                onPressed: () {
+                                                  if (_sectionController![
+                                                          group.key] !=
+                                                      null) {
+                                                    _sectionController![
+                                                                group.key]!
+                                                            .isDismissed
+                                                        ? _sectionController![
+                                                                group.key]!
+                                                            .forward()
+                                                        : _sectionController![
+                                                                group.key]!
+                                                            .reverse();
+                                                  }
+                                                },
+                                                content:
+                                                    MediaQuery.removePadding(
+                                                        context: context,
+                                                        removeTop: true,
+                                                        removeBottom: snapshot
+                                                                .data!
+                                                                .entries
+                                                                .last !=
+                                                            group,
+                                                        child: ListView(
+                                                          shrinkWrap: true,
+                                                          physics:
+                                                              NeverScrollableScrollPhysics(),
+                                                          children: group.value!
+                                                              .map(
+                                                                (modal) =>
+                                                                    TransactionComponent(
+                                                                  parentController:
+                                                                      _sectionController![
+                                                                          group
+                                                                              .key],
+                                                                  modal: modal,
+                                                                  isEditable:
+                                                                      true,
+                                                                  onTap:
+                                                                      () async {
+                                                                    await RouteApplication
+                                                                        .navigatorKey
+                                                                        .currentState
+                                                                        ?.pushNamed(
+                                                                            RouteApplication.getRoute(ERoute.detailTransaction),
+                                                                            arguments: [
+                                                                          modal,
+                                                                          true,
+                                                                          false
+                                                                        ]);
+                                                                    setState(
+                                                                        () {});
+                                                                  },
+                                                                  editSlidableAction:
+                                                                      (context) {
                                                                     RouteApplication
-                                                                        .getRoute(ERoute
-                                                                            .addEditTransaction),
-                                                                    arguments:
-                                                                        modal);
-                                                          },
-                                                          deleteSlidableAction:
-                                                              (context) async {
-                                                            await service
-                                                                .delete(modal);
-                                                          },
-                                                        ),
-                                                      )
-                                                      .toList(),
-                                                ))).builder();
-                                      } else {
-                                        return const SliverPadding(
-                                            padding: EdgeInsets.all(0));
-                                      }
-                                    }).toList()))
+                                                                        .navigatorKey
+                                                                        .currentState
+                                                                        ?.pushNamed(
+                                                                            RouteApplication.getRoute(ERoute
+                                                                                .addEditTransaction),
+                                                                            arguments:
+                                                                                modal);
+                                                                  },
+                                                                  deleteSlidableAction:
+                                                                      (context) async {
+                                                                    await serviceTransaction
+                                                                        .delete(
+                                                                            modal);
+                                                                  },
+                                                                ),
+                                                              )
+                                                              .toList(),
+                                                        ))).builder();
+                                          } else {
+                                            return const SliverPadding(
+                                                padding: EdgeInsets.all(0));
+                                          }
+                                        }).toList()))
+                                : Expanded(
+                                    child: Center(
+                                        child: Text(
+                                            "No transaction in this month!")))
                             : LinearProgressIndicator());
                   }
                 }
@@ -331,6 +442,7 @@ class _TransactionPageState extends State<TransactionPage>
   Future<Map<ModalTransaction, ModalTransaction?>> mappingCompareTimeCreate(
       Map<String, List<ModalTransaction>?> data) async {
     Map<ModalTransaction, ModalTransaction?> map = {};
+
     for (List<ModalTransaction>? modal in data.values) {
       if (modal != null) {
         for (ModalTransaction element in modal) {
@@ -338,17 +450,60 @@ class _TransactionPageState extends State<TransactionPage>
         }
       }
     }
-    CurrentTransaction service = CurrentTransaction();
+
     for (ModalTransaction modal in map.keys) {
-      map[modal] = await service.findFirstTransaction(modal);
+      map[modal] = await serviceLog.findFirstTransaction(modal);
     }
 
     return map;
   }
 
-  Future<SplayTreeMap<String, List<ModalTransaction>?>>
-      filterTransactionByDateTime(
-          QuerySnapshot<ModalTransactionLog> querySnapshot) async {
+  bool acceptPushTransaction(ModalTransaction modal) {
+    if ((selectedFilterCategory == null
+            ? true
+            : selectedFilterCategory?.id == modal.categoryTypeRef?.id) &&
+        (selectedFilterTransactionType == null
+            ? true
+            : selectedFilterTransactionType?.id ==
+                modal.transactionTypeRef?.id)) return true;
+
+    return false;
+  }
+
+  Future<SplayTreeMap<String, List<ModalTransaction>?>> sortByTime(
+    Map<String, List<ModalTransaction>?> result,
+  ) async {
+    //get first modal (not modified yet)
+    Map<ModalTransaction, ModalTransaction?> mapCompare =
+        await mappingCompareTimeCreate(result);
+
+    //sort each group by timeCreate
+    for (String element in result.keys) {
+      result[element]!.sort((modal1, modal2) {
+        ModalTransaction? compare1 = mapCompare[modal1];
+        ModalTransaction? compare2 = mapCompare[modal2];
+        return compare1!.timeCreate!.compareTo(compare2!.timeCreate!);
+      });
+    }
+
+    //sort key of group
+    return SplayTreeMap<String, List<ModalTransaction>?>.from(result,
+        (key1, key2) => DateTime.parse(key1).compareTo(DateTime.parse(key2)));
+  }
+
+  Future<SplayTreeMap<String, List<ModalTransaction>?>> sortByMoney(
+      Map<String, List<ModalTransaction>?> result) async {
+    for (String element in result.keys) {
+      result[element]!
+          .sort((modal1, modal2) => (modal1.money! - modal2.money!).toInt());
+    }
+
+    return SplayTreeMap<String, List<ModalTransaction>?>.from(result,
+        (key1, key2) => DateTime.parse(key1).compareTo(DateTime.parse(key2)));
+  }
+
+  Future<SplayTreeMap<String, List<ModalTransaction>?>> filterTransaction(
+      QuerySnapshot<ModalTransactionLog> querySnapshot) async {
     TransactionFirestore serviceTransaction = TransactionFirestore();
 
     Map<String, List<ModalTransaction>?> result =
@@ -366,31 +521,29 @@ class _TransactionPageState extends State<TransactionPage>
       ModalTransaction? firstModal = await serviceTransaction
           .getModalFromRef(element.firstTransactionRef!);
       ModalTransaction push = currerntModal ?? firstModal!;
-      String key = _getDate(firstModal!.getTimeCreate!);
-      if (result.containsKey(key)) {
-        result[key]!.add(push);
-      } else {
-        result.addAll({
-          key: [push]
-        });
+
+      if (firstModal?.getTimeCreate?.year == fliterTransactionByMonth?.year &&
+          firstModal?.getTimeCreate?.month == fliterTransactionByMonth?.month &&
+          acceptPushTransaction(push)) {
+        String key = _getDate(firstModal!.getTimeCreate!);
+        if (result.containsKey(key)) {
+          result[key]!.add(push);
+        } else {
+          result.addAll({
+            key: [push]
+          });
+        }
       }
     }
 
-    //get first modal (not modified yet)
-    Map<ModalTransaction, ModalTransaction?> mapCompare =
-        await mappingCompareTimeCreate(result);
-
-    //sort group by timeCreate
-    for (String element in result.keys) {
-      result[element]!.sort((modal1, modal2) {
-        ModalTransaction? compare1 = mapCompare[modal1];
-        ModalTransaction? compare2 = mapCompare[modal2];
-        return compare1!.timeCreate!.compareTo(compare2!.timeCreate!);
-      });
+    switch (sortBy) {
+      case SortBy.time:
+        return sortByTime(result);
+      case SortBy.money:
+        return sortByMoney(result);
+      default:
+        return sortByTime(result);
     }
-
-    return SplayTreeMap<String, List<ModalTransaction>?>.from(result,
-        (key1, key2) => DateTime.parse(key1).compareTo(DateTime.parse(key2)));
   }
 
   @override

@@ -100,4 +100,24 @@ class TransactionFirestore extends IFirestore {
         .get();
     return snapshot.data();
   }
+
+  Future<ModalTransaction?> _getFirstLastTransaction(bool descending) async {
+    QuerySnapshot<ModalTransaction> snapshot = await FirebaseFirestore.instance
+        .collection(getPath(user?.uid))
+        .where('transaction_ref', isEqualTo: null)
+        .orderBy('time_create', descending: descending)
+        .limit(1)
+        .withConverter(
+            fromFirestore: ModalTransaction.fromFirestore,
+            toFirestore: (ModalTransaction modal, _) => modal.toFirestore())
+        .get();
+
+    return snapshot.size == 1 ? snapshot.docs.first.data() : null;
+  }
+
+  Future<ModalTransaction?> get lastTransaction =>
+      _getFirstLastTransaction(true);
+
+  Future<ModalTransaction?> get firstTransaction =>
+      _getFirstLastTransaction(false);
 }

@@ -4,7 +4,7 @@ import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 
-class CurrentTransaction extends IFirestore {
+class CurrentTransactionFirestore extends IFirestore {
   @override
   Future<void> delete(IModal modal) async {
     if (modal is! ModalTransaction) {

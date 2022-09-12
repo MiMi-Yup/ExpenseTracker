@@ -9,15 +9,14 @@ import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:path/path.dart';
 
 class TransactionUtilities {
+  final TransactionFirestore serviceTransaction = TransactionFirestore();
+  final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
   String getPathStorage(String? uid, String? id, String? nameFile) =>
       'attachments/user_$uid/$id/$nameFile';
 
   Future<bool> add(ModalTransaction modal,
       {ModalTransaction? didEditModal}) async {
     try {
-      TransactionFirestore serviceTransaction = TransactionFirestore();
-      CurrentTransaction serviceLog = CurrentTransaction();
-
       if (didEditModal != null) {
         modal.transactionRef = serviceTransaction.getRef(didEditModal);
       }
@@ -69,8 +68,6 @@ class TransactionUtilities {
   }
 
   Future<bool> delete(ModalTransaction modal) async {
-    CurrentTransaction serviceLog = CurrentTransaction();
-    TransactionFirestore serviceTransaction = TransactionFirestore();
     ModalTransactionLog? log = await serviceLog.findTransactionLog(modal);
     if (log == null) {
       return true;
@@ -109,8 +106,6 @@ class TransactionUtilities {
   Future<List<ModalTransaction>?> timelineEditTransaction(
       ModalTransaction modal) async {
     List<ModalTransaction>? timeline = [];
-    TransactionFirestore serviceTransaction = TransactionFirestore();
-    CurrentTransaction serviceLog = CurrentTransaction();
     ModalTransaction? iterableModal;
     ModalTransactionLog? log = await serviceLog.findTransactionLog(modal);
     if (log != null) {

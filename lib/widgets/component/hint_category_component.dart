@@ -30,10 +30,14 @@ class HintCategoryComponent {
         ),
       );
 
-  Widget getMinCategory({double height = 10.0, Color? indicatorColor}) =>
+  Widget getMinCategory(
+          {double height = 10.0,
+          Color? indicatorColor,
+          Color? backgroundColor}) =>
       Container(
         padding: EdgeInsets.all(10.0),
         decoration: BoxDecoration(
+            color: backgroundColor,
             borderRadius: BorderRadius.circular(height * 2),
             border: Border.all(color: modal.color!.withAlpha(150))),
         child: Row(

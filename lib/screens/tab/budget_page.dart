@@ -7,6 +7,7 @@ import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/budget.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/budget.dart';
 import 'package:expense_tracker/widgets/component/budget_component.dart';
+import 'package:expense_tracker/widgets/component/fliter_month_component.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +22,8 @@ class _BudgetPageState extends State<BudgetPage>
     with AutomaticKeepAliveClientMixin {
   final BudgetUtilities service = BudgetUtilities();
 
+  DateTime? filterBudgetByMonth;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -28,12 +31,21 @@ class _BudgetPageState extends State<BudgetPage>
         AppBar(
           elevation: 0,
           backgroundColor: MyColor.mainBackgroundColor,
-          leading:
-              IconButton(onPressed: null, icon: Icon(Icons.arrow_back_ios)),
-          actions: [
-            IconButton(onPressed: null, icon: Icon(Icons.arrow_forward_ios))
-          ],
-          title: Text("Month"),
+          title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text('Show budget in month: '),
+            FilterBudgetByMonthComponent(
+                    onChanged: (value) {
+                      setState(() {
+                        filterBudgetByMonth = value;
+                      });
+                      RouteApplication.navigatorKey.currentState?.pop();
+                    },
+                    setInitDateTime: filterBudgetByMonth == null
+                        ? (value) => filterBudgetByMonth = value
+                        : null,
+                    selectedDate: filterBudgetByMonth)
+                .builder()
+          ]),
           centerTitle: true,
         ),
         Expanded(

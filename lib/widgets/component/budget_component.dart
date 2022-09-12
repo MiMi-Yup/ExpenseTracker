@@ -107,6 +107,7 @@ class _BudgetComponentState extends State<BudgetComponent>
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(

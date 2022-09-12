@@ -166,55 +166,131 @@ class _AddEditBudgetState extends State<AddEditBudget> {
                                 await BudgetFirestore().update(result, modal);
                                 dismissPage();
                               } else if (result is ModalBudget) {
-                                Widget dismissBtn = TextButton(
-                                  child: Text("Dismiss"),
-                                  onPressed: () {
-                                    RouteApplication.navigatorKey.currentState
-                                        ?.popUntil(ModalRoute.withName(
-                                            RouteApplication.getRoute(
-                                                ERoute.main)));
-                                  },
-                                );
-                                Widget overrideBtn = TextButton(
-                                  child: Text("Override"),
-                                  onPressed: () async {
-                                    await service.delete(result);
-                                    await service.add(modal);
-                                    dismissPage();
-                                  },
-                                );
-                                Widget modifiedBtn = TextButton(
-                                  child: Text("Edit current budget"),
-                                  onPressed: () {
-                                    RouteApplication.navigatorKey.currentState
-                                        ?.popUntil(ModalRoute.withName(
-                                            RouteApplication.getRoute(
-                                                ERoute.main)));
-                                    RouteApplication.navigatorKey.currentState
-                                        ?.pushNamed(
-                                            RouteApplication.getRoute(
-                                                ERoute.addEditBudget),
-                                            arguments: result);
-                                  },
-                                );
-
-                                // set up the AlertDialog
-                                AlertDialog alert = AlertDialog(
-                                  title: Text("Exist budget"),
-                                  content: Text(
-                                      "1 month allow exist only 1 budget for 1 category. What do you want?"),
-                                  actions: [
-                                    dismissBtn,
-                                    overrideBtn,
-                                    modifiedBtn,
-                                  ],
-                                );
-
-                                // show the dialog
-                                await showDialog(
-                                  context: context,
-                                  builder: (context) => alert,
-                                );
+                                showModalBottomSheet(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10.0),
+                                            topRight: Radius.circular(10.0))),
+                                    context: context,
+                                    builder: (context) => Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                "Exist budget",
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Text(
+                                                    "1 month allow exist only 1 budget for 1 category. What do you want?"),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () => RouteApplication
+                                                          .navigatorKey
+                                                          .currentState
+                                                          ?.popUntil(ModalRoute
+                                                              .withName(
+                                                                  RouteApplication
+                                                                      .getRoute(
+                                                                          ERoute
+                                                                              .main))),
+                                                      child: Container(
+                                                        padding: EdgeInsets.all(
+                                                            10.0),
+                                                        alignment:
+                                                            Alignment.center,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10.0),
+                                                            color: MyColor
+                                                                .purple()),
+                                                        child: Text("Dismiss"),
+                                                      ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () async {
+                                                        await service
+                                                            .delete(result);
+                                                        await service
+                                                            .add(modal);
+                                                        dismissPage();
+                                                      },
+                                                      child: Container(
+                                                        padding: EdgeInsets.all(
+                                                            10.0),
+                                                        alignment:
+                                                            Alignment.center,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10.0),
+                                                            color:
+                                                                MyColor.purple(
+                                                                    alpha:
+                                                                        125)),
+                                                        child: Text("Override"),
+                                                      ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        RouteApplication
+                                                            .navigatorKey
+                                                            .currentState
+                                                            ?.popUntil(ModalRoute.withName(
+                                                                RouteApplication
+                                                                    .getRoute(ERoute
+                                                                        .main)));
+                                                        RouteApplication
+                                                            .navigatorKey
+                                                            .currentState
+                                                            ?.pushNamed(
+                                                                RouteApplication
+                                                                    .getRoute(ERoute
+                                                                        .addEditBudget),
+                                                                arguments:
+                                                                    result);
+                                                      },
+                                                      child: Container(
+                                                        padding: EdgeInsets.all(
+                                                            10.0),
+                                                        alignment:
+                                                            Alignment.center,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10.0),
+                                                            color:
+                                                                MyColor.purple(
+                                                                    alpha:
+                                                                        125)),
+                                                        child: Text(
+                                                            "Edit current budget"),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ));
                               } else {
                                 dismissPage();
                               }

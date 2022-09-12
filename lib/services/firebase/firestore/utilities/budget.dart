@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
+import 'package:expense_tracker/modals/modal_notification.dart';
 import 'package:expense_tracker/services/firebase/firestore/budget.dart';
+import 'package:expense_tracker/services/firebase/firestore/notification.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class BudgetUtilities {
@@ -27,6 +29,17 @@ class BudgetUtilities {
   }
 
   Future<void> delete(ModalBudget modal) async {
-    return service.delete(modal);
+    NotificationFirestore serviceNotification = NotificationFirestore();
+
+    List<ModalNotification>? listNotificationRef =
+        await serviceNotification.checkBudgetExists(modal);
+
+    if (listNotificationRef?.isNotEmpty == true) {
+      listNotificationRef?.forEach((element) {
+        serviceNotification.delete(element);
+      });
+    }
+
+    service.delete(modal);
   }
 }

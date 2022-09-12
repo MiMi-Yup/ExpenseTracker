@@ -12,12 +12,15 @@ import 'package:expense_tracker/services/firebase/firestore/notification.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
+import 'package:expense_tracker/widgets/component/fliter_month_component.dart';
 import 'package:expense_tracker/widgets/component/overview_transaction_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
+import 'package:expense_tracker/widgets/month_picker.dart';
 import 'package:expense_tracker/widgets/section.dart';
 import 'package:expense_tracker/widgets/transaction_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 
 class HomePage extends StatefulWidget {
   void Function(EPage)? toPage;
@@ -31,8 +34,8 @@ class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   late PageController _controller;
 
-  final TransactionUtilities service = TransactionUtilities();
-
+  final TransactionUtilities serviceTransaction = TransactionUtilities();
+  final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
   final List<Widget> _charts = [
     LineChartSample1(),
     Text("data"),
@@ -42,13 +45,15 @@ class _HomePageState extends State<HomePage>
   int _currentIndex = 0;
   late double height = MediaQuery.of(context).size.height;
 
-  final List<OverviewTransactionComponent> overview_transaction =
+  final List<OverviewTransactionComponent> overviewTransaction =
       TranasactionTypeInstance.instance()
           .modals!
           .map((e) => OverviewTransactionComponent(
               transactionTypeRef: TransactionTypeFirestore().getRef(e!),
               money: 3000))
           .toList();
+
+  DateTime? fliterTransactionByMonth;
 
   @override
   void initState() {
@@ -98,12 +103,18 @@ class _HomePageState extends State<HomePage>
                             scale: 1.0)),
                   ),
                 ),
-                title: DropDown<String>(
-                    hint: "Time",
-                    isExpanded: false,
-                    items: ["1", "2", "3"],
-                    choseValue: null,
-                    onChanged: (p0) => null).builder(),
+                title: FilterTransactionByMonthComponent(
+                        onChanged: (value) {
+                          setState(() {
+                            fliterTransactionByMonth = value;
+                          });
+                          RouteApplication.navigatorKey.currentState?.pop();
+                        },
+                        setInitDateTime: fliterTransactionByMonth == null
+                            ? (value) => fliterTransactionByMonth = value
+                            : null,
+                        selectedDate: fliterTransactionByMonth)
+                    .builder(),
                 actions: [
                   IconButton(
                       onPressed: () =>
@@ -145,7 +156,7 @@ class _HomePageState extends State<HomePage>
                           }
 
                           return Stack(
-                            children: <Widget>[
+                            children: [
                               Icon(Icons.notifications),
                               if (indicator != null) indicator
                             ],
@@ -164,7 +175,7 @@ class _HomePageState extends State<HomePage>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children:
-                      overview_transaction.map((e) => e.builder()).toList(),
+                      overviewTransaction.map((e) => e.builder()).toList(),
                 ),
               )
             ],
@@ -230,7 +241,7 @@ class _HomePageState extends State<HomePage>
                   onPressed: () => widget.toPage!(EPage.transaction),
                   content: StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
                     initialData: null,
-                    stream: CurrentTransaction().stream,
+                    stream: serviceLog.stream,
                     builder: (context, snapshot) {
                       QuerySnapshot<ModalTransactionLog>? query = snapshot.data;
                       return query == null
@@ -250,10 +261,18 @@ class _HomePageState extends State<HomePage>
                                   return FutureBuilder<ModalTransaction?>(
                                       future: TransactionFirestore()
                                           .getModalFromRef(docRef),
-                                      builder: (context, snapshot) => snapshot
-                                              .hasData
-                                          ? TransactionComponent(
-                                              modal: snapshot.data!,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          ModalTransaction modal =
+                                              snapshot.data!;
+                                          if (modal.getTimeCreate?.year ==
+                                                  fliterTransactionByMonth
+                                                      ?.year &&
+                                              modal.getTimeCreate?.month ==
+                                                  fliterTransactionByMonth
+                                                      ?.month) {
+                                            return TransactionComponent(
+                                              modal: modal,
                                               isEditable: true,
                                               onTap: () async {
                                                 await RouteApplication
@@ -276,16 +295,20 @@ class _HomePageState extends State<HomePage>
                                                         RouteApplication
                                                             .getRoute(ERoute
                                                                 .addEditTransaction),
-                                                        arguments:
-                                                            snapshot.data!);
+                                                        arguments: modal);
                                               },
                                               deleteSlidableAction:
                                                   (context) async {
-                                                await service
-                                                    .delete(snapshot.data!);
+                                                await serviceTransaction
+                                                    .delete(modal);
                                               },
-                                            )
-                                          : LinearProgressIndicator());
+                                            );
+                                          }
+                                          return SizedBox();
+                                        } else {
+                                          return LinearProgressIndicator();
+                                        }
+                                      });
                                 }).toList(),
                               ));
                     },

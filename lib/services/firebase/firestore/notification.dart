@@ -1,6 +1,8 @@
 import 'package:expense_tracker/modals/modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:expense_tracker/modals/modal_notification.dart';
+import 'package:expense_tracker/services/firebase/firestore/budget.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
 
 class NotificationFirestore extends IFirestore {
@@ -58,6 +60,13 @@ class NotificationFirestore extends IFirestore {
               toFirestore: (ModalNotification modal, _) => modal.toFirestore())
           .snapshots(includeMetadataChanges: true);
 
+  Future<void> setRead(ModalNotification modal) {
+    return FirebaseFirestore.instance
+        .collection(getPath(user?.uid))
+        .doc(modal.id)
+        .update({'is_read': true});
+  }
+
   Future<void> setReadAll() async {
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
@@ -90,5 +99,19 @@ class NotificationFirestore extends IFirestore {
     });
 
     return batch.commit();
+  }
+
+  Future<List<ModalNotification>?> checkBudgetExists(ModalBudget modal) async {
+    QuerySnapshot<ModalNotification> snapshot = await FirebaseFirestore.instance
+        .collection(getPath(user?.uid))
+        .where('budget_ref', isEqualTo: BudgetFirestore().getRef(modal))
+        .withConverter(
+            fromFirestore: ModalNotification.fromFirestore,
+            toFirestore: (ModalNotification modal, _) => modal.toFirestore())
+        .get();
+
+    return snapshot.size == 0
+        ? null
+        : snapshot.docs.map((e) => e.data()).toList();
   }
 }
