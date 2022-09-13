@@ -143,7 +143,9 @@ class _BudgetComponentState extends State<BudgetComponent>
                                       color: widget.backgroundIndicatorColor),
                                 ),
                                 Container(
-                                  width: width * widget.modal.percent,
+                                  width: width *
+                                      widget.modal
+                                          .percentBudget(widget.nowMoney),
                                   height: height,
                                   decoration: BoxDecoration(
                                       borderRadius:
@@ -160,9 +162,12 @@ class _BudgetComponentState extends State<BudgetComponent>
                           SizedBox(height: 10.0),
                           Visibility(
                               visible:
-                                  widget.modal.isExceedLimit(widget.nowMoney),
+                                  widget.modal.isExceedLimit(widget.nowMoney) ||
+                                      widget.modal.isAlert(widget.nowMoney),
                               child: Text(
-                                "You're exceed the limit!",
+                                widget.modal.isExceedLimit(widget.nowMoney)
+                                    ? "You're exceed the budget!"
+                                    : "You're reached the limit of budget",
                                 style: TextStyle(color: Colors.red),
                               ))
                         ],

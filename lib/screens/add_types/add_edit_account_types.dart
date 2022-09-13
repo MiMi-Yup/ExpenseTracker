@@ -214,7 +214,7 @@ class _AddEditAccountTypesState extends State<AddEditAccountTypes> {
                                           color: Colors.black,
                                           child: StreamBuilder<TaskSnapshot>(
                                               builder: (context, snapshot) {
-                                                if (snapshot.data != null) {
+                                                if (snapshot.hasData) {
                                                   TaskState state =
                                                       snapshot.data!.state;
                                                   switch (state) {

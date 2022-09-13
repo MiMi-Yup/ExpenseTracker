@@ -213,7 +213,7 @@ class _AddEditCategoryTypesState extends State<AddEditCategoryTypes> {
                                           color: Colors.black,
                                           child: StreamBuilder<TaskSnapshot>(
                                               builder: (context, snapshot) {
-                                                if (snapshot.data != null) {
+                                                if (snapshot.hasData) {
                                                   TaskState state =
                                                       snapshot.data!.state;
                                                   switch (state) {

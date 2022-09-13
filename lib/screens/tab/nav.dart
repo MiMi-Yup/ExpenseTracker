@@ -2,10 +2,9 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/constants/enum/enum_transaction.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/routes/route.dart';
-import 'package:expense_tracker/screens/tab/budget_page.dart';
+import 'package:expense_tracker/screens/tab/budget/budget_page.dart';
 import 'package:expense_tracker/screens/tab/home_page.dart';
 import 'package:expense_tracker/screens/tab/profile/profile_page.dart';
 import 'package:expense_tracker/screens/tab/transaction/transaction_page.dart';
@@ -113,8 +112,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
                                   future: ActionFirebaseStorage.downloadFile(
                                       e.image!),
                                   builder: (context, snapshot) {
-                                    if (snapshot.hasData &&
-                                        snapshot.data != null) {
+                                    if (snapshot.hasData && snapshot.hasData) {
                                       return Image.memory(snapshot.data!,
                                           color: e.color);
                                     }

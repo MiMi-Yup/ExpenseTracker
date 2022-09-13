@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:expense_tracker/constants/asset/category.dart';
-import 'package:expense_tracker/constants/enum/enum_category.dart';
 import 'package:expense_tracker/modals/modal_account_type.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/services/firebase/firestore/category_types.dart';

@@ -31,6 +31,8 @@ class TransactionPage extends StatefulWidget {
 
 enum SortBy { money, time }
 
+enum SortOrder { descending, ascending }
+
 class _TransactionPageState extends State<TransactionPage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   Map<String, AnimationController?>? _sectionController;
@@ -47,6 +49,12 @@ class _TransactionPageState extends State<TransactionPage>
   ModalCategoryType? selectedFilterCategory;
   ModalTransactionType? selectedFilterTransactionType;
   SortBy? sortBy;
+  SortOrder sortOrder = SortOrder.descending;
+
+  final Map<SortOrder, Color> mapSortOrder = {
+    SortOrder.descending: Colors.green,
+    SortOrder.ascending: Colors.red
+  };
 
   @override
   void initState() {
@@ -137,6 +145,8 @@ class _TransactionPageState extends State<TransactionPage>
                                                         null;
                                                     selectedFilterTransactionType =
                                                         null;
+                                                    sortOrder =
+                                                        SortOrder.descending;
                                                     setState(() {});
                                                   },
                                                   child: Text("Reset"))
@@ -219,29 +229,47 @@ class _TransactionPageState extends State<TransactionPage>
                                               childAspectRatio: 3,
                                               shrinkWrap: true,
                                               children: SortBy.values
-                                                  .map((e) => GestureDetector(
-                                                      onTap: () {
-                                                        if (sortBy == e) {
-                                                          sortBy = null;
-                                                        } else {
-                                                          sortBy = e;
-                                                        }
-                                                        setState(() {});
-                                                      },
-                                                      child: getModalChip(
-                                                          name: e.name,
-                                                          indicatorColor:
-                                                              Colors.grey,
-                                                          backgroundColor:
-                                                              sortBy == e
-                                                                  ? Color
-                                                                      .fromARGB(
+                                                  .map<Widget>((e) =>
+                                                      GestureDetector(
+                                                          onTap: () {
+                                                            if (sortBy == e) {
+                                                              sortBy = null;
+                                                            } else {
+                                                              sortBy = e;
+                                                            }
+                                                            setState(() {});
+                                                          },
+                                                          child: getModalChip(
+                                                              name:
+                                                                  '${e.name[0].toUpperCase()}${e.name.substring(1).toLowerCase()}',
+                                                              indicatorColor:
+                                                                  Colors.grey,
+                                                              backgroundColor:
+                                                                  sortBy == e
+                                                                      ? Color.fromARGB(
                                                                           255,
                                                                           93,
                                                                           0,
                                                                           255)
-                                                                  : null)))
-                                                  .toList(),
+                                                                      : null)))
+                                                  .toList()
+                                                ..add(GestureDetector(
+                                                  onTap: () => setState(() =>
+                                                      sortOrder = sortOrder ==
+                                                              SortOrder
+                                                                  .ascending
+                                                          ? SortOrder.descending
+                                                          : SortOrder
+                                                              .ascending),
+                                                  child: getModalChip(
+                                                      name:
+                                                          '${sortOrder.name[0].toUpperCase()}${sortOrder.name.substring(1).toLowerCase()}',
+                                                      indicatorColor:
+                                                          Colors.black,
+                                                      backgroundColor:
+                                                          mapSortOrder[
+                                                              sortOrder]),
+                                                )),
                                             ),
                                           ),
                                           Text("Category"),
@@ -480,26 +508,40 @@ class _TransactionPageState extends State<TransactionPage>
     //sort each group by timeCreate
     for (String element in result.keys) {
       result[element]!.sort((modal1, modal2) {
-        ModalTransaction? compare1 = mapCompare[modal1];
-        ModalTransaction? compare2 = mapCompare[modal2];
+        ModalTransaction? compare1 = sortOrder == SortOrder.ascending
+            ? mapCompare[modal1]
+            : mapCompare[modal2];
+        ModalTransaction? compare2 = sortOrder == SortOrder.ascending
+            ? mapCompare[modal2]
+            : mapCompare[modal1];
         return compare1!.timeCreate!.compareTo(compare2!.timeCreate!);
       });
     }
 
     //sort key of group
-    return SplayTreeMap<String, List<ModalTransaction>?>.from(result,
-        (key1, key2) => DateTime.parse(key1).compareTo(DateTime.parse(key2)));
+    return SplayTreeMap<String, List<ModalTransaction>?>.from(
+        result,
+        (key1, key2) =>
+            DateTime.parse(sortOrder == SortOrder.ascending ? key1 : key2)
+                .compareTo(DateTime.parse(
+                    sortOrder == SortOrder.ascending ? key2 : key1)));
   }
 
   Future<SplayTreeMap<String, List<ModalTransaction>?>> sortByMoney(
       Map<String, List<ModalTransaction>?> result) async {
     for (String element in result.keys) {
-      result[element]!
-          .sort((modal1, modal2) => (modal1.money! - modal2.money!).toInt());
+      result[element]!.sort((modal1, modal2) =>
+          ((sortOrder == SortOrder.ascending ? modal1 : modal2).money! -
+                  (sortOrder == SortOrder.ascending ? modal2 : modal1).money!)
+              .toInt());
     }
 
-    return SplayTreeMap<String, List<ModalTransaction>?>.from(result,
-        (key1, key2) => DateTime.parse(key1).compareTo(DateTime.parse(key2)));
+    return SplayTreeMap<String, List<ModalTransaction>?>.from(
+        result,
+        (key1, key2) =>
+            DateTime.parse(sortOrder == SortOrder.ascending ? key1 : key2)
+                .compareTo(DateTime.parse(
+                    sortOrder == SortOrder.ascending ? key2 : key1)));
   }
 
   Future<SplayTreeMap<String, List<ModalTransaction>?>> filterTransaction(

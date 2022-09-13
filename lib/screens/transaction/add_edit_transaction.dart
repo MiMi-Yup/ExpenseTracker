@@ -6,9 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
-import 'package:expense_tracker/constants/enum/enum_category.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/constants/enum/enum_transaction.dart';
 import 'package:expense_tracker/instances/category_instance.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
@@ -526,7 +524,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                         //       color: Colors.black,
                                         //       child: StreamBuilder<TaskSnapshot>(
                                         //           builder: (context, snapshot) {
-                                        //             if (snapshot.data != null) {
+                                        //             if (snapshot.hasData) {
                                         //               TaskState state =
                                         //                   snapshot.data!.state;
                                         //               switch (state) {

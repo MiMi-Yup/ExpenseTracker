@@ -46,6 +46,9 @@ class ModalBudget extends IModal {
 
   double get percent => percentAlert ?? 0.0;
 
+  double percentBudget(double currentMoney) =>
+      budget == null ? 1 : currentMoney / budget!;
+
   DateTime? get getTimeCreate => timeCreate?.toDate();
 
   bool isExceedLimit(double currentMoney) =>

@@ -9,8 +9,8 @@ import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:path/path.dart';
 
 class TransactionUtilities {
-  final TransactionFirestore serviceTransaction = TransactionFirestore();
-  final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
+  final TransactionFirestore _serviceTransaction = TransactionFirestore();
+  final CurrentTransactionFirestore _serviceLog = CurrentTransactionFirestore();
   String getPathStorage(String? uid, String? id, String? nameFile) =>
       'attachments/user_$uid/$id/$nameFile';
 
@@ -18,10 +18,10 @@ class TransactionUtilities {
       {ModalTransaction? didEditModal}) async {
     try {
       if (didEditModal != null) {
-        modal.transactionRef = serviceTransaction.getRef(didEditModal);
+        modal.transactionRef = _serviceTransaction.getRef(didEditModal);
       }
 
-      await serviceTransaction.insert(modal);
+      await _serviceTransaction.insert(modal);
 
       if (modal.attachments != null && modal.attachments!.isNotEmpty) {
         Set<String> existOnFireStorage = {};
@@ -38,7 +38,7 @@ class TransactionUtilities {
         for (int index = 0; index < uploadFiles.length; index++) {
           String pathFileUpload = uploadFiles.elementAt(index);
 
-          existOnFireStorage.add(getPathStorage(serviceTransaction.user?.uid,
+          existOnFireStorage.add(getPathStorage(_serviceTransaction.user?.uid,
               modal.id, basename(pathFileUpload)));
 
           ActionFirebaseStorage.uploadFile(
@@ -47,18 +47,18 @@ class TransactionUtilities {
 
         modal.attachments =
             existOnFireStorage.isEmpty ? null : existOnFireStorage;
-        await serviceTransaction.override_(modal);
+        await _serviceTransaction.override_(modal);
       }
 
-      ModalTransactionLog? log = await serviceLog.findTransactionLog(modal);
+      ModalTransactionLog? log = await _serviceLog.findTransactionLog(modal);
       if (log == null) {
-        serviceLog.insert(ModalTransactionLog(
+        _serviceLog.insert(ModalTransactionLog(
             id: modal.id,
-            firstTransactionRef: serviceTransaction.getRef(modal),
+            firstTransactionRef: _serviceTransaction.getRef(modal),
             lastTransactionRef: null));
       } else {
-        log.lastTransactionRef = serviceTransaction.getRef(modal);
-        serviceLog.update(log, log);
+        log.lastTransactionRef = _serviceTransaction.getRef(modal);
+        _serviceLog.update(log, log);
       }
 
       return true;
@@ -68,19 +68,19 @@ class TransactionUtilities {
   }
 
   Future<bool> delete(ModalTransaction modal) async {
-    ModalTransactionLog? log = await serviceLog.findTransactionLog(modal);
+    ModalTransactionLog? log = await _serviceLog.findTransactionLog(modal);
     if (log == null) {
       return true;
     } else {
       DocumentReference ref =
           log.lastTransactionRef ?? log.firstTransactionRef!;
       ModalTransaction? iterable =
-          await serviceTransaction.getModalFromRef(ref);
+          await _serviceTransaction.getModalFromRef(ref);
       while (iterable != null) {
         if (iterable.attachments != null) {
           List<String> deleteAttachments = iterable.attachments!
               .where((element) => element.contains(getPathStorage(
-                  serviceTransaction.user?.uid, iterable?.id, '')))
+                  _serviceTransaction.user?.uid, iterable?.id, '')))
               .toList();
 
           for (String element in deleteAttachments) {
@@ -88,16 +88,16 @@ class TransactionUtilities {
           }
         }
 
-        serviceTransaction.delete(iterable);
+        _serviceTransaction.delete(iterable);
         if (iterable.transactionRef != null) {
-          iterable = await serviceTransaction
+          iterable = await _serviceTransaction
               .getModalFromRef(iterable.transactionRef!);
         } else {
           break;
         }
       }
 
-      await serviceLog.delete(iterable!);
+      await _serviceLog.delete(iterable!);
 
       return true;
     }
@@ -107,16 +107,16 @@ class TransactionUtilities {
       ModalTransaction modal) async {
     List<ModalTransaction>? timeline = [];
     ModalTransaction? iterableModal;
-    ModalTransactionLog? log = await serviceLog.findTransactionLog(modal);
+    ModalTransactionLog? log = await _serviceLog.findTransactionLog(modal);
     if (log != null) {
-      iterableModal = await serviceTransaction
+      iterableModal = await _serviceTransaction
           .getModalFromRef(log.lastTransactionRef ?? log.firstTransactionRef!);
     }
 
     if (iterableModal != null) {
       while (iterableModal!.transactionRef != null) {
         timeline.add(iterableModal);
-        iterableModal = await serviceTransaction
+        iterableModal = await _serviceTransaction
             .getModalFromRef(iterableModal.transactionRef!);
       }
 

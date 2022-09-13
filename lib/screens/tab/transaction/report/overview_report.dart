@@ -1,5 +1,4 @@
 import 'package:expense_tracker/constants/color.dart';
-import 'package:expense_tracker/constants/enum/enum_category.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/instances/category_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';

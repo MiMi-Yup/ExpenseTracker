@@ -120,4 +120,18 @@ class TransactionFirestore extends IFirestore {
 
   Future<ModalTransaction?> get firstTransaction =>
       _getFirstLastTransaction(false);
+
+  Stream<QuerySnapshot<ModalTransactionLog>> streamMonth(DateTime date) {
+    DateTime startDate = DateTime(date.year, date.month, 1);
+    DateTime endDate = DateTime(date.year, date.month + 1, 0);
+    return FirebaseFirestore.instance
+        .collection(getPath(user?.uid))
+        .where('time_create',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .where('time_create', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
+        .withConverter(
+            fromFirestore: ModalTransactionLog.fromFirestore,
+            toFirestore: (ModalTransactionLog modal, _) => modal.toFirestore())
+        .snapshots(includeMetadataChanges: true);
+  }
 }
