@@ -33,8 +33,8 @@ abstract class FliterMonthComponent {
               snapshot.data?['last_transaction']?.timeCreate?.toDate() ??
                   DateTime.now();
           if (setInitDateTime != null) {
-            setInitDateTime!(maxFliterTransactionByMonth!);
             selectedDate = maxFliterTransactionByMonth;
+            setInitDateTime!(maxFliterTransactionByMonth!);
           }
           return GestureDetector(
             onTap: () => showModalBottomSheet(

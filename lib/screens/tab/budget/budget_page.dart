@@ -30,12 +30,6 @@ class _BudgetPageState extends State<BudgetPage>
   DateTime? filterBudgetByMonth;
 
   @override
-  void didUpdateWidget(covariant BudgetPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    setState(() {});
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -50,7 +44,8 @@ class _BudgetPageState extends State<BudgetPage>
                     RouteApplication.navigatorKey.currentState?.pop();
                   },
                   setInitDateTime: filterBudgetByMonth == null
-                      ? (value) => filterBudgetByMonth = value
+                      ? (value) => WidgetsBinding.instance.addPostFrameCallback(
+                          (_) => setState(() => filterBudgetByMonth = value))
                       : null,
                   selectedDate: filterBudgetByMonth)
               .builder(),
@@ -114,7 +109,7 @@ class _BudgetPageState extends State<BudgetPage>
                                                               value + element),
                                                   onTap: () => RouteApplication
                                                       .navigatorKey.currentState
-                                                      ?.pushNamed(RouteApplication.getRoute(ERoute.addEditBudget),
+                                                      ?.pushNamed(RouteApplication.getRoute(ERoute.detailBudget),
                                                           arguments: modal),
                                                   editSlidableAction: (context) => RouteApplication
                                                       .navigatorKey.currentState

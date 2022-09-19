@@ -12,6 +12,7 @@ import 'package:expense_tracker/screens/login/forgot_password.dart';
 import 'package:expense_tracker/screens/login/login.dart';
 import 'package:expense_tracker/screens/notification.dart';
 import 'package:expense_tracker/screens/signup/signup.dart';
+import 'package:expense_tracker/screens/tab/budget/detail_budget.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/screens/tab/profile/account_page.dart';
 import 'package:expense_tracker/screens/tab/profile/export_page.dart';
@@ -50,7 +51,8 @@ class RouteApplication {
     getRoute(ERoute.termOfCondition): (context) => Container(),
     getRoute(ERoute.addEditAccountType): (context) => AddEditAccountTypes(),
     getRoute(ERoute.addEditCategoryType): (context) => AddEditCategoryTypes(),
-    getRoute(ERoute.editTransactionType): (context) => EditTransactionTypes()
+    getRoute(ERoute.editTransactionType): (context) => EditTransactionTypes(),
+    getRoute(ERoute.detailBudget): (context) => DetailBudget(),
   };
 
   static String getRoute(ERoute route) => "/${route.name}";

@@ -25,4 +25,6 @@ enum ERoute {
   addEditAccountType,
   addEditCategoryType,
   editTransactionType,
+
+  detailBudget
 }
