@@ -139,8 +139,8 @@ class _NotificationPageState extends State<NotificationPage> {
                               margin: EdgeInsets.all(4.0),
                               decoration: BoxDecoration(
                                   color: modal.isRead == true
-                                      ? Colors.black
-                                      : Colors.deepPurple,
+                                      ? Colors.deepPurple
+                                      : Colors.black,
                                   borderRadius: BorderRadius.circular(4.0)),
                               child: Row(
                                   mainAxisAlignment:

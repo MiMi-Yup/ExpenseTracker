@@ -22,7 +22,8 @@ class Navigation extends StatefulWidget {
   State<Navigation> createState() => _NavigationState();
 }
 
-class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
+class _NavigationState extends State<Navigation>
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final Map<EPage, int?> _mapPage = <EPage, int?>{
     EPage.home: 0,
     EPage.transaction: 1,
@@ -77,7 +78,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FutureBuilder<List<ModalTransactionType>>(
         future: TransactionTypeFirestore().read(),
-        initialData: [],
+        initialData: const [],
         builder: (context, snapshot) => Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -180,4 +181,7 @@ class _NavigationState extends State<Navigation> with TickerProviderStateMixin {
           }),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

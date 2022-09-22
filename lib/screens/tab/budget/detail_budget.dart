@@ -30,10 +30,11 @@ class _DetailBudgetState extends State<DetailBudget> {
       ? arguments as ModalBudget
       : throw ArgumentError('Require argument ModalBudget');
 
-  final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
-  final TransactionUtilities serviceTransaction = TransactionUtilities();
+  final BudgetUtilities serviceBudget = BudgetUtilities();
 
-  StreamController<double> _streamController = StreamController<double>();
+  final StreamController<double> _streamController = StreamController<double>();
+
+  List<ModalTransaction>? storeLastLoad;
 
   void calTotalMoney(List<ModalTransaction>? modals) async {
     if (modals != null) {
@@ -63,7 +64,15 @@ class _DetailBudgetState extends State<DetailBudget> {
               onPressed: () => RouteApplication.navigatorKey.currentState
                   ?.pushNamed(RouteApplication.getRoute(ERoute.addEditBudget),
                       arguments: modal),
-              icon: Icon(Icons.edit))
+              icon: Icon(Icons.edit)),
+          IconButton(
+              onPressed: () async {
+                await serviceBudget.delete(modal);
+                RouteApplication.navigatorKey.currentState?.popUntil(
+                    ModalRoute.withName(
+                        RouteApplication.getRoute(ERoute.main)));
+              },
+              icon: Icon(Icons.delete_forever))
         ],
         elevation: 0.0,
         backgroundColor: MyColor.mainBackgroundColor,
@@ -74,26 +83,27 @@ class _DetailBudgetState extends State<DetailBudget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Time of budget: ", style: TextStyle(fontSize: 18.0)),
-                  Row(
-                    children: [
-                      Text(convertDMY(startDate),
-                          style: TextStyle(fontSize: 18.0)),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                        child: Text("-"),
-                      ),
-                      Text(convertDMY(endDate),
-                          style: TextStyle(fontSize: 18.0))
-                    ],
-                  )
-                ],
+              Container(
+                height: 50,
+                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Time of budget: ", style: TextStyle(fontSize: 18.0)),
+                    Row(
+                      children: [
+                        Text(convertDMY(startDate),
+                            style: TextStyle(fontSize: 18.0)),
+                        Text("-"),
+                        Text(convertDMY(endDate),
+                            style: TextStyle(fontSize: 18.0))
+                      ],
+                    )
+                  ],
+                ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+              Container(
+                height: 50.0,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -105,23 +115,27 @@ class _DetailBudgetState extends State<DetailBudget> {
                   ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Budget:", style: TextStyle(fontSize: 18.0)),
-                  Text(
-                      "${UserInstance.instance().getCurrency().currencyCode} ${modal.budget.toString()}",
-                      style: TextStyle(fontSize: 18.0))
-                ],
+              Container(
+                height: 50.0,
+                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Budget:", style: TextStyle(fontSize: 18.0)),
+                    Text(
+                        "${UserInstance.instance().getCurrency().currencyCode} ${modal.budget.toString()}",
+                        style: TextStyle(fontSize: 18.0))
+                  ],
+                ),
               ),
               StreamBuilder<double>(
                   stream: _streamController.stream,
                   builder: (context, snapshot) => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                          Container(
+                            height: 50.0,
+                            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -133,15 +147,19 @@ class _DetailBudgetState extends State<DetailBudget> {
                               ],
                             ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Percent expense:",
-                                  style: TextStyle(fontSize: 18.0)),
-                              Text(
-                                  "${snapshot.data != null ? "${(snapshot.data! / modal.budget! * 100.0).toStringAsFixed(2)}%" : "Loading"}",
-                                  style: TextStyle(fontSize: 18.0))
-                            ],
+                          Container(
+                            height: 50.0,
+                            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Percent expense:",
+                                    style: TextStyle(fontSize: 18.0)),
+                                Text(
+                                    "${snapshot.data != null ? "${(snapshot.data! / modal.budget! * 100.0).toStringAsFixed(2)}%" : "Loading"}",
+                                    style: TextStyle(fontSize: 18.0))
+                              ],
+                            ),
                           )
                         ],
                       )),
@@ -149,54 +167,39 @@ class _DetailBudgetState extends State<DetailBudget> {
           )),
       bottomNavigationBar: Container(
         padding: EdgeInsets.only(left: 10.0, right: 10.0),
-        constraints: BoxConstraints(
-            minHeight: 0.0,
-            minWidth: double.infinity,
-            maxHeight: size.height / 2),
+        constraints: BoxConstraints(maxHeight: size.height / 2),
         decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(10.0),
                 topRight: Radius.circular(10.0))),
         child: FutureBuilder<List<ModalTransaction>>(
-          future: BudgetUtilities().getTransactionsInBudget(modal),
-          initialData: null,
+          future: serviceBudget.getTransactionsInBudget(modal),
+          initialData: storeLastLoad,
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
                 List<ModalTransaction>? modals = snapshot.data;
                 calTotalMoney(modals);
                 if (modals != null) {
+                  storeLastLoad = modals;
                   modals.sort((modal1, modal2) =>
                       (modal2.money! - modal1.money!).toInt());
                   return MediaQuery.removePadding(
                       context: context,
                       removeTop: true,
-                      removeBottom: false,
                       child: ListView(
+                        shrinkWrap: true,
                         children: modals
                             .map((e) => TransactionComponent(
                                   modal: e,
-                                  isEditable: true,
-                                  onTap: () async {
-                                    await RouteApplication
-                                        .navigatorKey.currentState
-                                        ?.pushNamed(
-                                            RouteApplication.getRoute(
-                                                ERoute.detailTransaction),
-                                            arguments: [e, true, false]);
-                                    setState(() {});
-                                  },
-                                  editSlidableAction: (context) {
-                                    RouteApplication.navigatorKey.currentState
-                                        ?.pushNamed(
-                                            RouteApplication.getRoute(
-                                                ERoute.addEditTransaction),
-                                            arguments: e);
-                                  },
-                                  deleteSlidableAction: (context) async {
-                                    await serviceTransaction.delete(e);
-                                  },
+                                  isEditable: false,
+                                  onTap: () async => await RouteApplication
+                                      .navigatorKey.currentState
+                                      ?.pushNamed(
+                                          RouteApplication.getRoute(
+                                              ERoute.detailTransaction),
+                                          arguments: [e, false, false]),
                                 ))
                             .toList(),
                       ));

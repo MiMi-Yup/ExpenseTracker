@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
@@ -7,6 +6,8 @@ import 'package:expense_tracker/services/firebase/auth/google_auth.dart';
 import 'package:expense_tracker/services/firebase/firestore/user.dart';
 import 'package:expense_tracker/widgets/input_otp.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 
 class CodeAuth extends StatefulWidget {
   CodeAuth({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class _CodeAuthState extends State<CodeAuth>
     with SingleTickerProviderStateMixin {
   late bool _initCode = ModalRoute.of(context)?.settings.arguments as bool;
   late bool _confirm = !_initCode;
+  final LocalAuthentication _authentication = LocalAuthentication();
   String _code = "";
   String _reCode = "";
 
@@ -122,8 +124,41 @@ class _CodeAuthState extends State<CodeAuth>
     _changedTitle(wrongPIN: wrong);
   }
 
+  Future<bool> checkFingerprint() async {
+    final bool isDeviceSupported = await _authentication.isDeviceSupported();
+    final bool canCheckBiometrics = await _authentication.canCheckBiometrics;
+
+    if (isDeviceSupported && canCheckBiometrics) {
+      try {
+        return await _authentication.authenticate(
+          localizedReason: 'Scan Fingerprint To Enter Vault',
+          options: const AuthenticationOptions(
+              useErrorDialogs: true, stickyAuth: true),
+        );
+      } on PlatformException {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_initCode) {
+      checkFingerprint().then((value) {
+        if (value) {
+          RouteApplication.navigatorKey.currentState
+              ?.popUntil((route) => route.isFirst);
+          RouteApplication.navigatorKey.currentState
+              ?.pushReplacementNamed(RouteApplication.getRoute(ERoute.main));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Access deined because failed too much!")));
+        }
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,

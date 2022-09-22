@@ -33,6 +33,11 @@ class _DetailTransactionState extends State<DetailTransaction>
   late bool isEditable = (arguments?[1] as bool?) ?? false;
   late bool isShowTimelineModified = arguments?[2] as bool;
 
+  ///arguments of RouteModal has 3 elements
+  ///[0]: modal
+  ///[1]: allow edit
+  ///[2]: show timeline modified
+
   final CurrentTransactionFirestore service = CurrentTransactionFirestore();
 
   GlobalKey keyAppBar = GlobalKey();

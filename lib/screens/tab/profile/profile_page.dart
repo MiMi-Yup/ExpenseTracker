@@ -1,19 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_tracker/constants/asset/category.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
-import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/routes/route.dart';
-import 'package:expense_tracker/screens/tab/profile/account_page.dart';
-import 'package:expense_tracker/screens/tab/profile/export_page.dart';
-import 'package:expense_tracker/screens/tab/profile/setting_preference.dart';
 import 'package:expense_tracker/services/firebase/auth/google_auth.dart';
-import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -68,8 +58,8 @@ class ProfilePage extends StatelessWidget {
                 ],
               ),
               IconButton(
-                  onPressed: () {
-                    //show edit profile
+                  onPressed: () async {
+                    
                   },
                   icon: Icon(Icons.edit))
             ],
