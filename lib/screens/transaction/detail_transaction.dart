@@ -373,8 +373,9 @@ class _DetailTransactionState extends State<DetailTransaction>
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         modal.getMoney(UserInstance.instance()
-                            .getCurrency()
-                            .currencyCode!),
+                                .getCurrency()
+                                ?.currencyCode ??
+                            ""),
                         style: TextStyle(
                             fontSize: 32, fontWeight: FontWeight.bold),
                       ),

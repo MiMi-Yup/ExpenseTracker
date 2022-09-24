@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseAuth.instance.currentUser?.reload();
+  if (FirebaseAuth.instance.currentUser != null) {
+    await FirebaseAuth.instance.currentUser?.reload();
+  }
   runApp(const MyApp());
 }
 

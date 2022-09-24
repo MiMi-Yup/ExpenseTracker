@@ -50,7 +50,7 @@ class OverviewTransactionComponent {
                 children: [
                   Text(modal.toString()),
                   Text(
-                    "${UserInstance.instance().getCurrency().currencyCode} ${money}",
+                    "${UserInstance.instance().getCurrency()?.currencyCode} ${money}",
                     style: const TextStyle(fontSize: 18.0),
                   )
                 ],

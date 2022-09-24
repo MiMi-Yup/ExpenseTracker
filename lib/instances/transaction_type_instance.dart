@@ -10,7 +10,7 @@ class TranasactionTypeInstance {
   static TranasactionTypeInstance instance() {
     if (_instance == null) {
       _instance = TranasactionTypeInstance();
-      FirebaseAuth.instance.authStateChanges().listen((event) {
+      FirebaseAuth.instance.userChanges().listen((event) {
         if (event == null) {
           _service = null;
           _modals = null;

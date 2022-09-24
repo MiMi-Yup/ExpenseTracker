@@ -75,7 +75,7 @@ class _AddEditBudgetState extends State<AddEditBudget> {
                     style: TextStyle(fontSize: 40.0),
                     decoration: InputDecoration(
                         prefixText:
-                            "${UserInstance.instance().getCurrency().currencyCode} ",
+                            "${UserInstance.instance().getCurrency()?.currencyCode} ",
                         isCollapsed: true,
                         hintText: "0.00",
                         border: InputBorder.none),

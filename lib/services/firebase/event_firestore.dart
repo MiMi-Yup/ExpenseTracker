@@ -22,9 +22,7 @@ import 'package:expense_tracker/services/firebase/firestore/utilities/budget.dar
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/test/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_isolate/flutter_isolate.dart';
 
 enum StatusIsolateThread {
   transactionChanged,
@@ -37,13 +35,22 @@ class EventFirestore {
   static EventFirestore? _instance;
   final NotificationService notificationService = NotificationService();
 
+  Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
+  Stream<QuerySnapshot<ModalBudget>>? _streamBudget;
+
   EventFirestore._() {
+    _streamLog = null;
+    _streamBudget = null;
     _initApplication();
-    budgetChangeListener();
   }
 
   factory EventFirestore.instance() {
     _instance ??= EventFirestore._();
+    return _instance!;
+  }
+
+  factory EventFirestore.reInstance() {
+    _instance = EventFirestore._();
     return _instance!;
   }
 
@@ -77,14 +84,17 @@ class EventFirestore {
     CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
     BudgetFirestore serviceBudget = BudgetFirestore();
 
-    serviceLog.stream.listen((event) async {
+    _streamLog = serviceLog.stream;
+    _streamBudget = serviceBudget.stream;
+
+    _streamLog?.listen((event) async {
       if (event.docChanges.isNotEmpty) {
         //await FlutterIsolate.spawn(isolateThread, port.sendPort);
         transactionCollectionChanged(event.docChanges);
       }
     });
 
-    serviceBudget.stream.listen((event) async {
+    _streamBudget?.listen((event) async {
       if (event.docChanges.isNotEmpty) {
         if (event.docChanges.firstWhereOrNull((element) =>
                 element.type == DocumentChangeType.added ||
@@ -141,6 +151,8 @@ class EventFirestore {
             );
           }
         }
+
+        budgetChangeListener();
 
         UserFirestore userFirestore = UserFirestore();
 

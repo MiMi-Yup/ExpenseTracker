@@ -29,6 +29,23 @@ class _BudgetPageState extends State<BudgetPage>
 
   DateTime? filterBudgetByMonth;
 
+  Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
+  Stream<QuerySnapshot<ModalBudget>>? _streamBudget;
+
+  @override
+  void initState() {
+    super.initState();
+    _streamLog = CurrentTransactionFirestore().stream;
+    _streamBudget = BudgetFirestore().stream;
+  }
+
+  @override
+  void dispose() {
+    _streamBudget = null;
+    _streamLog = null;
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -64,10 +81,10 @@ class _BudgetPageState extends State<BudgetPage>
             children: [
               Expanded(
                   child: StreamBuilder(
-                stream: CurrentTransactionFirestore().stream,
+                stream: _streamLog,
                 builder: (context, snapshot) =>
                     StreamBuilder<QuerySnapshot<ModalBudget>>(
-                  stream: BudgetFirestore().stream,
+                  stream: _streamBudget,
                   initialData: null,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {

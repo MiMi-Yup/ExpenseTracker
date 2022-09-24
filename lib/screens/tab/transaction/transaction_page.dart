@@ -14,6 +14,7 @@ import 'package:expense_tracker/services/firebase/firestore/current_transaction.
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/component/fliter_month_component.dart';
+import 'package:expense_tracker/widgets/component/hint_category_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/month_picker.dart';
@@ -56,10 +57,13 @@ class _TransactionPageState extends State<TransactionPage>
     SortOrder.ascending: Colors.red
   };
 
+  Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
+
   @override
   void initState() {
     super.initState();
     _sectionController = {};
+    _streamLog = serviceLog.stream;
   }
 
   @override
@@ -67,6 +71,7 @@ class _TransactionPageState extends State<TransactionPage>
     _sectionController?.forEach((key, value) {
       value?.dispose();
     });
+    _streamLog = null;
     super.dispose();
   }
 
@@ -112,7 +117,8 @@ class _TransactionPageState extends State<TransactionPage>
                         });
                       },
                       setInitDateTime: fliterTransactionByMonth == null
-                          ? (value) => fliterTransactionByMonth = value
+                          ? (value) => WidgetsBinding.instance.addPostFrameCallback(
+                          (_) => setState(() => fliterTransactionByMonth = value))
                           : null,
                       selectedDate: fliterTransactionByMonth)
                   .builder(),
@@ -164,31 +170,35 @@ class _TransactionPageState extends State<TransactionPage>
                                               children: CategoryInstance
                                                       .instance()
                                                   .modals!
-                                                  .map<Widget>(
-                                                      (e) => GestureDetector(
-                                                            onTap: () {
-                                                              selectedFilterCategory =
-                                                                  selectedFilterCategory !=
+                                                  .map<Widget>((e) {
+                                                ModalCategoryType? modal =
+                                                    CategoryInstance.instance()
+                                                        .getModal(e!.id!);
+                                                return GestureDetector(
+                                                  onTap: () {
+                                                    selectedFilterCategory =
+                                                        selectedFilterCategory !=
+                                                                e
+                                                            ? e
+                                                            : null;
+                                                    setState(() {});
+                                                  },
+                                                  child: modal == null
+                                                      ? null
+                                                      : HintCategoryComponent(
+                                                              modal: modal)
+                                                          .getMinCategory(
+                                                              backgroundColor:
+                                                                  selectedFilterCategory ==
                                                                           e
-                                                                      ? e
-                                                                      : null;
-                                                              setState(() {});
-                                                            },
-                                                            child: CategoryInstance
-                                                                    .instance()
-                                                                .getHintCategoryComponent(
-                                                                    e!.id!)
-                                                                .getMinCategory(
-                                                                    backgroundColor: selectedFilterCategory ==
-                                                                            e
-                                                                        ? Color.fromARGB(
-                                                                            255,
-                                                                            93,
-                                                                            0,
-                                                                            255)
-                                                                        : null),
-                                                          ))
-                                                  .toList()
+                                                                      ? Color.fromARGB(
+                                                                          255,
+                                                                          93,
+                                                                          0,
+                                                                          255)
+                                                                      : null),
+                                                );
+                                              }).toList()
                                                 ..addAll(
                                                     TranasactionTypeInstance
                                                             .instance()
@@ -330,7 +340,7 @@ class _TransactionPageState extends State<TransactionPage>
                   )),
           StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
               initialData: null,
-              stream: serviceLog.stream,
+              stream: _streamLog,
               builder: (context, snapshot) {
                 if (snapshot.data == null) {
                   //wait to loading

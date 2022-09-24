@@ -1,6 +1,8 @@
 import 'package:expense_tracker/instances/category_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
+import 'package:expense_tracker/modals/modal_category_type.dart';
+import 'package:expense_tracker/widgets/component/hint_category_component.dart';
 import 'package:flutter/material.dart';
 
 class CategoryComponent {
@@ -9,6 +11,8 @@ class CategoryComponent {
   CategoryComponent({required this.modal});
 
   Widget nameCategoryBuilder() {
+    ModalCategoryType? getModal =
+        CategoryInstance.instance().getModal(modal.categoryTypeRef!.id);
     return Container(
       padding: EdgeInsets.all(10.0),
       decoration: BoxDecoration(
@@ -16,9 +20,8 @@ class CategoryComponent {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CategoryInstance.instance()
-              .getHintCategoryComponent(modal.categoryTypeRef!.id)
-              .getFullCategory(),
+          if (getModal != null)
+            HintCategoryComponent(modal: getModal).getFullCategory(),
           Text(
               '${CategoryInstance.instance().getModal(modal.categoryTypeRef!.id)?.name}',
               style: TextStyle(color: Colors.black))
@@ -32,6 +35,8 @@ class CategoryComponent {
       Color backgroundIndicatorColor = Colors.grey,
       Color valueColor = Colors.red}) {
     const height = 10.0;
+    ModalCategoryType? getModal =
+        CategoryInstance.instance().getModal(modal.categoryTypeRef!.id);
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
@@ -39,12 +44,11 @@ class CategoryComponent {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              CategoryInstance.instance()
-                  .getHintCategoryComponent(modal.categoryTypeRef!.id)
-                  .getMinCategory(),
+              if (getModal != null)
+                HintCategoryComponent(modal: getModal).getMinCategory(),
               Text(
                   //now money query missing
-                  '${UserInstance.instance().getCurrency().currencyCode} ${modal.budget}',
+                  '${UserInstance.instance().getCurrency()?.currencyCode} ${modal.budget}',
                   style: TextStyle(color: valueColor))
             ],
           ),

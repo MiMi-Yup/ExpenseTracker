@@ -47,6 +47,12 @@ class _DetailBudgetState extends State<DetailBudget> {
   String convertDMY(DateTime date) => "${date.day}/${date.month}/${date.year}";
 
   @override
+  void dispose() {
+    _streamController.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     DateTime timeCreate = modal.getTimeCreate!;
     DateTime startDate = DateTime(timeCreate.year, timeCreate.month, 1);
@@ -123,7 +129,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                   children: [
                     Text("Budget:", style: TextStyle(fontSize: 18.0)),
                     Text(
-                        "${UserInstance.instance().getCurrency().currencyCode} ${modal.budget.toString()}",
+                        "${UserInstance.instance().getCurrency()?.currencyCode} ${modal.budget.toString()}",
                         style: TextStyle(fontSize: 18.0))
                   ],
                 ),
@@ -142,7 +148,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                                 Text("Now expense:",
                                     style: TextStyle(fontSize: 18.0)),
                                 Text(
-                                    "${snapshot.data != null ? "${UserInstance.instance().getCurrency().currencyCode} ${snapshot.data}" : "Loading"}",
+                                    "${snapshot.data != null ? "${UserInstance.instance().getCurrency()?.currencyCode} ${snapshot.data}" : "Loading"}",
                                     style: TextStyle(fontSize: 18.0))
                               ],
                             ),

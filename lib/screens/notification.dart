@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
@@ -18,6 +20,20 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   final NotificationFirestore serviceNotification = NotificationFirestore();
   final BudgetFirestore serviceBudget = BudgetFirestore();
+
+  Stream<QuerySnapshot<ModalNotification>>? _stream;
+
+  @override
+  void initState() {
+    super.initState();
+    _stream = serviceNotification.stream;
+  }
+
+  @override
+  void dispose() {
+    _stream = null;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +118,7 @@ class _NotificationPageState extends State<NotificationPage> {
         backgroundColor: MyColor.mainBackgroundColor,
       ),
       body: StreamBuilder<QuerySnapshot<ModalNotification>>(
-          stream: serviceNotification.stream,
+          stream: _stream,
           initialData: null,
           builder: (context, snapshot) {
             if (snapshot.hasData) {

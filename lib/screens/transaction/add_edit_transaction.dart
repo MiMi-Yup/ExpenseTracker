@@ -241,7 +241,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                             style: TextStyle(fontSize: 40.0),
                             decoration: InputDecoration(
                                 prefixText:
-                                    "${UserInstance.instance().getCurrency().currencyCode} ",
+                                    "${UserInstance.instance().getCurrency()?.currencyCode} ",
                                 isCollapsed: true,
                                 hintText: "0.00",
                                 border: InputBorder.none),

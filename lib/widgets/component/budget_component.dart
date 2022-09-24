@@ -1,6 +1,8 @@
 import 'package:expense_tracker/instances/category_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
+import 'package:expense_tracker/modals/modal_category_type.dart';
+import 'package:expense_tracker/widgets/component/hint_category_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -62,6 +64,8 @@ class _BudgetComponentState extends State<BudgetComponent>
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    ModalCategoryType? getModal =
+        CategoryInstance.instance().getModal(widget.modal.categoryTypeRef!.id);
     return SizeTransition(
         sizeFactor: ReverseAnimation(CurvedAnimation(
           curve: Curves.linear,
@@ -113,10 +117,9 @@ class _BudgetComponentState extends State<BudgetComponent>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CategoryInstance.instance()
-                                  .getHintCategoryComponent(
-                                      widget.modal.categoryTypeRef!.id)
-                                  .getMinCategory(),
+                              if (getModal != null)
+                                HintCategoryComponent(modal: getModal)
+                                    .getMinCategory(),
                               Visibility(
                                 child: Icon(
                                   Icons.warning_amber,
@@ -128,7 +131,7 @@ class _BudgetComponentState extends State<BudgetComponent>
                           ),
                           SizedBox(height: 10.0),
                           Text(
-                              "Remaining ${UserInstance.instance().getCurrency().currencyCode} ${widget.modal.remainMoney(widget.nowMoney)}"),
+                              "Remaining ${UserInstance.instance().getCurrency()?.currencyCode} ${widget.modal.remainMoney(widget.nowMoney)}"),
                           Padding(
                             padding:
                                 const EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -156,7 +159,7 @@ class _BudgetComponentState extends State<BudgetComponent>
                             ),
                           ),
                           Text(
-                            "${UserInstance.instance().getCurrency().currencyCode} ${widget.nowMoney} of ${UserInstance.instance().getCurrency().currencyCode} ${widget.modal.budget}",
+                            "${UserInstance.instance().getCurrency()?.currencyCode} ${widget.nowMoney} of ${UserInstance.instance().getCurrency()?.currencyCode} ${widget.modal.budget}",
                             style: TextStyle(color: Colors.grey),
                           ),
                           SizedBox(height: 10.0),

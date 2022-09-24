@@ -38,7 +38,7 @@ class _WelcomePageState extends State<WelcomePage> {
     super.initState();
     _timer =
         Timer.periodic(const Duration(seconds: 2), (timer) => _changeOpacity());
-    EventFirestore.instance();
+    EventFirestore.reInstance();
   }
 
   @override

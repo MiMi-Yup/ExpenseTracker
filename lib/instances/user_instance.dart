@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/services/firebase/firestore/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class UserInstance {
   static UserInstance? _instance;
@@ -31,11 +29,11 @@ class UserInstance {
     return _instance!;
   }
 
-  ModalCurrencyType getCurrency() {
-    return _currency!;
+  ModalCurrencyType? getCurrency() {
+    return _currency;
   }
 
-  ModalUser getModal() {
-    return _modal!;
+  ModalUser? getModal() {
+    return _modal;
   }
 }

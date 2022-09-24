@@ -30,8 +30,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with AutomaticKeepAliveClientMixin {
+class _HomePageState extends State<HomePage> {
   late PageController _controller;
 
   final TransactionUtilities serviceTransaction = TransactionUtilities();
@@ -55,15 +54,22 @@ class _HomePageState extends State<HomePage>
 
   DateTime? fliterTransactionByMonth;
 
+  Stream<QuerySnapshot<ModalNotification>>? _streamNotification;
+  Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
+
   @override
   void initState() {
     super.initState();
     _controller = PageController(initialPage: _currentIndex);
+    _streamNotification = NotificationFirestore().stream;
+    _streamLog = serviceLog.stream;
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _streamLog = null;
+    _streamNotification = null;
     super.dispose();
   }
 
@@ -97,10 +103,14 @@ class _HomePageState extends State<HomePage>
                   onTap: () => widget.toPage!(EPage.profile),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                            UserInstance.instance().getModal().photoURL!,
-                            scale: 1.0)),
+                    child: (UserInstance.instance().getModal() != null &&
+                            UserInstance.instance().getModal()?.photoURL !=
+                                null)
+                        ? CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                UserInstance.instance().getModal()!.photoURL!,
+                                scale: 1.0))
+                        : null,
                   ),
                 ),
                 title: FilterTransactionByMonthComponent(
@@ -111,7 +121,8 @@ class _HomePageState extends State<HomePage>
                           RouteApplication.navigatorKey.currentState?.pop();
                         },
                         setInitDateTime: fliterTransactionByMonth == null
-                            ? (value) => fliterTransactionByMonth = value
+                            ? (value) => WidgetsBinding.instance.addPostFrameCallback(
+                          (_) => setState(() => fliterTransactionByMonth = value))
                             : null,
                         selectedDate: fliterTransactionByMonth)
                     .builder(),
@@ -121,7 +132,7 @@ class _HomePageState extends State<HomePage>
                           RouteApplication.navigatorKey.currentState?.pushNamed(
                               RouteApplication.getRoute(ERoute.notification)),
                       icon: StreamBuilder<QuerySnapshot<ModalNotification>>(
-                        stream: NotificationFirestore().stream,
+                        stream: _streamNotification,
                         builder: (context, snapshot) {
                           Widget? indicator;
                           if (snapshot.hasData) {
@@ -241,7 +252,7 @@ class _HomePageState extends State<HomePage>
                   onPressed: () => widget.toPage!(EPage.transaction),
                   content: StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
                     initialData: null,
-                    stream: serviceLog.stream,
+                    stream: _streamLog,
                     builder: (context, snapshot) {
                       QuerySnapshot<ModalTransactionLog>? query = snapshot.data;
                       return query == null

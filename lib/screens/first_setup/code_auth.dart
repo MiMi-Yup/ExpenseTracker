@@ -125,92 +125,111 @@ class _CodeAuthState extends State<CodeAuth>
   }
 
   Future<bool> checkFingerprint() async {
-    final bool isDeviceSupported = await _authentication.isDeviceSupported();
-    final bool canCheckBiometrics = await _authentication.canCheckBiometrics;
-
-    if (isDeviceSupported && canCheckBiometrics) {
-      try {
-        return await _authentication.authenticate(
-          localizedReason: 'Scan Fingerprint To Enter Vault',
-          options: const AuthenticationOptions(
-              useErrorDialogs: true, stickyAuth: true),
-        );
-      } on PlatformException {
-        return false;
-      }
-    } else {
+    try {
+      return await _authentication.authenticate(
+        localizedReason: 'Scan Fingerprint To Enter Vault',
+        options: const AuthenticationOptions(
+            useErrorDialogs: true, stickyAuth: true),
+      );
+    } on PlatformException {
       return false;
     }
   }
 
+  bool? wasShowFragmentFingerPrint;
+
+  Future<bool> canShowFragmentFingerprint() async {
+    if (_initCode) return false;
+    final bool isDeviceSupported = await _authentication.isDeviceSupported();
+    final bool canCheckBiometrics = await _authentication.canCheckBiometrics;
+    if (isDeviceSupported && canCheckBiometrics) return true;
+    return false;
+  }
+
+  Future<void> showFragmentFingerprint() async {
+    checkFingerprint().then((value) {
+      if (value) {
+        RouteApplication.navigatorKey.currentState
+            ?.popUntil((route) => route.isFirst);
+        RouteApplication.navigatorKey.currentState
+            ?.pushReplacementNamed(RouteApplication.getRoute(ERoute.main));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Access deined because failed too much!")));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (!_initCode) {
-      checkFingerprint().then((value) {
-        if (value) {
-          RouteApplication.navigatorKey.currentState
-              ?.popUntil((route) => route.isFirst);
-          RouteApplication.navigatorKey.currentState
-              ?.pushReplacementNamed(RouteApplication.getRoute(ERoute.main));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Access deined because failed too much!")));
-        }
-      });
-    }
+    return FutureBuilder<bool>(
+        initialData: null,
+        future: canShowFragmentFingerprint(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data!) {
+            showFragmentFingerprint();
+          }
 
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: MyColor.mainBackgroundColor,
-        leading: null,
-        actions: [
-          TextButton(
-            onPressed: () async => await GoogleAuth.signOut(),
-            child: Text("Sign out"),
-          )
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Text(
-                title.isEmpty
-                    ? _initCode
-                        ? message["setup"]!
-                        : message["enter"]!
-                    : title,
-                style: TextStyle(fontSize: 30.0),
+          return Scaffold(
+              appBar: AppBar(
+                elevation: 0,
+                backgroundColor: MyColor.mainBackgroundColor,
+                leading: null,
+                actions: [
+                  TextButton(
+                    onPressed: () => showFragmentFingerprint(),
+                    child: Text("By Biometrics"),
+                  ),
+                  TextButton(
+                    onPressed: () async => await GoogleAuth.signOut(),
+                    child: Text("Sign out"),
+                  )
+                ],
               ),
-            ),
-            AnimatedBuilder(
-              animation: _offsetAnimation,
-              builder: (context, child) => Container(
-                margin: EdgeInsets.symmetric(horizontal: 24.0),
-                padding: EdgeInsets.only(
-                    left: _offsetAnimation.value + 24.0,
-                    right: 24.0 - _offsetAnimation.value),
-                child: CodeInput(
-                  length: 4,
-                  builder: CodeInputBuilders.circle(
-                      totalRadius: 20.0,
-                      filledRadius: 15.0,
-                      border: Border(),
-                      color: Colors.white,
-                      textStyle: TextStyle()),
-                  keyboardType: TextInputType.number,
-                  onDone: _onDone,
-                  clearOnDone: true,
-                  autofocus: true,
+              body: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Text(
+                        title.isEmpty
+                            ? _initCode
+                                ? message["setup"]!
+                                : message["enter"]!
+                            : title,
+                        style: TextStyle(fontSize: 30.0),
+                      ),
+                    ),
+                    AnimatedBuilder(
+                      animation: _offsetAnimation,
+                      builder: (context, child) => Container(
+                        margin: EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: EdgeInsets.only(
+                            left: _offsetAnimation.value + 24.0,
+                            right: 24.0 - _offsetAnimation.value),
+                        child: CodeInput(
+                          length: 4,
+                          builder: CodeInputBuilders.circle(
+                              totalRadius: 20.0,
+                              filledRadius: 15.0,
+                              border: Border(),
+                              color: Colors.white,
+                              textStyle: TextStyle()),
+                          keyboardType: TextInputType.number,
+                          onDone: _onDone,
+                          clearOnDone: true,
+                          autofocus: snapshot.hasData
+                              ? snapshot.data!
+                                  ? false
+                                  : true
+                              : false,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+              ));
+        });
   }
 }

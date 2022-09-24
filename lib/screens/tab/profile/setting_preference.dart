@@ -26,20 +26,7 @@ class _SettingPreferenceState extends State<SettingPreference> {
     bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
 
     if (isBiometricSupported && canAuthenticateWithBiometrics) {
-      List<BiometricType> availableBiometrics =
-          await auth.getAvailableBiometrics();
-
-      if (availableBiometrics.isNotEmpty) {
-        if (availableBiometrics.contains(BiometricType.face)) {
-          result.add("Face ID");
-        }
-        if (availableBiometrics.contains(BiometricType.fingerprint)) {
-          result.add("Fingerprint");
-        }
-        if (availableBiometrics.contains(BiometricType.iris)) {
-          result.add("Iris");
-        }
-      }
+      result.add("Biometrics");
     }
 
     result.addAll(["PIN", "Google Auth"]);
@@ -159,6 +146,7 @@ class _SettingPreferenceState extends State<SettingPreference> {
                       topLeft: Radius.circular(10.0),
                       topRight: Radius.circular(10.0))),
               child: ListView(
+                shrinkWrap: true,
                 physics: BouncingScrollPhysics(),
                 children: data
                     .map((e) => GestureDetector(
@@ -207,37 +195,37 @@ class _SettingPreferenceState extends State<SettingPreference> {
                     topRight: Radius.circular(10.0))),
             child: StatefulBuilder(
               builder: (context, setState) => Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: ListView(
-                      physics: BouncingScrollPhysics(),
-                      children: data
-                          .map((e) => GestureDetector(
-                                onTap: () => setState(() => selected.contains(e)
-                                    ? selected.remove(e)
-                                    : selected.add(e)),
-                                child: Container(
-                                  padding: EdgeInsets.all(10.0),
-                                  height: 50.0,
-                                  color: Colors.transparent,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          e,
-                                          style: TextStyle(color: Colors.black),
-                                        ),
-                                        if (selected.contains(e))
-                                          Icon(
-                                            Icons.check,
-                                            color: Colors.black,
-                                          )
-                                      ]),
-                                ),
-                              ))
-                          .toList(),
-                    ),
+                  ListView(
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    children: data
+                        .map((e) => GestureDetector(
+                              onTap: () => setState(() => selected.contains(e)
+                                  ? selected.remove(e)
+                                  : selected.add(e)),
+                              child: Container(
+                                padding: EdgeInsets.all(10.0),
+                                height: 50.0,
+                                color: Colors.transparent,
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        e,
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                      if (selected.contains(e))
+                                        Icon(
+                                          Icons.check,
+                                          color: Colors.black,
+                                        )
+                                    ]),
+                              ),
+                            ))
+                        .toList(),
                   ),
                   SizedBox(
                       width: double.maxFinite,
@@ -267,37 +255,37 @@ class _SettingPreferenceState extends State<SettingPreference> {
                     topRight: Radius.circular(10.0))),
             child: StatefulBuilder(
               builder: (context, setState) => Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: ListView(
-                        physics: BouncingScrollPhysics(),
-                        children: data.entries
-                            .map((e) => Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(e.value?.title ?? "",
-                                            style:
-                                                TextStyle(color: Colors.black)),
-                                        Text(e.value?.subTitle ?? "",
-                                            style: TextStyle(
-                                                color: Colors.black38))
-                                      ],
-                                    ),
-                                    Switch(
-                                      value: data[e.key]?.value ?? false,
-                                      onChanged: (value) => setState(
-                                          () => data[e.key]?.value = value),
-                                    )
-                                  ],
-                                ))
-                            .toList()),
-                  ),
+                  ListView(
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      children: data.entries
+                          .map((e) => Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(e.value?.title ?? "",
+                                          style:
+                                              TextStyle(color: Colors.black)),
+                                      Text(e.value?.subTitle ?? "",
+                                          style:
+                                              TextStyle(color: Colors.black38))
+                                    ],
+                                  ),
+                                  Switch(
+                                    value: data[e.key]?.value ?? false,
+                                    onChanged: (value) => setState(
+                                        () => data[e.key]?.value = value),
+                                  )
+                                ],
+                              ))
+                          .toList()),
                   SizedBox(
                       width: double.maxFinite,
                       child: largestButton(

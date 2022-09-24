@@ -1,15 +1,11 @@
-import 'dart:developer';
-
-import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/instances/category_instance.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
-import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/services/firebase/firestore/category_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
-import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
+import 'package:expense_tracker/widgets/component/hint_category_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -67,14 +63,15 @@ class _TransactionComponentState extends State<TransactionComponent>
 
   @override
   Widget build(BuildContext context) {
+    ModalCategoryType? getModal =
+        CategoryInstance.instance().getModal(widget.modal.categoryTypeRef!.id);
     final content = Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Row(
           children: [
-            CategoryInstance.instance()
-                .getHintCategoryComponent(widget.modal.categoryTypeRef!.id)
-                .getFullCategory(height: 50.0),
+            if (getModal != null)
+              HintCategoryComponent(modal: getModal).getFullCategory(),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Column(
@@ -93,7 +90,7 @@ class _TransactionComponentState extends State<TransactionComponent>
                   )
                 ],
               ),
-            ),
+            )
           ],
         ),
         Column(
@@ -101,7 +98,7 @@ class _TransactionComponentState extends State<TransactionComponent>
           children: [
             Text(
               widget.modal.getMoney(
-                  '${UserInstance.instance().getCurrency().currencyCode}'),
+                  '${UserInstance.instance().getCurrency()?.currencyCode}'),
               style: TextStyle(
                   color: TranasactionTypeInstance.instance()
                       .getModal(widget.modal.transactionTypeRef!.id)

@@ -59,7 +59,7 @@ class AccountComponent extends StatelessWidget {
               )
             ]),
             Text(
-                "${UserInstance.instance().getCurrency().currencyCode} ${accoutnModal.money}")
+                "${UserInstance.instance().getCurrency()?.currencyCode} ${accoutnModal.money}")
           ],
         ),
       ),

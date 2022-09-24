@@ -5,6 +5,7 @@ import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/auth/google_auth.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
+import 'package:restart_app/restart_app.dart';
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({Key? key}) : super(key: key);
@@ -31,10 +32,11 @@ class ProfilePage extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (UserInstance.instance().getModal().photoURL != null)
+                  if (UserInstance.instance().getModal() != null &&
+                      UserInstance.instance().getModal()?.photoURL != null)
                     CircleAvatar(
                         backgroundImage: NetworkImage(
-                            UserInstance.instance().getModal().photoURL!,
+                            UserInstance.instance().getModal()!.photoURL!,
                             scale: 1.0)),
                   SizedBox(
                     width: 16.0,
@@ -43,25 +45,21 @@ class ProfilePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${UserInstance.instance().getModal().email}',
+                        '${UserInstance.instance().getModal()?.email}',
                         style: TextStyle(color: Colors.white70),
                       ),
                       SizedBox(
                         height: 16.0,
                       ),
                       Text(
-                        '${UserInstance.instance().getModal().displayName}',
+                        '${UserInstance.instance().getModal()?.displayName}',
                         style: TextStyle(color: Colors.white),
                       )
                     ],
                   )
                 ],
               ),
-              IconButton(
-                  onPressed: () async {
-                    
-                  },
-                  icon: Icon(Icons.edit))
+              IconButton(onPressed: () async {}, icon: Icon(Icons.edit))
             ],
           ),
           SizedBox(
@@ -119,9 +117,12 @@ class ProfilePage extends StatelessWidget {
                                                   Expanded(
                                                       child: largestButton(
                                                           text: "Yes",
-                                                          onPressed: () =>
-                                                              GoogleAuth
-                                                                  .signOut(),
+                                                          onPressed: () async {
+                                                            await GoogleAuth
+                                                                .signOut();
+                                                            Restart
+                                                                .restartApp();
+                                                          },
                                                           background:
                                                               MyColor.purple()))
                                                 ],
