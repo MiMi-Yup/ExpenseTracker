@@ -81,16 +81,21 @@ class UserFirestore extends IFirestore {
       }
     }
 
-    if (modal != null) {
-      DocumentSnapshot<ModalCurrencyType> snapshot = await modal
-          .currencyTypeRef!
-          .withConverter(
-              fromFirestore: ModalCurrencyType.fromFirestore,
-              toFirestore: (ModalCurrencyType modal, _) => modal.toFirestore())
-          .get();
-      return snapshot.data();
+    try {
+      if (modal != null) {
+        DocumentSnapshot<ModalCurrencyType> snapshot = await modal
+            .currencyTypeRef!
+            .withConverter(
+                fromFirestore: ModalCurrencyType.fromFirestore,
+                toFirestore: (ModalCurrencyType modal, _) =>
+                    modal.toFirestore())
+            .get();
+        return snapshot.data();
+      }
+      return null;
+    } on FirebaseException {
+      return null;
     }
-    return null;
   }
 
   Future<bool> checkUserExists() {

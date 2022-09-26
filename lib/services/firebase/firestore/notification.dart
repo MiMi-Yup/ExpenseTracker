@@ -111,16 +111,21 @@ class NotificationFirestore extends IFirestore {
   }
 
   Future<List<ModalNotification>?> checkBudgetExists(ModalBudget modal) async {
-    QuerySnapshot<ModalNotification> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(user?.uid))
-        .where('budget_ref', isEqualTo: BudgetFirestore().getRef(modal))
-        .withConverter(
-            fromFirestore: ModalNotification.fromFirestore,
-            toFirestore: (ModalNotification modal, _) => modal.toFirestore())
-        .get();
+    try {
+      QuerySnapshot<ModalNotification> snapshot = await FirebaseFirestore
+          .instance
+          .collection(getPath(user?.uid))
+          .where('budget_ref', isEqualTo: BudgetFirestore().getRef(modal))
+          .withConverter(
+              fromFirestore: ModalNotification.fromFirestore,
+              toFirestore: (ModalNotification modal, _) => modal.toFirestore())
+          .get();
 
-    return snapshot.size == 0
-        ? null
-        : snapshot.docs.map((e) => e.data()).toList();
+      return snapshot.size == 0
+          ? null
+          : snapshot.docs.map((e) => e.data()).toList();
+    } on FirebaseException {
+      return null;
+    }
   }
 }

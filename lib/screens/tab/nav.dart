@@ -30,7 +30,6 @@ class _NavigationState extends State<Navigation>
     EPage.profile: 3
   };
 
-  int _currentIndex = 0;
   late AnimationController _fabController;
   late TabController _tabController;
 
@@ -44,7 +43,7 @@ class _NavigationState extends State<Navigation>
       duration: const Duration(milliseconds: 500),
     );
     _tabController = TabController(
-        initialIndex: _currentIndex,
+        initialIndex: 0,
         length: 4,
         animationDuration: const Duration(milliseconds: 250),
         vsync: this);
@@ -59,13 +58,11 @@ class _NavigationState extends State<Navigation>
 
   @override
   Widget build(BuildContext context) {
-    toPage(page) {
+    void toPage(int page) {
       if (_mapPage.containsValue(page)) {
         _tabController.animateTo(page,
             curve: Curves.linear, duration: const Duration(milliseconds: 250));
-        setState(() {
-          _currentIndex = page;
-        });
+        setState(() {});
       }
     }
 
@@ -167,14 +164,17 @@ class _NavigationState extends State<Navigation>
         ),
       ),
       bottomNavigationBar: BottomAppBarComponent(
-              navActions: _navActions, currentIndex: _currentIndex)
+              navActions: _navActions, currentIndex: _tabController.index)
           .builder(),
-      body: TabBarView(controller: _tabController, children: [
-        HomePage(toPage: (ePage) => toPage(_mapPage[ePage]!)),
-        TransactionPage(),
-        BudgetPage(),
-        ProfilePage()
-      ]),
+      body: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
+          controller: _tabController,
+          children: [
+            HomePage(toPage: (ePage) => toPage(_mapPage[ePage]!)),
+            TransactionPage(),
+            BudgetPage(),
+            ProfilePage()
+          ]),
     );
   }
 

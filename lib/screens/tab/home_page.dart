@@ -1,26 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
+import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_notification.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/notification.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
-import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/component/fliter_month_component.dart';
 import 'package:expense_tracker/widgets/component/overview_transaction_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
-import 'package:expense_tracker/widgets/dropdown.dart';
-import 'package:expense_tracker/widgets/month_picker.dart';
 import 'package:expense_tracker/widgets/section.dart';
 import 'package:expense_tracker/widgets/transaction_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 
 class HomePage extends StatefulWidget {
   void Function(EPage)? toPage;
@@ -36,6 +34,8 @@ class _HomePageState extends State<HomePage>
 
   final TransactionUtilities serviceTransaction = TransactionUtilities();
   final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
+  final AccountFirestore serviceAccount = AccountFirestore();
+
   final List<Widget> _charts = [
     LineChartSample1(),
     Text("data"),
@@ -46,14 +46,6 @@ class _HomePageState extends State<HomePage>
   late double height = MediaQuery.of(context).size.height;
 
   bool keepAlive = true;
-
-  final List<OverviewTransactionComponent>? overviewTransaction =
-      TranasactionTypeInstance.instance()
-          .modals
-          ?.map((e) => OverviewTransactionComponent(
-              transactionTypeRef: TransactionTypeFirestore().getRef(e!),
-              money: 3000))
-          .toList();
 
   DateTime? fliterTransactionByMonth;
 
@@ -181,19 +173,48 @@ class _HomePageState extends State<HomePage>
                 ],
               ),
               Text("Account balance"),
-              Text(
-                "\$9400",
-                style: TextStyle(fontSize: 30.0),
-              ),
-              if (overviewTransaction != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children:
-                        overviewTransaction!.map((e) => e.builder()).toList(),
-                  ),
-                )
+              FutureBuilder<List<ModalAccount>?>(
+                  future: serviceAccount.read(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      double totalMoney = 0.0;
+                      for (var element in snapshot.data!) {
+                        totalMoney += element.money ?? 0.0;
+                      }
+                      return Text(
+                        "${UserInstance.instance().getCurrency()?.currencyCode}$totalMoney",
+                        style: TextStyle(fontSize: 30.0),
+                      );
+                    } else {
+                      return LinearProgressIndicator();
+                    }
+                  }),
+              FutureBuilder<Map<ModalTransactionType, List<ModalTransaction>?>>(
+                initialData: null,
+                future: serviceLog.groupTransactionByTransactionType(
+                    filterByDate: fliterTransactionByMonth),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: snapshot.data!.keys.map((modalType) {
+                          double totalMoney = 0.0;
+                          snapshot.data![modalType]?.forEach(
+                              (modalTransaction) =>
+                                  totalMoney += modalTransaction.money ?? 0.0);
+                          return OverviewTransactionComponent(
+                                  modal: modalType, money: totalMoney)
+                              .builder();
+                        }).toList(),
+                      ),
+                    );
+                  } else {
+                    return LinearProgressIndicator();
+                  }
+                },
+              )
             ],
           ),
         ),

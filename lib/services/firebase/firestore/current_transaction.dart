@@ -1,6 +1,8 @@
+import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/modals/modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
+import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 
@@ -43,26 +45,43 @@ class CurrentTransactionFirestore extends IFirestore {
     }
   }
 
-  Future<List<ModalTransaction>> getTargetTransaction() async {
-    List<ModalTransactionLog>? modals = await read();
-    List<ModalTransaction> results = [];
+  Future<Map<ModalTransactionType, List<ModalTransaction>?>>
+      groupTransactionByTransactionType({DateTime? filterByDate}) async {
+    List<ModalTransactionLog>? logs = await read();
+    TransactionFirestore service = TransactionFirestore();
+    Map<ModalTransactionType, List<ModalTransaction>?> result = {};
+    DateTime? filterDate = filterByDate == null
+        ? null
+        : DateTime(filterByDate.year, filterByDate.month, 1);
 
-    if (modals != null) {
-      for (var element in modals) {
-        DocumentSnapshot<ModalTransaction> snapshot =
-            await (element.lastTransactionRef ?? element.firstTransactionRef)!
-                .withConverter(
-                    fromFirestore: ModalTransaction.fromFirestore,
-                    toFirestore: (ModalTransaction modal, _) =>
-                        modal.toFirestore())
-                .get();
-        if (snapshot.exists) {
-          results.add(snapshot.data()!);
+    if (logs != null) {
+      for (var log in logs) {
+        ModalTransaction? modal = await service.getModalFromRef(
+            log.lastTransactionRef ?? log.firstTransactionRef!);
+        if (modal != null) {
+          DateTime timeCreate = modal.getTimeCreate!;
+          DateTime startMonthTimeCreate =
+              DateTime(timeCreate.year, timeCreate.month, 1);
+          if (filterDate == null ||
+              filterDate.compareTo(startMonthTimeCreate) == 0) {
+            ModalTransactionType? modalType =
+                TranasactionTypeInstance.instance()
+                    .getModal(modal.transactionTypeRef!.id);
+            if (modalType != null) {
+              if (result.containsKey(modalType)) {
+                result[modalType]?.add(modal);
+              } else {
+                result.addAll({
+                  modalType: [modal]
+                });
+              }
+            }
+          }
         }
       }
     }
 
-    return results;
+    return result;
   }
 
   Stream<QuerySnapshot<ModalTransactionLog>> get stream => FirebaseFirestore

@@ -7,13 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class OverviewTransactionComponent {
-  DocumentReference transactionTypeRef;
   ModalTransactionType? modal;
   double money;
   OverviewTransactionComponent(
-      {required this.transactionTypeRef, required this.money}) {
-    modal = TranasactionTypeInstance.instance().getModal(transactionTypeRef.id);
-  }
+      {required this.modal, required this.money});
 
   Widget builder({void Function()? onTap}) {
     return GestureDetector(

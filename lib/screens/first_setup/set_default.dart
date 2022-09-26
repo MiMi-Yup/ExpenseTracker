@@ -6,6 +6,8 @@ import 'package:expense_tracker/constants/asset/bank.dart';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
+import 'package:expense_tracker/instances/transaction_type_instance.dart';
+import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_account_type.dart';
 import 'package:expense_tracker/modals/modal_currency_type.dart';
@@ -99,7 +101,7 @@ class _SetDefaultState extends State<SetDefault> {
               keyboardType: TextInputType.number,
               style: TextStyle(fontSize: 40.0),
               decoration: InputDecoration(
-                  prefixText: '${choseCurrency?.currencyCode} ',
+                  prefixText: '${choseCurrency?.currencyCode ?? "Currency"} ',
                   isCollapsed: true,
                   hintText: "\0.00",
                   border: InputBorder.none),
@@ -166,7 +168,7 @@ class _SetDefaultState extends State<SetDefault> {
                           items: snapshot.data!,
                           choseValue: choseCurrency,
                           onChanged: (itemSelected) =>
-                              choseCurrency = itemSelected,
+                              setState(() => choseCurrency = itemSelected),
                         ).builder(),
                       )),
                   Visibility(
@@ -227,37 +229,39 @@ class _SetDefaultState extends State<SetDefault> {
 
                               Future.delayed(const Duration(seconds: 1),
                                   () async {
-                                userFirestore.read().then((value) {
-                                  if (value != null && value.isNotEmpty) {
-                                    ModalUser fieldUser = value.first;
-                                    fieldUser.wasSetup = true;
-                                    userFirestore.update(null, fieldUser);
-                                  } else {
-                                    userFirestore.insert(ModalUser(
-                                        id: null,
-                                        email: null,
-                                        password: null,
-                                        wasSetup: true));
-                                  }
-                                });
+                                // List<ModalUser>? modals =await userFirestore.read();
+                                // if (modals != null && modals.isNotEmpty) {
+                                //     ModalUser fieldUser = modals.first;
+                                //     fieldUser.wasSetup = true;
+                                //     await userFirestore.update(null, fieldUser);
+                                //   } else {
+                                //     await userFirestore.insert(ModalUser(
+                                //         id: null,
+                                //         email: null,
+                                //         password: null,
+                                //         wasSetup: true));
+                                //   }
 
                                 DocumentReference accountTypeRef =
                                     accountTypeFirestore
                                         .getRef(choseAccountType!);
-                                AccountFirestore().insert(ModalAccount(
+                                await AccountFirestore().insert(ModalAccount(
                                     id: choseAccountType!.id,
                                     accountTypeRef: accountTypeRef,
                                     money: double.tryParse(controller.text)));
-                                userFirestore.read().then((value) {
-                                  if (value != null && value.isNotEmpty) {
-                                    ModalUser modal = value.first;
-                                    modal.currencyTypeRef =
-                                        currencyTypesFirestore
-                                            .getRef(choseCurrency!);
-                                    modal.wasSetup = true;
-                                    userFirestore.insert(modal);
-                                  }
-                                });
+                                List<ModalUser>? modals =
+                                    await userFirestore.read();
+                                if (modals != null && modals.isNotEmpty) {
+                                  ModalUser fieldUser = modals.first;
+                                  fieldUser.currencyTypeRef =
+                                      currencyTypesFirestore
+                                          .getRef(choseCurrency!);
+                                  fieldUser.wasSetup = true;
+                                  userFirestore.insert(fieldUser);
+                                }
+
+                                UserInstance.instance(renew: true);
+                                TranasactionTypeInstance.instance(renew: true);
 
                                 RouteApplication.navigatorKey.currentState
                                     ?.popUntil((route) => false);

@@ -67,15 +67,19 @@ class BudgetFirestore extends IFirestore {
       .snapshots(includeMetadataChanges: true);
 
   Future<ModalBudget?> _getFirstLastBudget(bool descending) async {
-    QuerySnapshot<ModalBudget> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(user?.uid))
-        .orderBy('time_create', descending: descending)
-        .limit(1)
-        .withConverter(
-            fromFirestore: ModalBudget.fromFirestore,
-            toFirestore: (ModalBudget modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.size == 1 ? snapshot.docs.first.data() : null;
+    try {
+      QuerySnapshot<ModalBudget> snapshot = await FirebaseFirestore.instance
+          .collection(getPath(user?.uid))
+          .orderBy('time_create', descending: descending)
+          .limit(1)
+          .withConverter(
+              fromFirestore: ModalBudget.fromFirestore,
+              toFirestore: (ModalBudget modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.size == 1 ? snapshot.docs.first.data() : null;
+    } on FirebaseException {
+      return null;
+    }
   }
 
   Future<ModalBudget?> get lastBudget => _getFirstLastBudget(true);

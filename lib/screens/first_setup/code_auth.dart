@@ -21,6 +21,9 @@ class _CodeAuthState extends State<CodeAuth>
   late bool _initCode = ModalRoute.of(context)?.settings.arguments as bool;
   late bool _confirm = !_initCode;
   final LocalAuthentication _authentication = LocalAuthentication();
+  final UserFirestore _service = UserFirestore();
+  ModalUser? _modal;
+
   String _code = "";
   String _reCode = "";
 
@@ -49,6 +52,11 @@ class _CodeAuthState extends State<CodeAuth>
           controller.reverse();
         }
       });
+    _service.read().then((value) {
+      if (value != null && value.isNotEmpty) {
+        _modal = value.first;
+      }
+    });
   }
 
   @override
@@ -84,45 +92,41 @@ class _CodeAuthState extends State<CodeAuth>
           //add pin completed. go to next
           _initCode = false;
 
-          await UserFirestore().read().then((value) async {
-            if (value != null && value.isNotEmpty) {
-              ModalUser fieldUser = value.first;
-              fieldUser.passcode = _code;
-              await UserFirestore().update(null, fieldUser);
-            } else {
-              await UserFirestore().insert(ModalUser(
-                  id: null, email: null, password: null, passcode: _code));
-            }
-          });
+          if (_modal != null) {
+            _modal?.passcode = _code;
+            await _service.update(null, _modal!);
+          } else {
+            await _service.insert(ModalUser(
+                id: null, email: null, password: null, passcode: _code));
+            _service.read().then((value) {
+              if (value != null && value.isNotEmpty) {
+                _modal = value.first;
+              }
+            });
+          }
         }
       }
       _confirm = !_confirm;
     } else {
-      UserFirestore().read().then((user) {
-        if (user != null) {
-          if (user.isEmpty) {
-            wrong = true;
+      if (_modal != null) {
+        bool allowAccess = _modal!.passcode == value;
+        if (allowAccess) {
+          bool wasSetup = _modal!.wasSetup ?? false;
+          if (wasSetup) {
+            RouteApplication.navigatorKey.currentState
+                ?.popUntil((route) => route.isFirst);
+            RouteApplication.navigatorKey.currentState
+                ?.pushReplacementNamed(RouteApplication.getRoute(ERoute.main));
           } else {
-            bool allowAccess = user.first.passcode == value;
-            if (allowAccess) {
-              bool wasSetup = user.first.wasSetup ?? false;
-              if (wasSetup) {
-                RouteApplication.navigatorKey.currentState
-                    ?.popUntil((route) => route.isFirst);
-                RouteApplication.navigatorKey.currentState
-                    ?.pushReplacementNamed(
-                        RouteApplication.getRoute(ERoute.main));
-              } else {
-                RouteApplication.navigatorKey.currentState
-                    ?.popUntil((route) => route.isFirst);
-                RouteApplication.navigatorKey.currentState
-                    ?.pushReplacementNamed(RouteApplication.getRoute(
-                        ERoute.introductionSetupAccount));
-              }
-            }
+            RouteApplication.navigatorKey.currentState
+                ?.popUntil((route) => route.isFirst);
+            RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
+                RouteApplication.getRoute(ERoute.introductionSetupAccount));
           }
         }
-      });
+      } else {
+        wrong = true;
+      }
     }
 
     _changedTitle(wrongPIN: wrong);
@@ -153,10 +157,18 @@ class _CodeAuthState extends State<CodeAuth>
   Future<void> showFragmentFingerprint() async {
     checkFingerprint().then((value) {
       if (value) {
-        RouteApplication.navigatorKey.currentState
-            ?.popUntil((route) => route.isFirst);
-        RouteApplication.navigatorKey.currentState
-            ?.pushReplacementNamed(RouteApplication.getRoute(ERoute.main));
+        bool wasSetup = _modal!.wasSetup ?? false;
+        if (wasSetup) {
+          RouteApplication.navigatorKey.currentState
+              ?.popUntil((route) => route.isFirst);
+          RouteApplication.navigatorKey.currentState
+              ?.pushReplacementNamed(RouteApplication.getRoute(ERoute.main));
+        } else {
+          RouteApplication.navigatorKey.currentState
+              ?.popUntil((route) => route.isFirst);
+          RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
+              RouteApplication.getRoute(ERoute.introductionSetupAccount));
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Access deined because failed too much!")));
@@ -180,10 +192,11 @@ class _CodeAuthState extends State<CodeAuth>
                 backgroundColor: MyColor.mainBackgroundColor,
                 leading: null,
                 actions: [
-                  TextButton(
-                    onPressed: () => showFragmentFingerprint(),
-                    child: Text("By Biometrics"),
-                  ),
+                  if (!_initCode)
+                    TextButton(
+                      onPressed: () => showFragmentFingerprint(),
+                      child: Text("By Biometrics"),
+                    ),
                   TextButton(
                     onPressed: () async => await GoogleAuth.signOut(),
                     child: Text("Sign out"),
