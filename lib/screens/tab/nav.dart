@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
-import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/routes/route.dart';
@@ -32,34 +31,43 @@ class _NavigationState extends State<Navigation>
   };
 
   int _currentIndex = 0;
-  late PageController _controller;
   late AnimationController _fabController;
+  late TabController _tabController;
+
+  bool keepAlive = true;
 
   @override
   void initState() {
     super.initState();
-    _controller = PageController(initialPage: _currentIndex);
     _fabController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+    _tabController = TabController(
+        initialIndex: _currentIndex,
+        length: 4,
+        animationDuration: const Duration(milliseconds: 250),
+        vsync: this);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     _fabController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final void Function(int) toPage = (page) {
+    toPage(page) {
       if (_mapPage.containsValue(page)) {
-        _controller.animateToPage(page,
+        _tabController.animateTo(page,
             curve: Curves.linear, duration: const Duration(milliseconds: 250));
+        setState(() {
+          _currentIndex = page;
+        });
       }
-    };
+    }
 
     final Map<int, ItemNavModal?> _navActions = <int, ItemNavModal?>{
       0: ItemNavModal(
@@ -76,7 +84,7 @@ class _NavigationState extends State<Navigation>
     return Scaffold(
       extendBody: true,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FutureBuilder<List<ModalTransactionType>>(
+      floatingActionButton: FutureBuilder<List<ModalTransactionType>?>(
         future: TransactionTypeFirestore().read(),
         initialData: const [],
         builder: (context, snapshot) => Padding(
@@ -146,7 +154,7 @@ class _NavigationState extends State<Navigation>
                                 ? Icons.add
                                 : Icons.close),
                           )),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_fabController.isDismissed) {
                       _fabController.forward();
                     } else {
@@ -161,27 +169,15 @@ class _NavigationState extends State<Navigation>
       bottomNavigationBar: BottomAppBarComponent(
               navActions: _navActions, currentIndex: _currentIndex)
           .builder(),
-      body: PageView.builder(
-          controller: _controller,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _navActions.length - 1,
-          itemBuilder: (context, index) {
-            switch (index) {
-              case 0:
-                return HomePage(toPage: (ePage) => toPage(_mapPage[ePage]!));
-              case 1:
-                return TransactionPage();
-              case 2:
-                return BudgetPage();
-              case 3:
-                return ProfilePage();
-              default:
-                return Container();
-            }
-          }),
+      body: TabBarView(controller: _tabController, children: [
+        HomePage(toPage: (ePage) => toPage(_mapPage[ePage]!)),
+        TransactionPage(),
+        BudgetPage(),
+        ProfilePage()
+      ]),
     );
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => keepAlive;
 }

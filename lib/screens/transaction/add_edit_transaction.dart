@@ -136,7 +136,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                               "Frequency",
                               style: TextStyle(color: Colors.grey),
                             ),
-                            FutureBuilder<List<ModalFrequencyType>>(
+                            FutureBuilder<List<ModalFrequencyType>?>(
                               future: FrequencyTypesFirestore().read(),
                               initialData: [],
                               builder: (context, snapshot) =>
@@ -273,7 +273,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                   fillText: modal.description,
                                   labelText: "Description",
                                   hintText: "Description"),
-                              FutureBuilder<List<ModalCategoryType>>(
+                              FutureBuilder<List<ModalCategoryType>?>(
                                 future: CategoryTypeFirebase().read(),
                                 initialData: [],
                                 builder: (context, snapshot) =>
@@ -285,7 +285,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                                 choseCategoryType = value)
                                         .builder(),
                               ),
-                              FutureBuilder<List<ModalAccount>>(
+                              FutureBuilder<List<ModalAccount>?>(
                                 future: AccountFirestore().read(),
                                 initialData: [],
                                 builder: (context, snapshot) =>

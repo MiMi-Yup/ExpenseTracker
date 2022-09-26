@@ -29,23 +29,32 @@ class CategoryTypeFirebase extends IFirestore {
   }
 
   @override
-  Future<List<ModalCategoryType>> read() async {
-    QuerySnapshot<ModalCategoryType> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(user?.uid))
-        .withConverter(
-            fromFirestore: ModalCategoryType.fromFirestore,
-            toFirestore: (ModalCategoryType modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.docs.map((e) => e.data()).toList();
+  Future<List<ModalCategoryType>?> read() async {
+    try {
+      QuerySnapshot<ModalCategoryType> snapshot = await FirebaseFirestore
+          .instance
+          .collection(getPath(user?.uid))
+          .withConverter(
+              fromFirestore: ModalCategoryType.fromFirestore,
+              toFirestore: (ModalCategoryType modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.docs.map((e) => e.data()).toList();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   @override
   Future<ModalCategoryType?> getModalFromRef(DocumentReference ref) async {
-    DocumentSnapshot<ModalCategoryType> snapshot = await ref
-        .withConverter(
-            fromFirestore: ModalCategoryType.fromFirestore,
-            toFirestore: (ModalCategoryType modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.data();
+    try {
+      DocumentSnapshot<ModalCategoryType> snapshot = await ref
+          .withConverter(
+              fromFirestore: ModalCategoryType.fromFirestore,
+              toFirestore: (ModalCategoryType modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.data();
+    } on FirebaseException {
+      return null;
+    }
   }
 }

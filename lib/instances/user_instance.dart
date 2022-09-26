@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/services/firebase/firestore/user.dart';
@@ -8,22 +11,33 @@ class UserInstance {
   static UserFirestore? _service;
   static ModalUser? _modal;
   static ModalCurrencyType? _currency;
+  static StreamSubscription<User?>? _streamSubscription;
 
-  static UserInstance instance() {
+  static UserInstance instance({bool renew = false}) {
+    if (_instance != null && renew) {
+      _streamSubscription?.cancel();
+      _instance = null;
+      _service = null;
+      _modal = null;
+      _currency = null;
+      _streamSubscription = null;
+    }
+
     if (_instance == null) {
       _instance = UserInstance();
-      FirebaseAuth.instance.userChanges().listen((event) async {
+      _streamSubscription =
+          FirebaseAuth.instance.userChanges().listen((event) async {
         if (event == null) {
           _service = null;
           _modal = null;
           _currency = null;
         } else {
           _service ??= UserFirestore();
-          List<ModalUser> modals = await _service!.read();
-          _modal ??= modals[0];
+          List<ModalUser>? modals = await _service!.read();
+          _modal ??= modals != null && modals.isNotEmpty ? modals.first : null;
           _currency ??= await _service!.getMainCurrencyAccount(modal: _modal);
         }
-      });
+      }, onError: (error) {});
     }
 
     return _instance!;

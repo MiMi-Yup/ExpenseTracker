@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:developer';
-import 'dart:isolate';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
@@ -34,22 +34,22 @@ enum StatusIsolateThread {
 class EventFirestore {
   static EventFirestore? _instance;
   final NotificationService notificationService = NotificationService();
-
-  Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
-  Stream<QuerySnapshot<ModalBudget>>? _streamBudget;
+  static StreamSubscription<QuerySnapshot>? _streamSubscriptionLog;
+  static StreamSubscription<QuerySnapshot>? _streamSubscriptionBudget;
+  static StreamSubscription<User?>? _streamSubscriptionUser;
 
   EventFirestore._() {
-    _streamLog = null;
-    _streamBudget = null;
     _initApplication();
   }
 
   factory EventFirestore.instance() {
-    _instance ??= EventFirestore._();
-    return _instance!;
-  }
+    if (_instance != null) {
+      _streamSubscriptionBudget?.cancel();
+      _streamSubscriptionLog?.cancel();
+      _streamSubscriptionUser?.cancel();
+      _instance = null;
+    }
 
-  factory EventFirestore.reInstance() {
     _instance = EventFirestore._();
     return _instance!;
   }
@@ -84,17 +84,14 @@ class EventFirestore {
     CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
     BudgetFirestore serviceBudget = BudgetFirestore();
 
-    _streamLog = serviceLog.stream;
-    _streamBudget = serviceBudget.stream;
-
-    _streamLog?.listen((event) async {
+    _streamSubscriptionLog = serviceLog.stream.listen((event) async {
       if (event.docChanges.isNotEmpty) {
         //await FlutterIsolate.spawn(isolateThread, port.sendPort);
         transactionCollectionChanged(event.docChanges);
       }
-    });
+    }, onError: (error) {});
 
-    _streamBudget?.listen((event) async {
+    _streamSubscriptionBudget = serviceBudget.stream.listen((event) async {
       if (event.docChanges.isNotEmpty) {
         if (event.docChanges.firstWhereOrNull((element) =>
                 element.type == DocumentChangeType.added ||
@@ -107,20 +104,21 @@ class EventFirestore {
           //remove all notification about budget
         }
       }
-    });
+    }, onError: (error) {});
   }
 
   Future<void> _initApplication() async {
     notificationService.initializePlatformNotifications();
 
     await Future.delayed(const Duration(seconds: 2), () {
-      UserInstance.instance();
-      CategoryInstance.instance();
-      TranasactionTypeInstance.instance();
-      AccountTypeInstance.instance();
+      UserInstance.instance(renew: true);
+      CategoryInstance.instance(renew: true);
+      TranasactionTypeInstance.instance(renew: true);
+      AccountTypeInstance.instance(renew: true);
     });
 
-    FirebaseAuth.instance.authStateChanges().listen((user) async {
+    _streamSubscriptionUser =
+        FirebaseAuth.instance.authStateChanges().listen((user) async {
       if (user == null) {
         RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
             RouteApplication.getRoute(ERoute.introduction));
@@ -162,8 +160,10 @@ class EventFirestore {
         }
 
         bool initUser = true;
-        List<ModalUser> fieldUser = await userFirestore.read();
-        if (fieldUser.isNotEmpty && fieldUser.first.passcode != null) {
+        List<ModalUser>? fieldUser = await userFirestore.read();
+        if (fieldUser != null &&
+            fieldUser.isNotEmpty &&
+            fieldUser.first.passcode != null) {
           initUser = false;
         }
 
@@ -173,6 +173,6 @@ class EventFirestore {
             RouteApplication.getRoute(ERoute.pin),
             arguments: initUser);
       }
-    });
+    }, onError: (error) {});
   }
 }

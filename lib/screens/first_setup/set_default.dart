@@ -128,7 +128,7 @@ class _SetDefaultState extends State<SetDefault> {
                                 border: Border.all(color: Colors.grey),
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(4.0))),
-                            child: FutureBuilder<List<ModalAccountType>>(
+                            child: FutureBuilder<List<ModalAccountType>?>(
                               initialData: [],
                               future: accountTypeFirestore.read(),
                               builder: (context, snapshot) =>
@@ -157,7 +157,7 @@ class _SetDefaultState extends State<SetDefault> {
                       decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.all(Radius.circular(4.0))),
-                      child: FutureBuilder<List<ModalCurrencyType>>(
+                      child: FutureBuilder<List<ModalCurrencyType>?>(
                         initialData: [],
                         future: currencyTypesFirestore.read(),
                         builder: (context, snapshot) =>
@@ -228,7 +228,7 @@ class _SetDefaultState extends State<SetDefault> {
                               Future.delayed(const Duration(seconds: 1),
                                   () async {
                                 userFirestore.read().then((value) {
-                                  if (value.isNotEmpty) {
+                                  if (value != null && value.isNotEmpty) {
                                     ModalUser fieldUser = value.first;
                                     fieldUser.wasSetup = true;
                                     userFirestore.update(null, fieldUser);
@@ -249,7 +249,7 @@ class _SetDefaultState extends State<SetDefault> {
                                     accountTypeRef: accountTypeRef,
                                     money: double.tryParse(controller.text)));
                                 userFirestore.read().then((value) {
-                                  if (value.isNotEmpty) {
+                                  if (value != null && value.isNotEmpty) {
                                     ModalUser modal = value.first;
                                     modal.currencyTypeRef =
                                         currencyTypesFirestore

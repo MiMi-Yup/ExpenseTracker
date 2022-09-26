@@ -16,7 +16,7 @@ class AccountPage extends StatelessWidget {
         body: Column(
       children: [
         Expanded(
-          child: FutureBuilder<List<ModalAccount>>(
+          child: FutureBuilder<List<ModalAccount>?>(
             future: AccountFirestore().read(),
             builder: (context, snapshot) {
               Widget widget;

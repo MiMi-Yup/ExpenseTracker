@@ -7,6 +7,6 @@ class NotificationBudgetFirestore {
   NotificationBudgetFirestore() {}
 
   void x() {
-    serviceBudget.stream.listen((event) {});
+    serviceBudget.stream.listen((event) {}, onError: (error){});
   }
 }

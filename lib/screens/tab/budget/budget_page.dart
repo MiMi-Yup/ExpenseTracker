@@ -32,6 +32,8 @@ class _BudgetPageState extends State<BudgetPage>
   Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
   Stream<QuerySnapshot<ModalBudget>>? _streamBudget;
 
+  bool keepAlive = true;
+
   @override
   void initState() {
     super.initState();
@@ -161,5 +163,5 @@ class _BudgetPageState extends State<BudgetPage>
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => keepAlive;
 }

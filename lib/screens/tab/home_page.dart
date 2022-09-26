@@ -30,7 +30,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   late PageController _controller;
 
   final TransactionUtilities serviceTransaction = TransactionUtilities();
@@ -44,10 +45,12 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   late double height = MediaQuery.of(context).size.height;
 
-  final List<OverviewTransactionComponent> overviewTransaction =
+  bool keepAlive = true;
+
+  final List<OverviewTransactionComponent>? overviewTransaction =
       TranasactionTypeInstance.instance()
-          .modals!
-          .map((e) => OverviewTransactionComponent(
+          .modals
+          ?.map((e) => OverviewTransactionComponent(
               transactionTypeRef: TransactionTypeFirestore().getRef(e!),
               money: 3000))
           .toList();
@@ -121,8 +124,9 @@ class _HomePageState extends State<HomePage> {
                           RouteApplication.navigatorKey.currentState?.pop();
                         },
                         setInitDateTime: fliterTransactionByMonth == null
-                            ? (value) => WidgetsBinding.instance.addPostFrameCallback(
-                          (_) => setState(() => fliterTransactionByMonth = value))
+                            ? (value) => WidgetsBinding.instance
+                                .addPostFrameCallback((_) => setState(
+                                    () => fliterTransactionByMonth = value))
                             : null,
                         selectedDate: fliterTransactionByMonth)
                     .builder(),
@@ -181,14 +185,15 @@ class _HomePageState extends State<HomePage> {
                 "\$9400",
                 style: TextStyle(fontSize: 30.0),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children:
-                      overviewTransaction.map((e) => e.builder()).toList(),
-                ),
-              )
+              if (overviewTransaction != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children:
+                        overviewTransaction!.map((e) => e.builder()).toList(),
+                  ),
+                )
             ],
           ),
         ),
@@ -332,5 +337,5 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => keepAlive;
 }

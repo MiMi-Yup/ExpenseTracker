@@ -48,8 +48,6 @@ dependencies:
   flutter_date_pickers: ^0.4.0
   
   flutter_local_notifications: ^9.9.1
-  
-  restart_app: ^1.1.0+1
 
   #Firebase services
   firebase_core: ^1.21.1

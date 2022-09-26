@@ -38,14 +38,19 @@ class TransactionFirestore extends IFirestore {
   }
 
   @override
-  Future<List<ModalTransaction>> read() async {
-    QuerySnapshot<ModalTransaction> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(user?.uid))
-        .withConverter(
-            fromFirestore: ModalTransaction.fromFirestore,
-            toFirestore: (ModalTransaction modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.docs.map((e) => e.data()).toList();
+  Future<List<ModalTransaction>?> read() async {
+    try {
+      QuerySnapshot<ModalTransaction> snapshot = await FirebaseFirestore
+          .instance
+          .collection(getPath(user?.uid))
+          .withConverter(
+              fromFirestore: ModalTransaction.fromFirestore,
+              toFirestore: (ModalTransaction modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.docs.map((e) => e.data()).toList();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   Future<void> override_(IModal modal) async {
@@ -93,12 +98,16 @@ class TransactionFirestore extends IFirestore {
   @override
   Future<ModalTransaction?> getModalFromRef(
       DocumentReference<Object?> ref) async {
-    DocumentSnapshot<ModalTransaction> snapshot = await ref
-        .withConverter(
-            fromFirestore: ModalTransaction.fromFirestore,
-            toFirestore: (ModalTransaction modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.data();
+    try {
+      DocumentSnapshot<ModalTransaction> snapshot = await ref
+          .withConverter(
+              fromFirestore: ModalTransaction.fromFirestore,
+              toFirestore: (ModalTransaction modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.data();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   Future<ModalTransaction?> _getFirstLastTransaction(bool descending) async {

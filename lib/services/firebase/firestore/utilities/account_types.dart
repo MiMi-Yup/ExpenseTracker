@@ -25,7 +25,7 @@ class AccountTypeUtilities {
         modal.image = pathStorage;
         await instance.insert(modal);
       }
-    });
+    }, onError: (error){});
 
     return task;
   }

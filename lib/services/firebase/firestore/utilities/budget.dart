@@ -13,23 +13,25 @@ import 'package:firebase_core/firebase_core.dart';
 class BudgetUtilities {
   final BudgetFirestore _service = BudgetFirestore();
   Future<dynamic> add(ModalBudget modal) async {
-    List<ModalBudget> modals = await _service.read();
-    ModalBudget existModal = modals.singleWhere((element) {
-      DateTime? existsBudget = element.timeCreate?.toDate();
-      DateTime? addBudget = modal.timeCreate?.toDate();
-      if (element.categoryTypeRef?.id != modal.categoryTypeRef?.id ||
-          existsBudget?.year != addBudget?.year ||
-          existsBudget?.month != addBudget?.month) return false;
-      return true;
-    },
-        orElse: () => ModalBudget(
-            id: null,
-            budget: null,
-            percentAlert: null,
-            timeCreate: null,
-            categoryTypeRef: null));
+    List<ModalBudget>? modals = await _service.read();
+    if (modals != null && modals.isNotEmpty) {
+      ModalBudget existModal = modals.singleWhere((element) {
+        DateTime? existsBudget = element.timeCreate?.toDate();
+        DateTime? addBudget = modal.timeCreate?.toDate();
+        if (element.categoryTypeRef?.id != modal.categoryTypeRef?.id ||
+            existsBudget?.year != addBudget?.year ||
+            existsBudget?.month != addBudget?.month) return false;
+        return true;
+      },
+          orElse: () => ModalBudget(
+              id: null,
+              budget: null,
+              percentAlert: null,
+              timeCreate: null,
+              categoryTypeRef: null));
+      if (existModal.id != null) return existModal;
+    }
 
-    if (existModal.id != null) return existModal;
     return _service.insert(modal);
   }
 
@@ -62,31 +64,34 @@ class BudgetUtilities {
 
     List<ModalTransactionLog>? logs = await serviceLog.read();
     Iterable<DocumentReference<Object?>>? transactionRefs =
-        logs.map((e) => e.lastTransactionRef ?? e.firstTransactionRef!);
+        logs?.map((e) => e.lastTransactionRef ?? e.firstTransactionRef!);
 
     List<ModalTransaction> results = [];
 
-    for (DocumentReference<Object?> transactionRef in transactionRefs) {
-      ModalTransaction? transactionModal =
-          await serviceTransaction.getModalFromRef(transactionRef);
+    if (transactionRefs != null) {
+      for (DocumentReference<Object?> transactionRef in transactionRefs) {
+        ModalTransaction? transactionModal =
+            await serviceTransaction.getModalFromRef(transactionRef);
 
-      ModalTransactionType? transactionType;
+        ModalTransactionType? transactionType;
 
-      if (transactionModal != null &&
-          transactionModal.transactionTypeRef != null) {
-        transactionType = await serviceTransactionType
-            .getModalFromRef(transactionModal.transactionTypeRef!);
-      } else {
-        continue;
-      }
-      if (transactionModal.categoryTypeRef?.id == categoryRef?.id &&
-          transactionType?.operator == '-' &&
-          transactionModal.timeCreate!
-                  .compareTo(Timestamp.fromDate(startDate)) >=
-              0 &&
-          transactionModal.timeCreate!.compareTo(Timestamp.fromDate(endDate)) <=
-              0) {
-        results.add(transactionModal);
+        if (transactionModal != null &&
+            transactionModal.transactionTypeRef != null) {
+          transactionType = await serviceTransactionType
+              .getModalFromRef(transactionModal.transactionTypeRef!);
+        } else {
+          continue;
+        }
+        if (transactionModal.categoryTypeRef?.id == categoryRef?.id &&
+            transactionType?.operator == '-' &&
+            transactionModal.timeCreate!
+                    .compareTo(Timestamp.fromDate(startDate)) >=
+                0 &&
+            transactionModal.timeCreate!
+                    .compareTo(Timestamp.fromDate(endDate)) <=
+                0) {
+          results.add(transactionModal);
+        }
       }
     }
 

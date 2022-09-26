@@ -27,25 +27,34 @@ class AccountTypeFirestore extends IFirestore {
   }
 
   @override
-  Future<List<ModalAccountType>> read() async {
-    QuerySnapshot<ModalAccountType> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(user?.uid))
-        .withConverter(
-            fromFirestore: ModalAccountType.fromFirestore,
-            toFirestore: (ModalAccountType accountType, _) =>
-                accountType.toFirestore())
-        .get();
-    return snapshot.docs.map((e) => e.data()).toList();
+  Future<List<ModalAccountType>?> read() async {
+    try {
+      QuerySnapshot<ModalAccountType> snapshot = await FirebaseFirestore
+          .instance
+          .collection(getPath(user?.uid))
+          .withConverter(
+              fromFirestore: ModalAccountType.fromFirestore,
+              toFirestore: (ModalAccountType accountType, _) =>
+                  accountType.toFirestore())
+          .get();
+      return snapshot.docs.map((e) => e.data()).toList();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   @override
   Future<ModalAccountType?> getModalFromRef(
       DocumentReference<Object?> ref) async {
-    DocumentSnapshot<ModalAccountType> snapshot = await ref
-        .withConverter(
-            fromFirestore: ModalAccountType.fromFirestore,
-            toFirestore: (ModalAccountType modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.data();
+    try {
+      DocumentSnapshot<ModalAccountType> snapshot = await ref
+          .withConverter(
+              fromFirestore: ModalAccountType.fromFirestore,
+              toFirestore: (ModalAccountType modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.data();
+    } on FirebaseException {
+      return null;
+    }
   }
 }

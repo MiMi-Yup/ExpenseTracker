@@ -14,26 +14,34 @@ class FrequencyTypesFirestore extends IFirestore {
   String getPath(String? uid) => 'frequency_types';
 
   @override
-  Future<List<ModalFrequencyType>> read() async {
-    QuerySnapshot<ModalFrequencyType> snapshot = await FirebaseFirestore
-        .instance
-        .collection(getPath(user?.uid))
-        .withConverter(
-            fromFirestore: ModalFrequencyType.fromFirestore,
-            toFirestore: (ModalFrequencyType currency, _) =>
-                currency.toFirestore())
-        .get();
-    return snapshot.docs.map((e) => e.data()).toList();
+  Future<List<ModalFrequencyType>?> read() async {
+    try {
+      QuerySnapshot<ModalFrequencyType> snapshot = await FirebaseFirestore
+          .instance
+          .collection(getPath(user?.uid))
+          .withConverter(
+              fromFirestore: ModalFrequencyType.fromFirestore,
+              toFirestore: (ModalFrequencyType currency, _) =>
+                  currency.toFirestore())
+          .get();
+      return snapshot.docs.map((e) => e.data()).toList();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   @override
   Future<ModalFrequencyType?> getModalFromRef(
       DocumentReference<Object?> ref) async {
-    DocumentSnapshot<ModalFrequencyType> snapshot = await ref
-        .withConverter(
-            fromFirestore: ModalFrequencyType.fromFirestore,
-            toFirestore: (ModalFrequencyType modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.data();
+    try {
+      DocumentSnapshot<ModalFrequencyType> snapshot = await ref
+          .withConverter(
+              fromFirestore: ModalFrequencyType.fromFirestore,
+              toFirestore: (ModalFrequencyType modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.data();
+    } on FirebaseException {
+      return null;
+    }
   }
 }

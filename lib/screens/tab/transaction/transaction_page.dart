@@ -46,6 +46,8 @@ class _TransactionPageState extends State<TransactionPage>
   bool hasFilter = false;
   bool isExpandAll = false;
 
+  bool keepAlive = true;
+
   DateTime? fliterTransactionByMonth;
   ModalCategoryType? selectedFilterCategory;
   ModalTransactionType? selectedFilterTransactionType;
@@ -117,8 +119,9 @@ class _TransactionPageState extends State<TransactionPage>
                         });
                       },
                       setInitDateTime: fliterTransactionByMonth == null
-                          ? (value) => WidgetsBinding.instance.addPostFrameCallback(
-                          (_) => setState(() => fliterTransactionByMonth = value))
+                          ? (value) => WidgetsBinding.instance
+                              .addPostFrameCallback((_) => setState(
+                                  () => fliterTransactionByMonth = value))
                           : null,
                       selectedDate: fliterTransactionByMonth)
                   .builder(),
@@ -572,9 +575,10 @@ class _TransactionPageState extends State<TransactionPage>
               .getModalFromRef(element.lastTransactionRef!);
       ModalTransaction? firstModal = await serviceTransaction
           .getModalFromRef(element.firstTransactionRef!);
-      ModalTransaction push = currerntModal ?? firstModal!;
+      ModalTransaction? push = currerntModal ?? firstModal;
 
-      if (firstModal?.getTimeCreate?.year == fliterTransactionByMonth?.year &&
+      if (push != null &&
+          firstModal?.getTimeCreate?.year == fliterTransactionByMonth?.year &&
           firstModal?.getTimeCreate?.month == fliterTransactionByMonth?.month &&
           acceptPushTransaction(push)) {
         String key = _getDate(firstModal!.getTimeCreate!);
@@ -599,5 +603,5 @@ class _TransactionPageState extends State<TransactionPage>
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => keepAlive;
 }

@@ -24,7 +24,7 @@ class CategoryTypeUtilities {
         modal.image = pathStorage;
         await CategoryTypeFirebase().insert(modal);
       }
-    });
+    }, onError: (error){});
 
     return task;
   }

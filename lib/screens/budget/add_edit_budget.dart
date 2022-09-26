@@ -93,7 +93,7 @@ class _AddEditBudgetState extends State<AddEditBudget> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    FutureBuilder<List<ModalCategoryType>>(
+                    FutureBuilder<List<ModalCategoryType>?>(
                       future: CategoryTypeFirebase().read(),
                       initialData: [],
                       builder: (context, snapshot) =>

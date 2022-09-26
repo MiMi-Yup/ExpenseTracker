@@ -85,7 +85,7 @@ class _CodeAuthState extends State<CodeAuth>
           _initCode = false;
 
           await UserFirestore().read().then((value) async {
-            if (value.isNotEmpty) {
+            if (value != null && value.isNotEmpty) {
               ModalUser fieldUser = value.first;
               fieldUser.passcode = _code;
               await UserFirestore().update(null, fieldUser);
@@ -99,22 +99,26 @@ class _CodeAuthState extends State<CodeAuth>
       _confirm = !_confirm;
     } else {
       UserFirestore().read().then((user) {
-        if (user.isEmpty) {
-          wrong = true;
-        } else {
-          bool allowAccess = user.first.passcode == value;
-          if (allowAccess) {
-            bool wasSetup = user.first.wasSetup ?? false;
-            if (wasSetup) {
-              RouteApplication.navigatorKey.currentState
-                  ?.popUntil((route) => route.isFirst);
-              RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
-                  RouteApplication.getRoute(ERoute.main));
-            } else {
-              RouteApplication.navigatorKey.currentState
-                  ?.popUntil((route) => route.isFirst);
-              RouteApplication.navigatorKey.currentState?.pushReplacementNamed(
-                  RouteApplication.getRoute(ERoute.introductionSetupAccount));
+        if (user != null) {
+          if (user.isEmpty) {
+            wrong = true;
+          } else {
+            bool allowAccess = user.first.passcode == value;
+            if (allowAccess) {
+              bool wasSetup = user.first.wasSetup ?? false;
+              if (wasSetup) {
+                RouteApplication.navigatorKey.currentState
+                    ?.popUntil((route) => route.isFirst);
+                RouteApplication.navigatorKey.currentState
+                    ?.pushReplacementNamed(
+                        RouteApplication.getRoute(ERoute.main));
+              } else {
+                RouteApplication.navigatorKey.currentState
+                    ?.popUntil((route) => route.isFirst);
+                RouteApplication.navigatorKey.currentState
+                    ?.pushReplacementNamed(RouteApplication.getRoute(
+                        ERoute.introductionSetupAccount));
+              }
             }
           }
         }

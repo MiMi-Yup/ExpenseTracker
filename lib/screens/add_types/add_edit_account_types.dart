@@ -289,7 +289,7 @@ class _AddEditAccountTypesState extends State<AddEditAccountTypes> {
                                     Future.delayed(const Duration(seconds: 1),
                                         () async {
                                       int count = 0;
-                                      List<ModalTransactionType> modalType =
+                                      List<ModalTransactionType>? modalType =
                                           await TransactionTypeFirestore()
                                               .read();
                                       RouteApplication.navigatorKey.currentState
@@ -299,7 +299,11 @@ class _AddEditAccountTypesState extends State<AddEditAccountTypes> {
                                               builder: (context) =>
                                                   EditTransactionTypes(),
                                               settings: RouteSettings(
-                                                  arguments: modalType[0])));
+                                                  arguments: modalType !=
+                                                              null &&
+                                                          modalType.isNotEmpty
+                                                      ? modalType.first
+                                                      : null)));
                                     });
                                   }
                                 },

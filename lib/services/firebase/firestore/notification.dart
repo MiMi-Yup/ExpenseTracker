@@ -21,12 +21,16 @@ class NotificationFirestore extends IFirestore {
   @override
   Future<ModalNotification?> getModalFromRef(
       DocumentReference<Object?> ref) async {
-    DocumentSnapshot<ModalNotification> snapshot = await ref
-        .withConverter(
-            fromFirestore: ModalNotification.fromFirestore,
-            toFirestore: (ModalNotification modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.data();
+    try {
+      DocumentSnapshot<ModalNotification> snapshot = await ref
+          .withConverter(
+              fromFirestore: ModalNotification.fromFirestore,
+              toFirestore: (ModalNotification modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.data();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   @override
@@ -41,15 +45,20 @@ class NotificationFirestore extends IFirestore {
   String getPath(String? uid) => 'users/user_$uid/notifications';
 
   @override
-  Future<List<ModalNotification>> read() async {
-    QuerySnapshot<ModalNotification> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(user?.uid))
-        .withConverter(
-            fromFirestore: ModalNotification.fromFirestore,
-            toFirestore: (ModalNotification modal, _) => modal.toFirestore())
-        .get();
+  Future<List<ModalNotification>?> read() async {
+    try {
+      QuerySnapshot<ModalNotification> snapshot = await FirebaseFirestore
+          .instance
+          .collection(getPath(user?.uid))
+          .withConverter(
+              fromFirestore: ModalNotification.fromFirestore,
+              toFirestore: (ModalNotification modal, _) => modal.toFirestore())
+          .get();
 
-    return snapshot.docs.map((e) => e.data()).toList();
+      return snapshot.docs.map((e) => e.data()).toList();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   Stream<QuerySnapshot<ModalNotification>> get stream =>

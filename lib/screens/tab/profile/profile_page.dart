@@ -3,9 +3,9 @@ import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/auth/google_auth.dart';
+import 'package:expense_tracker/services/firebase/event_firestore.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
-import 'package:restart_app/restart_app.dart';
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({Key? key}) : super(key: key);
@@ -118,10 +118,10 @@ class ProfilePage extends StatelessWidget {
                                                       child: largestButton(
                                                           text: "Yes",
                                                           onPressed: () async {
+                                                            EventFirestore
+                                                                .instance();
                                                             await GoogleAuth
                                                                 .signOut();
-                                                            Restart
-                                                                .restartApp();
                                                           },
                                                           background:
                                                               MyColor.purple()))

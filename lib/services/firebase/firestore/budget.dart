@@ -19,12 +19,16 @@ class BudgetFirestore extends IFirestore {
   }
 
   @override
-  Future<List<ModalBudget>> read() async {
-    QuerySnapshot<Map<String, dynamic>> collection =
-        await FirebaseFirestore.instance.collection(getPath(user?.uid)).get();
-    return collection.docs
-        .map((snapshot) => ModalBudget.fromFirestore(snapshot, null))
-        .toList();
+  Future<List<ModalBudget>?> read() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> collection =
+          await FirebaseFirestore.instance.collection(getPath(user?.uid)).get();
+      return collection.docs
+          .map((snapshot) => ModalBudget.fromFirestore(snapshot, null))
+          .toList();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   Future<bool> checkCategoryTypeExists(ModalCategoryType modal) async {
@@ -43,12 +47,16 @@ class BudgetFirestore extends IFirestore {
 
   @override
   Future<ModalBudget?> getModalFromRef(DocumentReference<Object?> ref) async {
-    DocumentSnapshot<ModalBudget> snapshot = await ref
-        .withConverter(
-            fromFirestore: ModalBudget.fromFirestore,
-            toFirestore: (ModalBudget modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.data();
+    try {
+      DocumentSnapshot<ModalBudget> snapshot = await ref
+          .withConverter(
+              fromFirestore: ModalBudget.fromFirestore,
+              toFirestore: (ModalBudget modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.data();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   Stream<QuerySnapshot<ModalBudget>> get stream => FirebaseFirestore.instance

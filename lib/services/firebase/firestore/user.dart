@@ -36,39 +36,47 @@ class UserFirestore extends IFirestore {
   }
 
   @override
-  Future<List<ModalUser>> read() async {
-    DocumentSnapshot<ModalUser> snapshot = await FirebaseFirestore.instance
-        .doc(getPath(user?.uid))
-        .withConverter(
-            fromFirestore: ModalUser.fromFirestore,
-            toFirestore: (ModalUser user, _) => user.toFirestore())
-        .get();
-    ModalUser? modal = snapshot.data();
-    if (modal != null) {
-      modal.displayName = user?.displayName;
-      modal.email = user?.email;
-      modal.emailVerified = user?.emailVerified;
-      modal.phoneNumber = user?.phoneNumber;
-      modal.photoURL = user?.photoURL;
-      return [modal];
+  Future<List<ModalUser>?> read() async {
+    try {
+      DocumentSnapshot<ModalUser> snapshot = await FirebaseFirestore.instance
+          .doc(getPath(user?.uid))
+          .withConverter(
+              fromFirestore: ModalUser.fromFirestore,
+              toFirestore: (ModalUser user, _) => user.toFirestore())
+          .get();
+      ModalUser? modal = snapshot.data();
+      if (modal != null) {
+        modal.displayName = user?.displayName;
+        modal.email = user?.email;
+        modal.emailVerified = user?.emailVerified;
+        modal.phoneNumber = user?.phoneNumber;
+        modal.photoURL = user?.photoURL;
+        return [modal];
+      }
+      return [];
+    } on FirebaseException {
+      return null;
     }
-    return [];
   }
 
   @override
   Future<ModalUser?> getModalFromRef(DocumentReference<Object?> ref) async {
-    DocumentSnapshot<ModalUser> snapshot = await ref
-        .withConverter(
-            fromFirestore: ModalUser.fromFirestore,
-            toFirestore: (ModalUser modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.data();
+    try {
+      DocumentSnapshot<ModalUser> snapshot = await ref
+          .withConverter(
+              fromFirestore: ModalUser.fromFirestore,
+              toFirestore: (ModalUser modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.data();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   Future<ModalCurrencyType?> getMainCurrencyAccount({ModalUser? modal}) async {
     if (modal == null) {
-      List<ModalUser> modals = await read();
-      if (modals.isNotEmpty) {
+      List<ModalUser>? modals = await read();
+      if (modals != null && modals.isNotEmpty) {
         modal = modals.first;
       }
     }

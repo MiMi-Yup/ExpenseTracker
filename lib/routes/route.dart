@@ -22,6 +22,7 @@ import 'package:expense_tracker/screens/tab/transaction/report/overview_report.d
 import 'package:expense_tracker/screens/transaction/add_edit_transaction.dart';
 import 'package:expense_tracker/screens/transaction/detail_transaction.dart';
 import 'package:expense_tracker/screens/welcome_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class RouteApplication {

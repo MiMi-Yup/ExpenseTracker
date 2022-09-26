@@ -12,25 +12,34 @@ class CurrencyTypesFirestore extends IFirestore {
   String getPath(String? uid) => 'currency_types';
 
   @override
-  Future<List<ModalCurrencyType>> read() async {
-    QuerySnapshot<ModalCurrencyType> snapshot = await FirebaseFirestore.instance
-        .collection(getPath(user?.uid))
-        .withConverter(
-            fromFirestore: ModalCurrencyType.fromFirestore,
-            toFirestore: (ModalCurrencyType currency, _) =>
-                currency.toFirestore())
-        .get();
-    return snapshot.docs.map((e) => e.data()).toList();
+  Future<List<ModalCurrencyType>?> read() async {
+    try {
+      QuerySnapshot<ModalCurrencyType> snapshot = await FirebaseFirestore
+          .instance
+          .collection(getPath(user?.uid))
+          .withConverter(
+              fromFirestore: ModalCurrencyType.fromFirestore,
+              toFirestore: (ModalCurrencyType currency, _) =>
+                  currency.toFirestore())
+          .get();
+      return snapshot.docs.map((e) => e.data()).toList();
+    } on FirebaseException {
+      return null;
+    }
   }
 
   @override
   Future<ModalCurrencyType?> getModalFromRef(
       DocumentReference<Object?> ref) async {
-    DocumentSnapshot<ModalCurrencyType> snapshot = await ref
-        .withConverter(
-            fromFirestore: ModalCurrencyType.fromFirestore,
-            toFirestore: (ModalCurrencyType modal, _) => modal.toFirestore())
-        .get();
-    return snapshot.data();
+    try {
+      DocumentSnapshot<ModalCurrencyType> snapshot = await ref
+          .withConverter(
+              fromFirestore: ModalCurrencyType.fromFirestore,
+              toFirestore: (ModalCurrencyType modal, _) => modal.toFirestore())
+          .get();
+      return snapshot.data();
+    } on FirebaseException {
+      return null;
+    }
   }
 }
