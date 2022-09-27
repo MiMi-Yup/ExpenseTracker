@@ -1,6 +1,9 @@
 import 'package:expense_tracker/constants/asset/background.dart';
 import 'package:expense_tracker/constants/color.dart';
+import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/modals/modal_account.dart';
+import 'package:expense_tracker/modals/modal_account_type.dart';
+import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/widgets/component/account_component.dart';
@@ -19,23 +22,25 @@ class AccountPage extends StatelessWidget {
           child: FutureBuilder<List<ModalAccount>?>(
             future: AccountFirestore().read(),
             builder: (context, snapshot) {
-              Widget widget;
-              if (snapshot.hasData) {
-                widget = SliverList(
-                    delegate: SliverChildListDelegate(
-                        snapshot.data!
-                            .map((e) => AccountComponent(accoutnModal: e))
-                            .toList(),
-                        addSemanticIndexes: false));
-              } else {
-                widget = SliverToBoxAdapter(
-                  child: Padding(
-                    padding:
-                        EdgeInsets.all(MediaQuery.of(context).size.width / 4),
-                    child: LinearProgressIndicator(),
-                  ),
-                );
-              }
+              Widget widget = snapshot.hasData
+                  ? SliverList(
+                      delegate: SliverChildListDelegate(
+                          snapshot.data!
+                              .map((e) => AccountComponent(
+                                  accoutnModal: e,
+                                  onTap: () => RouteApplication
+                                      .navigatorKey.currentState
+                                      ?.pushNamed(RouteApplication.getRoute(
+                                          ERoute.detailAccount), arguments: e)))
+                              .toList(),
+                          addSemanticIndexes: false))
+                  : SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width / 4),
+                        child: LinearProgressIndicator(),
+                      ),
+                    );
               return CustomScrollView(
                 physics: BouncingScrollPhysics(),
                 slivers: [
@@ -80,7 +85,13 @@ class AccountPage extends StatelessWidget {
         Container(
           width: double.maxFinite,
           padding: const EdgeInsets.all(16.0),
-          child: largestButton(text: "+ Add new wallet", onPressed: () => null),
+          child: largestButton(
+              text: "+ Add new wallet",
+              onPressed: () => RouteApplication.navigatorKey.currentState
+                  ?.pushNamed(RouteApplication.getRoute(ERoute.addEditAccount),
+                      arguments: (ModalAccountType? accountType,
+                          ModalCurrencyType? currencyType,
+                          double? balance) async {})),
         )
       ],
     ));

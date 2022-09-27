@@ -1,10 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
+import 'package:expense_tracker/instances/transaction_type_instance.dart';
+import 'package:expense_tracker/instances/user_instance.dart';
+import 'package:expense_tracker/modals/modal_account.dart';
+import 'package:expense_tracker/modals/modal_account_type.dart';
+import 'package:expense_tracker/modals/modal_currency_type.dart';
+import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/services/firebase/firestore/account_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
+import 'package:expense_tracker/services/firebase/firestore/currency_types.dart';
+import 'package:expense_tracker/services/firebase/firestore/user.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
 
 class IntroductionSetup extends StatelessWidget {
-  const IntroductionSetup({Key? key}) : super(key: key);
+  IntroductionSetup({Key? key}) : super(key: key);
+
+  UserFirestore userFirestore = UserFirestore();
+  CurrencyTypesFirestore currencyTypesFirestore = CurrencyTypesFirestore();
+  AccountTypeFirestore accountTypeFirestore = AccountTypeFirestore();
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +54,33 @@ class IntroductionSetup extends StatelessWidget {
               child: largestButton(
                 text: "Let’s go",
                 onPressed: () => RouteApplication.navigatorKey.currentState
-                    ?.pushNamed(
-                        RouteApplication.getRoute(ERoute.setDefault)),
+                    ?.pushNamed(RouteApplication.getRoute(ERoute.setDefault),
+                        arguments: (ModalAccountType? accountType,
+                            ModalCurrencyType? currencyType,
+                            double? balance) async {
+                  DocumentReference accountTypeRef =
+                      accountTypeFirestore.getRef(accountType!);
+                  await AccountFirestore().insert(ModalAccount(
+                      id: accountType!.id,
+                      accountTypeRef: accountTypeRef,
+                      money: balance));
+                  List<ModalUser>? modals = await userFirestore.read();
+                  if (modals != null && modals.isNotEmpty) {
+                    ModalUser fieldUser = modals.first;
+                    fieldUser.currencyTypeRef =
+                        currencyTypesFirestore.getRef(currencyType!);
+                    fieldUser.wasSetup = true;
+                    userFirestore.insert(fieldUser);
+                  }
+
+                  UserInstance.instance(renew: true);
+                  TranasactionTypeInstance.instance(renew: true);
+
+                  RouteApplication.navigatorKey.currentState
+                      ?.popUntil((route) => false);
+                  RouteApplication.navigatorKey.currentState
+                      ?.pushNamed(RouteApplication.getRoute(ERoute.main));
+                }),
               ))
         ],
       ),

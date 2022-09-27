@@ -45,45 +45,6 @@ class CurrentTransactionFirestore extends IFirestore {
     }
   }
 
-  Future<Map<ModalTransactionType, List<ModalTransaction>?>>
-      groupTransactionByTransactionType({DateTime? filterByDate}) async {
-    List<ModalTransactionLog>? logs = await read();
-    TransactionFirestore service = TransactionFirestore();
-    Map<ModalTransactionType, List<ModalTransaction>?> result = {};
-    DateTime? filterDate = filterByDate == null
-        ? null
-        : DateTime(filterByDate.year, filterByDate.month, 1);
-
-    if (logs != null) {
-      for (var log in logs) {
-        ModalTransaction? modal = await service.getModalFromRef(
-            log.lastTransactionRef ?? log.firstTransactionRef!);
-        if (modal != null) {
-          DateTime timeCreate = modal.getTimeCreate!;
-          DateTime startMonthTimeCreate =
-              DateTime(timeCreate.year, timeCreate.month, 1);
-          if (filterDate == null ||
-              filterDate.compareTo(startMonthTimeCreate) == 0) {
-            ModalTransactionType? modalType =
-                TranasactionTypeInstance.instance()
-                    .getModal(modal.transactionTypeRef!.id);
-            if (modalType != null) {
-              if (result.containsKey(modalType)) {
-                result[modalType]?.add(modal);
-              } else {
-                result.addAll({
-                  modalType: [modal]
-                });
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
   Stream<QuerySnapshot<ModalTransactionLog>> get stream => FirebaseFirestore
       .instance
       .collection(getPath(user?.uid))

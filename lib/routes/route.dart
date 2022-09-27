@@ -1,12 +1,12 @@
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/screens/account/add_new_account.dart';
+import 'package:expense_tracker/screens/account/detail_account.dart';
 import 'package:expense_tracker/screens/add_types/add_edit_account_types.dart';
 import 'package:expense_tracker/screens/add_types/add_edit_category_types.dart';
 import 'package:expense_tracker/screens/add_types/edit_transaction_types.dart';
 import 'package:expense_tracker/screens/budget/add_edit_budget.dart';
 import 'package:expense_tracker/screens/first_setup/code_auth.dart';
 import 'package:expense_tracker/screens/first_setup/introduction_setup.dart';
-import 'package:expense_tracker/screens/first_setup/set_default.dart';
+import 'package:expense_tracker/screens/account/add_new_account.dart';
 import 'package:expense_tracker/screens/introduction.dart';
 import 'package:expense_tracker/screens/login/forgot_password.dart';
 import 'package:expense_tracker/screens/login/login.dart';
@@ -34,16 +34,15 @@ class RouteApplication {
     getRoute(ERoute.authGoogle): (context) => /*const*/ Container(),
     getRoute(ERoute.forgotPassword): (context) => const ForgotPassword(),
     getRoute(ERoute.pin): (context) => const CodeAuth(),
-    getRoute(ERoute.setDefault): (context) => const SetDefault(),
-    getRoute(ERoute.introductionSetupAccount): (context) =>
-        const IntroductionSetup(),
+    getRoute(ERoute.setDefault): (context) => const AddNewAccount(),
+    getRoute(ERoute.introductionSetupAccount): (context) => IntroductionSetup(),
     getRoute(ERoute.main): (context) => const Navigation(),
     getRoute(ERoute.notification): (context) => const NotificationPage(),
     getRoute(ERoute.overviewReport): (context) => const OverviewReport(),
     getRoute(ERoute.detailReport): (context) => const DetailReport(),
     getRoute(ERoute.addEditBudget): (context) => const AddEditBudget(),
     getRoute(ERoute.overviewAccount): (context) => const AccountPage(),
-    getRoute(ERoute.detailAccount): (context) => /*const*/ Container(),
+    getRoute(ERoute.detailAccount): (context) => const DetailAccount(),
     getRoute(ERoute.export): (context) => const ExportPage(),
     getRoute(ERoute.setting): (context) => const SettingPreference(),
     getRoute(ERoute.addEditAccount): (context) => const AddNewAccount(),

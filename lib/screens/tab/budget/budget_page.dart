@@ -25,25 +25,9 @@ class _BudgetPageState extends State<BudgetPage>
   final BudgetUtilities serviceBudget = BudgetUtilities();
   final CurrentTransactionFirestore serviceTransaction =
       CurrentTransactionFirestore();
-
-  Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
-  Stream<QuerySnapshot<ModalBudget>>? _streamBudget;
+      final BudgetFirestore budgetFirestore =BudgetFirestore();
 
   bool keepAlive = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _streamLog = CurrentTransactionFirestore().stream;
-    _streamBudget = BudgetFirestore().stream;
-  }
-
-  @override
-  void dispose() {
-    _streamBudget = null;
-    _streamLog = null;
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,10 +63,10 @@ class _BudgetPageState extends State<BudgetPage>
             children: [
               Expanded(
                   child: StreamBuilder(
-                stream: _streamLog,
+                stream: serviceTransaction.stream,
                 builder: (context, snapshot) =>
                     StreamBuilder<QuerySnapshot<ModalBudget>>(
-                  stream: _streamBudget,
+                  stream: budgetFirestore.stream,
                   initialData: null,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {

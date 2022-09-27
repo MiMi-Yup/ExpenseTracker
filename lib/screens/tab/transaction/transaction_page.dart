@@ -9,9 +9,9 @@ import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/screens/tab/filter_transaction.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
-import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/component/fliter_month_component.dart';
 import 'package:expense_tracker/widgets/component/hint_category_component.dart';
@@ -26,16 +26,13 @@ class TransactionPage extends StatefulWidget {
   State<TransactionPage> createState() => _TransactionPageState();
 }
 
-enum SortBy { money, time }
-
-enum SortOrder { descending, ascending }
-
 class _TransactionPageState extends State<TransactionPage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   Map<String, AnimationController?>? _sectionController;
 
   final TransactionUtilities serviceTransaction = TransactionUtilities();
   final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
+  final FilterTransaction filterTransaction = FilterTransaction();
 
   late double height = MediaQuery.of(context).size.height;
 
@@ -54,13 +51,10 @@ class _TransactionPageState extends State<TransactionPage>
     SortOrder.ascending: Colors.red
   };
 
-  Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
-
   @override
   void initState() {
     super.initState();
     _sectionController = {};
-    _streamLog = serviceLog.stream;
   }
 
   @override
@@ -68,7 +62,6 @@ class _TransactionPageState extends State<TransactionPage>
     _sectionController?.forEach((key, value) {
       value?.dispose();
     });
-    _streamLog = null;
     super.dispose();
   }
 
@@ -336,7 +329,7 @@ class _TransactionPageState extends State<TransactionPage>
                   )),
           StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
               initialData: null,
-              stream: _streamLog,
+              stream: serviceLog.stream,
               builder: (context, snapshot) {
                 if (snapshot.data == null) {
                   //wait to loading
@@ -350,7 +343,13 @@ class _TransactionPageState extends State<TransactionPage>
                     return FutureBuilder<
                             SplayTreeMap<String, List<ModalTransaction>?>>(
                         initialData: null,
-                        future: filterTransaction(snapshot.data!),
+                        future: filterTransaction.filterTransaction(
+                            querySnapshot: snapshot.data!,
+                            sortBy: sortBy,
+                            sortOrder: sortOrder,
+                            selectedFilterCategory: selectedFilterCategory,
+                            selectedFilterTransactionType:
+                                selectedFilterTransactionType),
                         builder: (context, snapshot) => snapshot.hasData
                             ? snapshot.data!.isNotEmpty
                                 ? Expanded(
@@ -426,7 +425,7 @@ class _TransactionPageState extends State<TransactionPage>
                                                                             arguments: [
                                                                           modal,
                                                                           true,
-                                                                          false
+                                                                          true
                                                                         ]);
                                                                     setState(
                                                                         () {});
@@ -468,131 +467,6 @@ class _TransactionPageState extends State<TransactionPage>
         ],
       ),
     );
-  }
-
-  String _getDate(DateTime date) =>
-      "${date.year}-${date.month >= 10 ? date.month : "0${date.month}"}-${date.day >= 10 ? date.day : "0${date.day}"}";
-
-  Future<Map<ModalTransaction, ModalTransaction?>> mappingCompareTimeCreate(
-      Map<String, List<ModalTransaction>?> data) async {
-    Map<ModalTransaction, ModalTransaction?> map = {};
-
-    for (List<ModalTransaction>? modal in data.values) {
-      if (modal != null) {
-        for (ModalTransaction element in modal) {
-          map.addAll({element: null});
-        }
-      }
-    }
-
-    for (ModalTransaction modal in map.keys) {
-      map[modal] = await serviceLog.findFirstTransaction(modal);
-    }
-
-    return map;
-  }
-
-  bool acceptPushTransaction(ModalTransaction modal) {
-    if ((selectedFilterCategory == null
-            ? true
-            : selectedFilterCategory?.id == modal.categoryTypeRef?.id) &&
-        (selectedFilterTransactionType == null
-            ? true
-            : selectedFilterTransactionType?.id ==
-                modal.transactionTypeRef?.id)) return true;
-
-    return false;
-  }
-
-  Future<SplayTreeMap<String, List<ModalTransaction>?>> sortByTime(
-    Map<String, List<ModalTransaction>?> result,
-  ) async {
-    //get first modal (not modified yet)
-    Map<ModalTransaction, ModalTransaction?> mapCompare =
-        await mappingCompareTimeCreate(result);
-
-    //sort each group by timeCreate
-    for (String element in result.keys) {
-      result[element]!.sort((modal1, modal2) {
-        ModalTransaction? compare1 = sortOrder == SortOrder.ascending
-            ? mapCompare[modal1]
-            : mapCompare[modal2];
-        ModalTransaction? compare2 = sortOrder == SortOrder.ascending
-            ? mapCompare[modal2]
-            : mapCompare[modal1];
-        return compare1!.timeCreate!.compareTo(compare2!.timeCreate!);
-      });
-    }
-
-    //sort key of group
-    return SplayTreeMap<String, List<ModalTransaction>?>.from(
-        result,
-        (key1, key2) =>
-            DateTime.parse(sortOrder == SortOrder.ascending ? key1 : key2)
-                .compareTo(DateTime.parse(
-                    sortOrder == SortOrder.ascending ? key2 : key1)));
-  }
-
-  Future<SplayTreeMap<String, List<ModalTransaction>?>> sortByMoney(
-      Map<String, List<ModalTransaction>?> result) async {
-    for (String element in result.keys) {
-      result[element]!.sort((modal1, modal2) =>
-          ((sortOrder == SortOrder.ascending ? modal1 : modal2).money! -
-                  (sortOrder == SortOrder.ascending ? modal2 : modal1).money!)
-              .toInt());
-    }
-
-    return SplayTreeMap<String, List<ModalTransaction>?>.from(
-        result,
-        (key1, key2) =>
-            DateTime.parse(sortOrder == SortOrder.ascending ? key1 : key2)
-                .compareTo(DateTime.parse(
-                    sortOrder == SortOrder.ascending ? key2 : key1)));
-  }
-
-  Future<SplayTreeMap<String, List<ModalTransaction>?>> filterTransaction(
-      QuerySnapshot<ModalTransactionLog> querySnapshot) async {
-    TransactionFirestore serviceTransaction = TransactionFirestore();
-
-    Map<String, List<ModalTransaction>?> result =
-        <String, List<ModalTransaction>?>{};
-
-    Iterable<ModalTransactionLog?> iterable =
-        querySnapshot.docs.map<ModalTransactionLog?>((e) => e.data());
-
-    //fliter day to group
-    for (ModalTransactionLog? element in iterable) {
-      ModalTransaction? currerntModal = element!.lastTransactionRef == null
-          ? null
-          : await serviceTransaction
-              .getModalFromRef(element.lastTransactionRef!);
-      ModalTransaction? firstModal = await serviceTransaction
-          .getModalFromRef(element.firstTransactionRef!);
-      ModalTransaction? push = currerntModal ?? firstModal;
-
-      if (push != null &&
-          firstModal?.getTimeCreate?.year == Navigation.filterByDate.year &&
-          firstModal?.getTimeCreate?.month == Navigation.filterByDate.month &&
-          acceptPushTransaction(push)) {
-        String key = _getDate(firstModal!.getTimeCreate!);
-        if (result.containsKey(key)) {
-          result[key]!.add(push);
-        } else {
-          result.addAll({
-            key: [push]
-          });
-        }
-      }
-    }
-
-    switch (sortBy) {
-      case SortBy.time:
-        return sortByTime(result);
-      case SortBy.money:
-        return sortByMoney(result);
-      default:
-        return sortByTime(result);
-    }
   }
 
   @override

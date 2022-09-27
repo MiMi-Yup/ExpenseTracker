@@ -200,7 +200,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                                       ?.pushNamed(
                                           RouteApplication.getRoute(
                                               ERoute.detailTransaction),
-                                          arguments: [e, false, false]),
+                                          arguments: [e, false, true]),
                                 ))
                             .toList(),
                       ));

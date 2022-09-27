@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 class AccountComponent extends StatelessWidget {
   ModalAccount accoutnModal;
   ModalAccountType? accountTypeModal;
-  AccountComponent({super.key, required this.accoutnModal}) {
+  void Function()? onTap;
+  AccountComponent({super.key, required this.accoutnModal, this.onTap}) {
     accountTypeModal = AccountTypeInstance.instance()
         .getModal(accoutnModal.accountTypeRef!.id);
   }
@@ -17,9 +18,13 @@ class AccountComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: null,
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        margin: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+            color: Colors.black.withAlpha(125),
+            borderRadius: BorderRadius.circular(16.0)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -42,7 +47,7 @@ class AccountComponent extends StatelessWidget {
                             accountTypeModal!.image!),
                         builder: (context, snapshot) => snapshot.hasData
                             ? Image.memory(snapshot.data!)
-                            : Text("data")),
+                            : LinearProgressIndicator()),
               ),
               SizedBox(
                 width: 16.0,

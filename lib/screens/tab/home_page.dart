@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage>
   final TransactionUtilities serviceTransaction = TransactionUtilities();
   final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
   final AccountFirestore serviceAccount = AccountFirestore();
+  final NotificationFirestore serviceNotification = NotificationFirestore();
 
   final List<Widget> _charts = [
     LineChartSample1(),
@@ -47,22 +48,15 @@ class _HomePageState extends State<HomePage>
 
   bool keepAlive = true;
 
-  Stream<QuerySnapshot<ModalNotification>>? _streamNotification;
-  Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
-
   @override
   void initState() {
     super.initState();
     _controller = PageController(initialPage: _currentIndex);
-    _streamNotification = NotificationFirestore().stream;
-    _streamLog = serviceLog.stream;
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _streamLog = null;
-    _streamNotification = null;
     super.dispose();
   }
 
@@ -124,7 +118,7 @@ class _HomePageState extends State<HomePage>
                           RouteApplication.navigatorKey.currentState?.pushNamed(
                               RouteApplication.getRoute(ERoute.notification)),
                       icon: StreamBuilder<QuerySnapshot<ModalNotification>>(
-                        stream: _streamNotification,
+                        stream: serviceNotification.stream,
                         builder: (context, snapshot) {
                           Widget? indicator;
                           if (snapshot.hasData) {
@@ -187,7 +181,7 @@ class _HomePageState extends State<HomePage>
                   }),
               FutureBuilder<Map<ModalTransactionType, List<ModalTransaction>?>>(
                 initialData: null,
-                future: serviceLog.groupTransactionByTransactionType(
+                future: serviceTransaction.groupTransactionByTransactionType(
                     filterByDate: Navigation.filterByDate),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
@@ -274,7 +268,7 @@ class _HomePageState extends State<HomePage>
                   onPressed: () => widget.toPage!(EPage.transaction),
                   content: StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
                     initialData: null,
-                    stream: _streamLog,
+                    stream: serviceLog.stream,
                     builder: (context, snapshot) {
                       QuerySnapshot<ModalTransactionLog>? query = snapshot.data;
                       return query == null
@@ -317,7 +311,7 @@ class _HomePageState extends State<HomePage>
                                                         arguments: [
                                                       snapshot.data!,
                                                       true,
-                                                      false
+                                                      true
                                                     ]);
                                                 setState(() {});
                                               },

@@ -150,7 +150,7 @@ class _DetailTransactionState extends State<DetailTransaction>
             ),
           ],
         ),
-      if (modal.transactionRef != null || isShowTimelineModified)
+      if (modal.transactionRef != null && isShowTimelineModified)
         Column(
           children: [
             GestureDetector(
@@ -297,36 +297,35 @@ class _DetailTransactionState extends State<DetailTransaction>
                                     ],
                                   ),
                                 ));
-                        isRemove != null && isRemove == true
-                            ? showDialog(
-                                builder: (context) => Dialog(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Image.asset(
-                                          IconAsset.success,
-                                          scale: 2,
-                                        ),
-                                        SizedBox(height: 16.0),
-                                        Text(
-                                            "Transaction has been completely removed")
-                                      ],
+                        if (isRemove != null && isRemove == true) {
+                          showDialog(
+                            builder: (context) => Dialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Image.asset(
+                                      IconAsset.success,
+                                      scale: 2,
                                     ),
-                                  ),
+                                    SizedBox(height: 16.0),
+                                    Text(
+                                        "Transaction has been completely removed")
+                                  ],
                                 ),
-                                context: context,
-                              )
-                            : null;
-                        int count = 0;
-                        Future.delayed(const Duration(seconds: 1), () {
-                          RouteApplication.navigatorKey.currentState
-                              ?.popUntil((_) => count++ == 2);
-                        });
+                              ),
+                            ),
+                            context: context,
+                          );
+                          int count = 0;
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            RouteApplication.navigatorKey.currentState
+                                ?.popUntil((_) => count++ == 2);
+                          });
+                        }
                       },
                       icon: Icon(Icons.delete_forever_rounded))
                 ]

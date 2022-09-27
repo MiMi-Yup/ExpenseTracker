@@ -21,20 +21,6 @@ class _NotificationPageState extends State<NotificationPage> {
   final NotificationFirestore serviceNotification = NotificationFirestore();
   final BudgetFirestore serviceBudget = BudgetFirestore();
 
-  Stream<QuerySnapshot<ModalNotification>>? _stream;
-
-  @override
-  void initState() {
-    super.initState();
-    _stream = serviceNotification.stream;
-  }
-
-  @override
-  void dispose() {
-    _stream = null;
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,7 +104,7 @@ class _NotificationPageState extends State<NotificationPage> {
         backgroundColor: MyColor.mainBackgroundColor,
       ),
       body: StreamBuilder<QuerySnapshot<ModalNotification>>(
-          stream: _stream,
+          stream: serviceNotification.stream,
           initialData: null,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
