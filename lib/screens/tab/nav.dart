@@ -19,6 +19,17 @@ class Navigation extends StatefulWidget {
 
   @override
   State<Navigation> createState() => _NavigationState();
+
+  static DateTime? _filterByDate;
+  static DateTime get filterByDate {
+    _filterByDate ??= DateTime.now();
+    return _filterByDate!;
+  }
+
+  static void setState(BuildContext context, DateTime date) {
+    _filterByDate = date;
+    context.findAncestorStateOfType<_NavigationState>()?.setState(() {});
+  }
 }
 
 class _NavigationState extends State<Navigation>

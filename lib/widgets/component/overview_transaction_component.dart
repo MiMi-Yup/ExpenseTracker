@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';

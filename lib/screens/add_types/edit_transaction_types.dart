@@ -1,21 +1,9 @@
-import 'dart:io';
-
-import 'package:dotted_border/dotted_border.dart';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
-import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/constants/path_firebase_storage.dart';
-import 'package:expense_tracker/modals/modal_account_type.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/routes/route.dart';
-import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
-import 'package:expense_tracker/services/firebase/firestore/account_types.dart';
-import 'package:expense_tracker/services/firebase/firestore/category_types.dart';
-import 'package:expense_tracker/services/firebase/firestore/init.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/asset/bank.dart';
@@ -18,9 +17,7 @@ import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/services/firebase/firestore/currency_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/user.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
-import 'package:expense_tracker/widgets/editText.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SetDefault extends StatefulWidget {

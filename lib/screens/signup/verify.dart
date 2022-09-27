@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/widgets/input_otp.dart';

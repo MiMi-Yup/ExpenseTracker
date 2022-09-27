@@ -8,7 +8,6 @@ import 'package:expense_tracker/services/firebase/firestore/current_transaction.
 import 'package:expense_tracker/services/firebase/firestore/notification.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class BudgetUtilities {
   final BudgetFirestore _service = BudgetFirestore();

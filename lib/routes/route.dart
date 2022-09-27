@@ -22,38 +22,42 @@ import 'package:expense_tracker/screens/tab/transaction/report/overview_report.d
 import 'package:expense_tracker/screens/transaction/add_edit_transaction.dart';
 import 'package:expense_tracker/screens/transaction/detail_transaction.dart';
 import 'package:expense_tracker/screens/welcome_page.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class RouteApplication {
   static final Map<String, Widget Function(BuildContext)> routes =
       <String, Widget Function(BuildContext)>{
-    getRoute(ERoute.welcome): (context) => WelcomePage(),
-    getRoute(ERoute.introduction): (context) => Introduction(),
-    getRoute(ERoute.login): (context) => Login(),
-    getRoute(ERoute.signUp): (context) => SignUp(),
-    getRoute(ERoute.authGoogle): (context) => Container(),
-    getRoute(ERoute.forgotPassword): (context) => ForgotPassword(),
-    getRoute(ERoute.pin): (context) => CodeAuth(),
-    getRoute(ERoute.setDefault): (context) => SetDefault(),
-    getRoute(ERoute.introductionSetupAccount): (context) => IntroductionSetup(),
-    getRoute(ERoute.main): (context) => Navigation(),
-    getRoute(ERoute.notification): (context) => NotificationPage(),
-    getRoute(ERoute.overviewReport): (context) => OverviewReport(),
-    getRoute(ERoute.detailReport): (context) => DetailReport(),
-    getRoute(ERoute.addEditBudget): (context) => AddEditBudget(),
-    getRoute(ERoute.overviewAccount): (context) => AccountPage(),
-    getRoute(ERoute.detailAccount): (context) => Container(),
-    getRoute(ERoute.export): (context) => ExportPage(),
-    getRoute(ERoute.setting): (context) => SettingPreference(),
-    getRoute(ERoute.addEditAccount): (context) => AddNewAccount(),
-    getRoute(ERoute.addEditTransaction): (context) => AddEditTransaction(),
-    getRoute(ERoute.detailTransaction): (context) => DetailTransaction(),
-    getRoute(ERoute.termOfCondition): (context) => Container(),
-    getRoute(ERoute.addEditAccountType): (context) => AddEditAccountTypes(),
-    getRoute(ERoute.addEditCategoryType): (context) => AddEditCategoryTypes(),
-    getRoute(ERoute.editTransactionType): (context) => EditTransactionTypes(),
-    getRoute(ERoute.detailBudget): (context) => DetailBudget(),
+    getRoute(ERoute.welcome): (context) => const WelcomePage(),
+    getRoute(ERoute.introduction): (context) => const Introduction(),
+    getRoute(ERoute.login): (context) => const Login(),
+    getRoute(ERoute.signUp): (context) => const SignUp(),
+    getRoute(ERoute.authGoogle): (context) => /*const*/ Container(),
+    getRoute(ERoute.forgotPassword): (context) => const ForgotPassword(),
+    getRoute(ERoute.pin): (context) => const CodeAuth(),
+    getRoute(ERoute.setDefault): (context) => const SetDefault(),
+    getRoute(ERoute.introductionSetupAccount): (context) =>
+        const IntroductionSetup(),
+    getRoute(ERoute.main): (context) => const Navigation(),
+    getRoute(ERoute.notification): (context) => const NotificationPage(),
+    getRoute(ERoute.overviewReport): (context) => const OverviewReport(),
+    getRoute(ERoute.detailReport): (context) => const DetailReport(),
+    getRoute(ERoute.addEditBudget): (context) => const AddEditBudget(),
+    getRoute(ERoute.overviewAccount): (context) => const AccountPage(),
+    getRoute(ERoute.detailAccount): (context) => /*const*/ Container(),
+    getRoute(ERoute.export): (context) => const ExportPage(),
+    getRoute(ERoute.setting): (context) => const SettingPreference(),
+    getRoute(ERoute.addEditAccount): (context) => const AddNewAccount(),
+    getRoute(ERoute.addEditTransaction): (context) =>
+        const AddEditTransaction(),
+    getRoute(ERoute.detailTransaction): (context) => const DetailTransaction(),
+    getRoute(ERoute.termOfCondition): (context) => /*const*/ Container(),
+    getRoute(ERoute.addEditAccountType): (context) =>
+        const AddEditAccountTypes(),
+    getRoute(ERoute.addEditCategoryType): (context) =>
+        const AddEditCategoryTypes(),
+    getRoute(ERoute.editTransactionType): (context) =>
+        const EditTransactionTypes(),
+    getRoute(ERoute.detailBudget): (context) => const DetailBudget(),
   };
 
   static String getRoute(ERoute route) => "/${route.name}";

@@ -1,17 +1,12 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/asset/bank.dart';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
-import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/routes/route.dart';
-import 'package:expense_tracker/services/firebase/firestore/user.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/editText.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class AddNewAccount extends StatefulWidget {

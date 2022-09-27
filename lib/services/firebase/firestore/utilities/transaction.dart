@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_tracker/modals/modal.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';

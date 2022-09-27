@@ -1,14 +1,9 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_tracker/constants/asset/category.dart';
-import 'package:expense_tracker/modals/modal_account_type.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/services/firebase/firestore/category_types.dart';
-import 'package:expense_tracker/widgets/component/hint_category_component.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
 class CategoryInstance {
   static CategoryInstance? _instance;
@@ -48,9 +43,6 @@ class CategoryInstance {
 
     return _instance!;
   }
-
-  // HintCategoryComponent getHintCategoryComponent(String id) =>
-  //     HintCategoryComponent(modal: getModal(id)!);
 
   ModalCategoryType? getModal(String id) =>
       _modals?.singleWhere((element) => element?.id == id);

@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
 class CodeAuth extends StatefulWidget {
-  CodeAuth({Key? key}) : super(key: key);
+  const CodeAuth({Key? key}) : super(key: key);
 
   @override
   State<CodeAuth> createState() => _CodeAuthState();

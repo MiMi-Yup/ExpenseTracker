@@ -4,11 +4,10 @@ import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/services/firebase/firestore/budget.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
-import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/budget.dart';
-import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/component/budget_component.dart';
 import 'package:expense_tracker/widgets/component/fliter_month_component.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
@@ -26,8 +25,6 @@ class _BudgetPageState extends State<BudgetPage>
   final BudgetUtilities serviceBudget = BudgetUtilities();
   final CurrentTransactionFirestore serviceTransaction =
       CurrentTransactionFirestore();
-
-  DateTime? filterBudgetByMonth;
 
   Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
   Stream<QuerySnapshot<ModalBudget>>? _streamBudget;
@@ -57,16 +54,15 @@ class _BudgetPageState extends State<BudgetPage>
           backgroundColor: MyColor.mainBackgroundColor,
           title: FilterBudgetByMonthComponent(
                   onChanged: (value) {
-                    setState(() {
-                      filterBudgetByMonth = value;
-                    });
+                    setState(() => Navigation.setState(context, value));
                     RouteApplication.navigatorKey.currentState?.pop();
                   },
-                  setInitDateTime: filterBudgetByMonth == null
+                  setInitDateTime: Navigation.filterByDate == null
                       ? (value) => WidgetsBinding.instance.addPostFrameCallback(
-                          (_) => setState(() => filterBudgetByMonth = value))
+                          (_) => setState(
+                              () => Navigation.setState(context, value)))
                       : null,
-                  selectedDate: filterBudgetByMonth)
+                  selectedDate: Navigation.filterByDate)
               .builder(),
           centerTitle: true,
         ),
@@ -94,8 +90,9 @@ class _BudgetPageState extends State<BudgetPage>
                           .map((e) => e.data())
                           .where((element) {
                         DateTime? timeCreate = element.getTimeCreate;
-                        if (timeCreate?.year == filterBudgetByMonth?.year &&
-                            timeCreate?.month == filterBudgetByMonth?.month) {
+                        if (timeCreate?.year == Navigation.filterByDate.year &&
+                            timeCreate?.month ==
+                                Navigation.filterByDate.month) {
                           return true;
                         }
                         return false;

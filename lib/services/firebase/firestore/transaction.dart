@@ -1,18 +1,13 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_tracker/constants/path_firebase_storage.dart';
 import 'package:expense_tracker/modals/modal.dart';
 import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
-import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
 import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/services/firebase/firestore/category_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction_types.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class TransactionFirestore extends IFirestore {
   @override

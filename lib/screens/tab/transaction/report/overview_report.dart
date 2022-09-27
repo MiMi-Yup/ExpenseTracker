@@ -1,9 +1,6 @@
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/instances/category_instance.dart';
-import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:expense_tracker/routes/route.dart';
-import 'package:expense_tracker/widgets/component/category_component.dart';
 import 'package:expense_tracker/widgets/largest_button.dart';
 import 'package:flutter/material.dart';
 

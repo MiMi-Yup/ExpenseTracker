@@ -4,7 +4,6 @@ import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
 import 'package:expense_tracker/services/firebase/firestore/currency_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class UserFirestore extends IFirestore {
   @override

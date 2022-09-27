@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class DetailTransaction extends StatefulWidget {
-  DetailTransaction({Key? key}) : super(key: key);
+  const DetailTransaction({Key? key}) : super(key: key);
 
   @override
   State<DetailTransaction> createState() => _DetailTransactionState();

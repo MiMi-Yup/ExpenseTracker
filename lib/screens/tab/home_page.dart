@@ -47,8 +47,6 @@ class _HomePageState extends State<HomePage>
 
   bool keepAlive = true;
 
-  DateTime? fliterTransactionByMonth;
-
   Stream<QuerySnapshot<ModalNotification>>? _streamNotification;
   Stream<QuerySnapshot<ModalTransactionLog>>? _streamLog;
 
@@ -110,17 +108,15 @@ class _HomePageState extends State<HomePage>
                 ),
                 title: FilterTransactionByMonthComponent(
                         onChanged: (value) {
-                          setState(() {
-                            fliterTransactionByMonth = value;
-                          });
+                          setState(() => Navigation.setState(context, value));
                           RouteApplication.navigatorKey.currentState?.pop();
                         },
-                        setInitDateTime: fliterTransactionByMonth == null
+                        setInitDateTime: Navigation.filterByDate == null
                             ? (value) => WidgetsBinding.instance
                                 .addPostFrameCallback((_) => setState(
-                                    () => fliterTransactionByMonth = value))
+                                    () => Navigation.setState(context, value)))
                             : null,
-                        selectedDate: fliterTransactionByMonth)
+                        selectedDate: Navigation.filterByDate)
                     .builder(),
                 actions: [
                   IconButton(
@@ -192,7 +188,7 @@ class _HomePageState extends State<HomePage>
               FutureBuilder<Map<ModalTransactionType, List<ModalTransaction>?>>(
                 initialData: null,
                 future: serviceLog.groupTransactionByTransactionType(
-                    filterByDate: fliterTransactionByMonth),
+                    filterByDate: Navigation.filterByDate),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return Padding(
@@ -303,11 +299,11 @@ class _HomePageState extends State<HomePage>
                                           ModalTransaction modal =
                                               snapshot.data!;
                                           if (modal.getTimeCreate?.year ==
-                                                  fliterTransactionByMonth
-                                                      ?.year &&
+                                                  Navigation
+                                                      .filterByDate.year &&
                                               modal.getTimeCreate?.month ==
-                                                  fliterTransactionByMonth
-                                                      ?.month) {
+                                                  Navigation
+                                                      .filterByDate.month) {
                                             return TransactionComponent(
                                               modal: modal,
                                               isEditable: true,

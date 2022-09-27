@@ -5,22 +5,18 @@ import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/instances/category_instance.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
-import 'package:expense_tracker/modals/modal.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/component/fliter_month_component.dart';
 import 'package:expense_tracker/widgets/component/hint_category_component.dart';
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
-import 'package:expense_tracker/widgets/dropdown.dart';
-import 'package:expense_tracker/widgets/month_picker.dart';
-import 'package:expense_tracker/widgets/overview_transaction.dart';
 import 'package:expense_tracker/widgets/section.dart';
-import 'package:expense_tracker/widgets/transaction_chart.dart';
 import 'package:flutter/material.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -48,7 +44,6 @@ class _TransactionPageState extends State<TransactionPage>
 
   bool keepAlive = true;
 
-  DateTime? fliterTransactionByMonth;
   ModalCategoryType? selectedFilterCategory;
   ModalTransactionType? selectedFilterTransactionType;
   SortBy? sortBy;
@@ -114,16 +109,14 @@ class _TransactionPageState extends State<TransactionPage>
               FilterTransactionByMonthComponent(
                       onChanged: (value) {
                         RouteApplication.navigatorKey.currentState?.pop();
-                        setState(() {
-                          fliterTransactionByMonth = value;
-                        });
+                        setState(() => Navigation.setState(context, value));
                       },
-                      setInitDateTime: fliterTransactionByMonth == null
+                      setInitDateTime: Navigation.filterByDate == null
                           ? (value) => WidgetsBinding.instance
                               .addPostFrameCallback((_) => setState(
-                                  () => fliterTransactionByMonth = value))
+                                  () => Navigation.setState(context, value)))
                           : null,
-                      selectedDate: fliterTransactionByMonth)
+                      selectedDate: Navigation.filterByDate)
                   .builder(),
               IconButton(
                   onPressed: () async {
@@ -578,8 +571,8 @@ class _TransactionPageState extends State<TransactionPage>
       ModalTransaction? push = currerntModal ?? firstModal;
 
       if (push != null &&
-          firstModal?.getTimeCreate?.year == fliterTransactionByMonth?.year &&
-          firstModal?.getTimeCreate?.month == fliterTransactionByMonth?.month &&
+          firstModal?.getTimeCreate?.year == Navigation.filterByDate.year &&
+          firstModal?.getTimeCreate?.month == Navigation.filterByDate.month &&
           acceptPushTransaction(push)) {
         String key = _getDate(firstModal!.getTimeCreate!);
         if (result.containsKey(key)) {

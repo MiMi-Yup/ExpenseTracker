@@ -1,22 +1,8 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
-import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/instances/account_type_instance.dart';
-import 'package:expense_tracker/instances/category_instance.dart';
-import 'package:expense_tracker/instances/transaction_type_instance.dart';
-import 'package:expense_tracker/instances/user_instance.dart';
-import 'package:expense_tracker/modals/modal_currency_type.dart';
-import 'package:expense_tracker/modals/modal_user.dart';
-import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/event_firestore.dart';
-import 'package:expense_tracker/services/firebase/firestore/init.dart';
-import 'package:expense_tracker/services/firebase/firestore/user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/modals/modal.dart';
-import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_account_type.dart';
 import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/services/firebase/firestore/interface.dart';

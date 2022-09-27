@@ -1,10 +1,8 @@
 import 'dart:io';
 
-import 'package:expense_tracker/modals/modal.dart';
 import 'package:expense_tracker/modals/modal_account_type.dart';
 import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
 import 'package:expense_tracker/services/firebase/firestore/account_types.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
 
