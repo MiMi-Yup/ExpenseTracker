@@ -12,7 +12,7 @@ class OverviewTransactionComponent {
   OverviewTransactionComponent(
       {required this.modal, required this.money, required this.currency});
 
-  Widget builder({void Function()? onTap}) {
+  Widget builder({void Function()? onTap, double width = 100}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -46,9 +46,13 @@ class OverviewTransactionComponent {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(modal.toString()),
-                  Text(
-                    "${currency?.currencyCode} $money",
-                    style: const TextStyle(fontSize: 18.0),
+                  SizedBox(
+                    width: money.toString().length > 5 ? width : null,
+                    child: Text("${currency?.currencyCode} $money",
+                        style: const TextStyle(fontSize: 18.0),
+                        maxLines: 1,
+                        overflow: TextOverflow.fade,
+                        softWrap: false),
                   )
                 ],
               )

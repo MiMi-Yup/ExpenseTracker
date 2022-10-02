@@ -8,6 +8,7 @@ import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
 import 'package:expense_tracker/routes/route.dart';
+import 'package:expense_tracker/screens/tab/utils_screen.dart';
 import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/notification.dart';
@@ -170,10 +171,8 @@ class _HomePageState extends State<HomePage>
                       for (var element in snapshot.data!) {
                         totalMoney += element.money ?? 0.0;
                       }
-                      //return balance from all account
                       return Text(
-                        //"${UserInstance.instance().getCurrency()?.currencyCode}$totalMoney",
-                        "doanxem",
+                        "${UserInstance.instance().defaultCurrencyAccount?.currencyCode} ${MultiCurrency.convertBalanceToCurrency(targetCurrency: UserInstance.instance().defaultCurrencyAccount!, modals: snapshot.data!).toStringAsFixed(2)}",
                         style: TextStyle(fontSize: 30.0),
                       );
                     } else {
@@ -198,16 +197,28 @@ class _HomePageState extends State<HomePage>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: snapshot.data!.keys.map((modalType) {
-                                double totalMoney = 0.0;
-                                snapshot.data![modalType]?.forEach(
-                                    (modalTransaction) => totalMoney +=
-                                        modalTransaction.money ?? 0.0);
-                                return OverviewTransactionComponent(
-                                        modal: modalType,
-                                        money: totalMoney,
-                                        currency: UserInstance.instance()
-                                            .defaultCurrencyAccount)
-                                    .builder();
+                                return FutureBuilder<double>(
+                                    initialData: null,
+                                    future: MultiCurrency
+                                        .convertTransactionByCurrency(
+                                            targetCurrency:
+                                                UserInstance.instance()
+                                                    .defaultCurrencyAccount!,
+                                            modals: snapshot.data![modalType]!),
+                                    builder: (context, snapshot) => snapshot
+                                            .hasData
+                                        ? OverviewTransactionComponent(
+                                                modal: modalType,
+                                                money: snapshot.data! < 0
+                                                    ? snapshot.data! * -1.0
+                                                    : snapshot.data!,
+                                                currency:
+                                                    UserInstance.instance()
+                                                        .defaultCurrencyAccount)
+                                            .builder()
+                                        : SizedBox(
+                                            width: 100,
+                                            child: LinearProgressIndicator()));
                               }).toList(),
                             ),
                           );

@@ -1,10 +1,15 @@
 import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expense_tracker/instances/currency_type_instance.dart';
+import 'package:expense_tracker/instances/transaction_type_instance.dart';
+import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
+import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/screens/tab/nav.dart';
+import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/transaction.dart';
 
@@ -158,5 +163,63 @@ class FilterTransaction {
           {required Map<String, List<ModalTransaction>?> map,
           SortOrder sortOrder = SortOrder.descending}) async {
     return _sortByTime(result: map, sortOrder: sortOrder);
+  }
+}
+
+class MultiCurrency {
+  static Future<double> convertTransactionByCurrency(
+      {required ModalCurrencyType targetCurrency,
+      required List<ModalTransaction> modals}) async {
+    final AccountFirestore service = AccountFirestore();
+
+    ModalTransactionType? transactionType;
+    ModalCurrencyType? currencyType;
+    ModalAccount? account;
+
+    double result = 0.0;
+
+    for (ModalTransaction modal in modals) {
+      transactionType = TranasactionTypeInstance.instance()
+          .getModal(modal.transactionTypeRef!.id);
+      account = await service.getModalFromRef(modal.accountRef!);
+      if (account != null) {
+        currencyType = CurrencyTypeInstance.instance()
+            .getModal(account.currencyTypeRef!.id);
+        switch (transactionType?.operator) {
+          case '-':
+            result -= modal.money! /
+                currencyType!.coefficient! *
+                targetCurrency.coefficient!;
+            break;
+          case '+':
+            result += modal.money! /
+                currencyType!.coefficient! *
+                targetCurrency.coefficient!;
+            break;
+        }
+      } else {
+        continue;
+      }
+    }
+
+    return result;
+  }
+
+  static double convertBalanceToCurrency(
+      {required ModalCurrencyType targetCurrency,
+      required List<ModalAccount> modals}) {
+    ModalCurrencyType? currencyType;
+
+    double result = 0.0;
+
+    for (ModalAccount modal in modals) {
+      currencyType =
+          CurrencyTypeInstance.instance().getModal(modal.currencyTypeRef!.id);
+      result += modal.money! /
+          currencyType!.coefficient! *
+          targetCurrency.coefficient!;
+    }
+
+    return result;
   }
 }

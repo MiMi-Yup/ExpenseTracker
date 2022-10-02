@@ -54,7 +54,7 @@ class CategoryComponent {
             ],
           ),
           SizedBox(height: 10.0),
-          Stack(
+          Stack(  
             children: [
               Container(
                 width: width,

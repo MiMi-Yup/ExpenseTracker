@@ -158,7 +158,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                             '${modal.title}',
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            softWrap: false,
+                                            softWrap: false
                                           ),
                                           SizedBox(
                                             height: 10.0,
