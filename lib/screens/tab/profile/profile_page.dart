@@ -26,25 +26,25 @@ class ProfilePage extends StatelessWidget {
           child: AppBar(
             backgroundColor: MyColor.mainBackgroundColor,
             elevation: 0.0,
-            leading: UserInstance.instance().getModal() != null &&
-                    UserInstance.instance().getModal()?.photoURL != null
+            leading: UserInstance.instance().modal != null &&
+                    UserInstance.instance().modal?.photoURL != null
                 ? CircleAvatar(
                     backgroundImage: NetworkImage(
-                        UserInstance.instance().getModal()!.photoURL!,
+                        UserInstance.instance().modal!.photoURL!,
                         scale: 1.0))
                 : null,
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${UserInstance.instance().getModal()?.email}',
+                  '${UserInstance.instance().modal?.email}',
                   style: TextStyle(color: Colors.white70),
                 ),
                 SizedBox(
                   height: 16.0,
                 ),
                 Text(
-                  '${UserInstance.instance().getModal()?.displayName}',
+                  '${UserInstance.instance().modal?.displayName}',
                   style: TextStyle(color: Colors.white),
                 )
               ],

@@ -6,7 +6,8 @@ import 'package:collection/collection.dart';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/instances/account_type_instance.dart';
-import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/category_type_instance.dart';
+import 'package:expense_tracker/instances/currency_type_instance.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
@@ -111,10 +112,11 @@ class EventFirestore {
     notificationService.initializePlatformNotifications();
 
     await Future.delayed(const Duration(seconds: 2), () {
-      UserInstance.instance(renew: true);
-      CategoryInstance.instance(renew: true);
+      CurrencyTypeInstance.instance(renew: true);
+      CategoryTypeInstance.instance(renew: true);
       TranasactionTypeInstance.instance(renew: true);
       AccountTypeInstance.instance(renew: true);
+      UserInstance.instance(renew: true);
     });
 
     _streamSubscriptionUser =
@@ -153,6 +155,11 @@ class EventFirestore {
         budgetChangeListener();
 
         UserFirestore userFirestore = UserFirestore();
+        InitializationFirestore service = InitializationFirestore();
+        bool checkFirebase = await service.checkDefaultCollectionAvaiable();
+        if (!checkFirebase) {
+          service.init();
+        }
 
         bool checkUserExists = await userFirestore.checkUserExists();
         if (!checkUserExists) {

@@ -20,6 +20,33 @@ class InitializationFirestore {
     return batch.commit();
   }
 
+  Future<bool> checkDefaultCollectionAvaiable() async {
+    QuerySnapshot<Map<String, dynamic>> defaultCategoryTypes =
+        await FirebaseFirestore.instance
+            .collection('default_category_types')
+            .get();
+    QuerySnapshot<Map<String, dynamic>> defaultAccountTypes =
+        await FirebaseFirestore.instance
+            .collection('default_account_types')
+            .get();
+    QuerySnapshot<Map<String, dynamic>> defaultTransactionTypes =
+        await FirebaseFirestore.instance
+            .collection('default_transaction_types')
+            .get();
+    QuerySnapshot<Map<String, dynamic>> frequencyTypes =
+        await FirebaseFirestore.instance.collection('frequency_types').get();
+    QuerySnapshot<Map<String, dynamic>> currencyTypes =
+        await FirebaseFirestore.instance.collection('currency_types').get();
+    if (defaultCategoryTypes.size == 0 ||
+        defaultAccountTypes.size == 0 ||
+        defaultTransactionTypes.size == 0 ||
+        frequencyTypes.size == 0 ||
+        currencyTypes.size == 0) {
+      return false;
+    }
+    return true;
+  }
+
   void copyDefaultToUser(String uid) {
     String pathUser = 'users/user_$uid';
     FirebaseFirestore instance = FirebaseFirestore.instance;

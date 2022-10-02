@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/category_type_instance.dart';
+import 'package:expense_tracker/instances/currency_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
@@ -36,7 +37,7 @@ class _AddEditBudgetState extends State<AddEditBudget> {
           categoryTypeRef: null);
 
   late ModalCategoryType? choseCategoryType = modal.categoryTypeRef != null
-      ? CategoryInstance.instance().getModal(modal.categoryTypeRef!.id)
+      ? CategoryTypeInstance.instance().getModal(modal.categoryTypeRef!.id)
       : null;
 
   @override
@@ -73,7 +74,7 @@ class _AddEditBudgetState extends State<AddEditBudget> {
                     style: TextStyle(fontSize: 40.0),
                     decoration: InputDecoration(
                         prefixText:
-                            "${UserInstance.instance().getCurrency()?.currencyCode} ",
+                            "${UserInstance.instance().defaultCurrencyAccount?.currencyCode} ",
                         isCollapsed: true,
                         hintText: "0.00",
                         border: InputBorder.none),

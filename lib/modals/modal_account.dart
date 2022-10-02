@@ -4,9 +4,13 @@ import 'package:expense_tracker/modals/modal.dart';
 class ModalAccount extends IModal {
   DocumentReference? accountTypeRef;
   double? money;
+  DocumentReference? currencyTypeRef;
 
   ModalAccount(
-      {required super.id, required this.accountTypeRef, required this.money});
+      {required super.id,
+      required this.accountTypeRef,
+      required this.money,
+      required this.currencyTypeRef});
 
   ModalAccount.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options)
@@ -14,11 +18,16 @@ class ModalAccount extends IModal {
     Map<String, dynamic>? data = snapshot.data();
     accountTypeRef = data?['account_type_ref'];
     money = data?['money'];
+    currencyTypeRef = data?['currency_type_ref'];
   }
 
   @override
   Map<String, dynamic> toFirestore() {
-    return {'account_type_ref': accountTypeRef, 'money': money};
+    return {
+      'account_type_ref': accountTypeRef,
+      'money': money,
+      'currency_type_ref': currencyTypeRef
+    };
   }
 
   @override

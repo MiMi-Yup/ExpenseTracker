@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
+import 'package:expense_tracker/instances/account_type_instance.dart';
+import 'package:expense_tracker/instances/currency_type_instance.dart';
+import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_account_type.dart';
 import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/routes/route.dart';
@@ -23,7 +26,7 @@ class AddNewAccount extends StatefulWidget {
 class _AddNewAccountState extends State<AddNewAccount> {
   ModalAccountType? choseAccountType;
   ModalCurrencyType? choseCurrency;
-  late TextEditingController controller;
+  TextEditingController? controller;
   String? errorText;
 
   UserFirestore userFirestore = UserFirestore();
@@ -31,32 +34,58 @@ class _AddNewAccountState extends State<AddNewAccount> {
   AccountTypeFirestore accountTypeFirestore = AccountTypeFirestore();
 
   late Object? arguments = ModalRoute.of(context)?.settings.arguments;
-  late Future<void> Function(ModalAccountType? accountType,
-          ModalCurrencyType? currencyType, double? balance)? callWhenFinish =
-      arguments == null
-          ? null
-          : arguments as Future<void> Function(
-              ModalAccountType?, ModalCurrencyType?, double?);
+  late Future<void> Function(
+      ModalAccountType? accountType,
+      ModalCurrencyType? currencyType,
+      double? balance)? callWhenFinish = arguments != null &&
+          arguments is List &&
+          (arguments as List)[0] is Future<void> Function(
+              ModalAccountType?, ModalCurrencyType?, double?)
+      ? (arguments as List)[0] as Future<void> Function(
+          ModalAccountType?, ModalCurrencyType?, double?)
+      : throw ArgumentError("Required action when complete");
+  late ModalAccount? accountEditModal =
+      arguments != null && arguments is List && (arguments as List).length == 2
+          ? (arguments as List)[1] as ModalAccount
+          : null;
+
+  ///arguments has 2 elements
+  ///[0] is Future<void> Function(ModalAccountType?, ModalCurrencyType?, double?) which action when complete
+  ///[1] is ModalAccount which edit account
 
   @override
-  void initState() {
-    super.initState();
-    controller = TextEditingController();
-    controller.addListener(() {
-      setState(() {
-        errorText = controller.text.isEmpty ? null : 'Not empty';
-      });
-    });
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (controller == null) {
+      controller =
+          TextEditingController(text: accountEditModal?.money.toString());
+      controller?.addListener(() {
+        setState(() {
+          errorText = controller!.text.isEmpty ? null : 'Not empty';
+        });
+      });
+
+      if (accountEditModal != null) {
+        choseAccountType = AccountTypeInstance.instance()
+            .getModal(accountEditModal!.accountTypeRef!.id);
+        controller?.text = accountEditModal!.money.toString();
+        choseCurrency = CurrencyTypeInstance.instance()
+            .getModal(accountEditModal!.currencyTypeRef!.id);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
         centerTitle: true,
         backgroundColor: MyColor.mainBackgroundColor,
-        title: Text("Add new account"),
+        title:
+            Text(accountEditModal == null ? "Add new account" : "Edit account"),
         leading: IconButton(
             onPressed: () => RouteApplication.navigatorKey.currentState?.pop(),
             icon: Icon(Icons.arrow_back_ios)),
@@ -167,7 +196,7 @@ class _AddNewAccountState extends State<AddNewAccount> {
                           onPressed: () {
                             if (choseAccountType != null &&
                                 choseCurrency != null &&
-                                controller.text.isNotEmpty) {
+                                controller!.text.isNotEmpty) {
                               showDialog(
                                 builder: (context) => Dialog(
                                   shape: RoundedRectangleBorder(
@@ -197,7 +226,7 @@ class _AddNewAccountState extends State<AddNewAccount> {
                                 await callWhenFinish?.call(
                                     choseAccountType,
                                     choseCurrency,
-                                    double.tryParse(controller.text));
+                                    double.tryParse(controller!.text));
                               });
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(

@@ -90,12 +90,11 @@ class _HomePageState extends State<HomePage>
                   onTap: () => widget.toPage!(EPage.profile),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: (UserInstance.instance().getModal() != null &&
-                            UserInstance.instance().getModal()?.photoURL !=
-                                null)
+                    child: (UserInstance.instance().modal != null &&
+                            UserInstance.instance().modal?.photoURL != null)
                         ? CircleAvatar(
                             backgroundImage: NetworkImage(
-                                UserInstance.instance().getModal()!.photoURL!,
+                                UserInstance.instance().modal!.photoURL!,
                                 scale: 1.0))
                         : null,
                   ),
@@ -162,7 +161,7 @@ class _HomePageState extends State<HomePage>
                       ))
                 ],
               ),
-              Text("Account balance"),
+              Text("Accounts balance"),
               FutureBuilder<List<ModalAccount>?>(
                   future: serviceAccount.read(),
                   builder: (context, snapshot) {
@@ -171,40 +170,53 @@ class _HomePageState extends State<HomePage>
                       for (var element in snapshot.data!) {
                         totalMoney += element.money ?? 0.0;
                       }
+                      //return balance from all account
                       return Text(
-                        "${UserInstance.instance().getCurrency()?.currencyCode}$totalMoney",
+                        //"${UserInstance.instance().getCurrency()?.currencyCode}$totalMoney",
+                        "doanxem",
                         style: TextStyle(fontSize: 30.0),
                       );
                     } else {
                       return LinearProgressIndicator();
                     }
                   }),
-              FutureBuilder<Map<ModalTransactionType, List<ModalTransaction>?>>(
-                initialData: null,
-                future: serviceTransaction.groupTransactionByTransactionType(
-                    filterByDate: Navigation.filterByDate),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: snapshot.data!.keys.map((modalType) {
-                          double totalMoney = 0.0;
-                          snapshot.data![modalType]?.forEach(
-                              (modalTransaction) =>
-                                  totalMoney += modalTransaction.money ?? 0.0);
-                          return OverviewTransactionComponent(
-                                  modal: modalType, money: totalMoney)
-                              .builder();
-                        }).toList(),
-                      ),
+              StreamBuilder<QuerySnapshot<ModalTransactionLog>>(
+                  initialData: null,
+                  stream: serviceLog.stream,
+                  builder: (context, snapshot) {
+                    return FutureBuilder<
+                        Map<ModalTransactionType, List<ModalTransaction>?>>(
+                      initialData: null,
+                      future:
+                          serviceTransaction.groupTransactionByTransactionType(
+                              filterByDate: Navigation.filterByDate),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: snapshot.data!.keys.map((modalType) {
+                                double totalMoney = 0.0;
+                                snapshot.data![modalType]?.forEach(
+                                    (modalTransaction) => totalMoney +=
+                                        modalTransaction.money ?? 0.0);
+                                return OverviewTransactionComponent(
+                                        modal: modalType,
+                                        money: totalMoney,
+                                        currency: UserInstance.instance()
+                                            .defaultCurrencyAccount)
+                                    .builder();
+                              }).toList(),
+                            ),
+                          );
+                        } else {
+                          return LinearProgressIndicator();
+                        }
+                      },
                     );
-                  } else {
-                    return LinearProgressIndicator();
-                  }
-                },
-              )
+                  })
             ],
           ),
         ),

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/category_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
@@ -110,7 +110,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                   children: [
                     Text("Category: ", style: TextStyle(fontSize: 18.0)),
                     HintCategoryComponent(
-                            modal: CategoryInstance.instance()
+                            modal: CategoryTypeInstance.instance()
                                 .getModal(modal.categoryTypeRef!.id)!)
                         .getMinCategory(),
                   ],
@@ -124,7 +124,7 @@ class _DetailBudgetState extends State<DetailBudget> {
                   children: [
                     Text("Budget:", style: TextStyle(fontSize: 18.0)),
                     Text(
-                        "${UserInstance.instance().getCurrency()?.currencyCode} ${modal.budget.toString()}",
+                        "${UserInstance.instance().defaultCurrencyAccount?.currencyCode} ${modal.budget.toString()}",
                         style: TextStyle(fontSize: 18.0))
                   ],
                 ),
@@ -143,7 +143,9 @@ class _DetailBudgetState extends State<DetailBudget> {
                                 Text("Now expense:",
                                     style: TextStyle(fontSize: 18.0)),
                                 Text(
-                                    "${snapshot.data != null ? "${UserInstance.instance().getCurrency()?.currencyCode} ${snapshot.data}" : "Loading"}",
+                                    snapshot.data != null
+                                        ? "${UserInstance.instance().defaultCurrencyAccount?.currencyCode} ${snapshot.data}"
+                                        : "Loading",
                                     style: TextStyle(fontSize: 18.0))
                               ],
                             ),

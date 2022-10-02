@@ -1,4 +1,5 @@
 import 'package:expense_tracker/instances/user_instance.dart';
+import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_transaction_type.dart';
 import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
 import 'package:flutter/foundation.dart';
@@ -7,8 +8,9 @@ import 'package:flutter/material.dart';
 class OverviewTransactionComponent {
   ModalTransactionType? modal;
   double money;
+  ModalCurrencyType? currency;
   OverviewTransactionComponent(
-      {required this.modal, required this.money});
+      {required this.modal, required this.money, required this.currency});
 
   Widget builder({void Function()? onTap}) {
     return GestureDetector(
@@ -45,7 +47,7 @@ class OverviewTransactionComponent {
                 children: [
                   Text(modal.toString()),
                   Text(
-                    "${UserInstance.instance().getCurrency()?.currencyCode} ${money}",
+                    "${currency?.currencyCode} $money",
                     style: const TextStyle(fontSize: 18.0),
                   )
                 ],

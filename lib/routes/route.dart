@@ -6,7 +6,7 @@ import 'package:expense_tracker/screens/add_types/edit_transaction_types.dart';
 import 'package:expense_tracker/screens/budget/add_edit_budget.dart';
 import 'package:expense_tracker/screens/first_setup/code_auth.dart';
 import 'package:expense_tracker/screens/first_setup/introduction_setup.dart';
-import 'package:expense_tracker/screens/account/add_new_account.dart';
+import 'package:expense_tracker/screens/account/add_edit_account.dart';
 import 'package:expense_tracker/screens/introduction.dart';
 import 'package:expense_tracker/screens/login/forgot_password.dart';
 import 'package:expense_tracker/screens/login/login.dart';
@@ -41,7 +41,7 @@ class RouteApplication {
     getRoute(ERoute.overviewReport): (context) => const OverviewReport(),
     getRoute(ERoute.detailReport): (context) => const DetailReport(),
     getRoute(ERoute.addEditBudget): (context) => const AddEditBudget(),
-    getRoute(ERoute.overviewAccount): (context) => const AccountPage(),
+    getRoute(ERoute.overviewAccount): (context) => AccountPage(),
     getRoute(ERoute.detailAccount): (context) => const DetailAccount(),
     getRoute(ERoute.export): (context) => const ExportPage(),
     getRoute(ERoute.setting): (context) => const SettingPreference(),

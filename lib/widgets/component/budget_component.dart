@@ -1,4 +1,4 @@
-import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/category_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
@@ -64,8 +64,8 @@ class _BudgetComponentState extends State<BudgetComponent>
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    ModalCategoryType? getModal =
-        CategoryInstance.instance().getModal(widget.modal.categoryTypeRef!.id);
+    ModalCategoryType? getModal = CategoryTypeInstance.instance()
+        .getModal(widget.modal.categoryTypeRef!.id);
     return SizeTransition(
         sizeFactor: ReverseAnimation(CurvedAnimation(
           curve: Curves.linear,
@@ -131,7 +131,7 @@ class _BudgetComponentState extends State<BudgetComponent>
                           ),
                           SizedBox(height: 10.0),
                           Text(
-                              "Remaining ${UserInstance.instance().getCurrency()?.currencyCode} ${widget.modal.remainMoney(widget.nowMoney)}"),
+                              "Remaining ${UserInstance.instance().defaultCurrencyAccount?.currencyCode} ${widget.modal.remainMoney(widget.nowMoney)}"),
                           Padding(
                             padding:
                                 const EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -159,7 +159,7 @@ class _BudgetComponentState extends State<BudgetComponent>
                             ),
                           ),
                           Text(
-                            "${UserInstance.instance().getCurrency()?.currencyCode} ${widget.nowMoney} of ${UserInstance.instance().getCurrency()?.currencyCode} ${widget.modal.budget}",
+                            "${UserInstance.instance().defaultCurrencyAccount?.currencyCode} ${widget.nowMoney} of ${UserInstance.instance().defaultCurrencyAccount?.currencyCode} ${widget.modal.budget}",
                             style: TextStyle(color: Colors.grey),
                           ),
                           SizedBox(height: 10.0),

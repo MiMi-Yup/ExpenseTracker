@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expense_tracker/instances/currency_type_instance.dart';
 import 'package:expense_tracker/modals/modal.dart';
 import 'package:expense_tracker/modals/modal_currency_type.dart';
 import 'package:expense_tracker/modals/modal_user.dart';
@@ -67,31 +68,6 @@ class UserFirestore extends IFirestore {
               toFirestore: (ModalUser modal, _) => modal.toFirestore())
           .get();
       return snapshot.data();
-    } on FirebaseException {
-      return null;
-    }
-  }
-
-  Future<ModalCurrencyType?> getMainCurrencyAccount({ModalUser? modal}) async {
-    if (modal == null) {
-      List<ModalUser>? modals = await read();
-      if (modals != null && modals.isNotEmpty) {
-        modal = modals.first;
-      }
-    }
-
-    try {
-      if (modal != null) {
-        DocumentSnapshot<ModalCurrencyType> snapshot = await modal
-            .currencyTypeRef!
-            .withConverter(
-                fromFirestore: ModalCurrencyType.fromFirestore,
-                toFirestore: (ModalCurrencyType modal, _) =>
-                    modal.toFirestore())
-            .get();
-        return snapshot.data();
-      }
-      return null;
     } on FirebaseException {
       return null;
     }

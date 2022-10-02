@@ -9,7 +9,7 @@ class ModalUser extends IModal {
   String? photoURL;
   bool? emailVerified;
   String? passcode;
-  DocumentReference? currencyTypeRef;
+  DocumentReference? currencyTypeDefaultRef;
   bool? wasSetup;
 
   ModalUser(
@@ -20,7 +20,7 @@ class ModalUser extends IModal {
       this.phoneNumber,
       this.photoURL,
       this.passcode,
-      this.currencyTypeRef,
+      this.currencyTypeDefaultRef,
       this.emailVerified,
       this.wasSetup});
 
@@ -29,7 +29,7 @@ class ModalUser extends IModal {
       : super.fromFirestore(snapshot, options) {
     Map<String, dynamic>? data = snapshot.data();
     passcode = data?['passcode'];
-    currencyTypeRef = data?['currency_type_ref'];
+    currencyTypeDefaultRef = data?['currency_type_default_ref'];
     wasSetup = data?['was_setup'];
   }
 
@@ -37,7 +37,7 @@ class ModalUser extends IModal {
   Map<String, dynamic> toFirestore() {
     return {
       'passcode': passcode,
-      'currency_type_ref': currencyTypeRef,
+      'currency_type_default_ref': currencyTypeDefaultRef,
       'was_setup': wasSetup
     };
   }

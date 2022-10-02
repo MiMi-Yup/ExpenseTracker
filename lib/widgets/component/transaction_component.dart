@@ -1,8 +1,10 @@
-import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/category_type_instance.dart';
+import 'package:expense_tracker/instances/currency_type_instance.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
-import 'package:expense_tracker/instances/user_instance.dart';
+import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
+import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/services/firebase/firestore/category_types.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/widgets/component/hint_category_component.dart';
@@ -36,7 +38,8 @@ class _TransactionComponentState extends State<TransactionComponent>
     with SingleTickerProviderStateMixin {
   AnimationController? _controller;
 
-  final CurrentTransactionFirestore service = CurrentTransactionFirestore();
+  final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
+  final AccountFirestore serviceAccount = AccountFirestore();
 
   @override
   void initState() {
@@ -63,8 +66,8 @@ class _TransactionComponentState extends State<TransactionComponent>
 
   @override
   Widget build(BuildContext context) {
-    ModalCategoryType? getModal =
-        CategoryInstance.instance().getModal(widget.modal.categoryTypeRef!.id);
+    ModalCategoryType? getModal = CategoryTypeInstance.instance()
+        .getModal(widget.modal.categoryTypeRef!.id);
     final content = Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -96,14 +99,20 @@ class _TransactionComponentState extends State<TransactionComponent>
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              widget.modal.getMoney(
-                  '${UserInstance.instance().getCurrency()?.currencyCode}'),
-              style: TextStyle(
-                  color: TranasactionTypeInstance.instance()
-                      .getModal(widget.modal.transactionTypeRef!.id)
-                      ?.color),
-            ),
+            FutureBuilder<ModalAccount?>(
+                initialData: null,
+                future:
+                    serviceAccount.getModalFromRef(widget.modal.accountRef!),
+                builder: (context, snapshot) {
+                  return Text(
+                    widget.modal.getMoney(
+                        '${snapshot.hasData ? CurrencyTypeInstance.instance().getModal(snapshot.data!.currencyTypeRef!.id)?.currencyCode : ""}'),
+                    style: TextStyle(
+                        color: TranasactionTypeInstance.instance()
+                            .getModal(widget.modal.transactionTypeRef!.id)
+                            ?.color),
+                  );
+                }),
             SizedBox(height: 10.0),
             widget.showModalTimeCreate
                 ? Text(
@@ -111,7 +120,7 @@ class _TransactionComponentState extends State<TransactionComponent>
                     style: TextStyle(color: Colors.grey),
                   )
                 : FutureBuilder<ModalTransaction?>(
-                    future: service.findFirstTransaction(widget.modal),
+                    future: serviceLog.findFirstTransaction(widget.modal),
                     builder: (context, snapshot) => Text(
                           snapshot.hasData
                               ? snapshot.data!.getTimeTransaction

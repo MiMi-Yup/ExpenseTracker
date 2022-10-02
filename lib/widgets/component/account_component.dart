@@ -1,4 +1,5 @@
 import 'package:expense_tracker/instances/account_type_instance.dart';
+import 'package:expense_tracker/instances/currency_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_account_type.dart';
@@ -7,12 +8,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AccountComponent extends StatelessWidget {
-  ModalAccount accoutnModal;
+  ModalAccount accountModal;
   ModalAccountType? accountTypeModal;
   void Function()? onTap;
-  AccountComponent({super.key, required this.accoutnModal, this.onTap}) {
+  AccountComponent({super.key, required this.accountModal, this.onTap}) {
     accountTypeModal = AccountTypeInstance.instance()
-        .getModal(accoutnModal.accountTypeRef!.id);
+        .getModal(accountModal.accountTypeRef!.id);
   }
 
   @override
@@ -64,7 +65,7 @@ class AccountComponent extends StatelessWidget {
               )
             ]),
             Text(
-                "${UserInstance.instance().getCurrency()?.currencyCode} ${accoutnModal.money}")
+                "${CurrencyTypeInstance.instance().getModal(accountModal.currencyTypeRef!.id)?.currencyCode} ${accountModal.money}")
           ],
         ),
       ),

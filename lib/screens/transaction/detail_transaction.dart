@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/instances/account_type_instance.dart';
-import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/category_type_instance.dart';
+import 'package:expense_tracker/instances/currency_type_instance.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
+import 'package:expense_tracker/modals/modal_account.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/services/firebase/cloud_storage/storage.dart';
+import 'package:expense_tracker/services/firebase/firestore/accounts.dart';
 import 'package:expense_tracker/services/firebase/firestore/current_transaction.dart';
 import 'package:expense_tracker/services/firebase/firestore/utilities/transaction.dart';
 import 'package:expense_tracker/widgets/component/repeat_component.dart';
@@ -38,7 +41,8 @@ class _DetailTransactionState extends State<DetailTransaction>
   ///[1]: allow edit
   ///[2]: show timeline modified
 
-  final CurrentTransactionFirestore service = CurrentTransactionFirestore();
+  final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
+  final AccountFirestore serviceAccount = AccountFirestore();
 
   GlobalKey keyAppBar = GlobalKey();
   GlobalKey scrollTimeline = GlobalKey();
@@ -368,17 +372,21 @@ class _DetailTransactionState extends State<DetailTransaction>
                         bottomRight: Radius.circular(10.0))),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        modal.getMoney(UserInstance.instance()
-                                .getCurrency()
-                                ?.currencyCode ??
-                            ""),
-                        style: TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    FutureBuilder<ModalAccount?>(
+                        initialData: null,
+                        future:
+                            serviceAccount.getModalFromRef(modal.accountRef!),
+                        builder: (context, snapshot) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              modal.getMoney(
+                                  "${snapshot.hasData ? CurrencyTypeInstance.instance().getModal(snapshot.data!.currencyTypeRef!.id)?.currencyCode : ""}"),
+                              style: TextStyle(
+                                  fontSize: 32, fontWeight: FontWeight.bold),
+                            ),
+                          );
+                        }),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -389,7 +397,7 @@ class _DetailTransactionState extends State<DetailTransaction>
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: FutureBuilder<ModalTransaction?>(
-                          future: service.findFirstTransaction(modal),
+                          future: serviceLog.findFirstTransaction(modal),
                           builder: (context, snapshot) => Text(
                                 snapshot.hasData
                                     ? '${snapshot.data!.getDateTransaction} ${snapshot.data!.getTimeTransaction}'
@@ -463,7 +471,7 @@ class _DetailTransactionState extends State<DetailTransaction>
                         height: 20.0,
                       ),
                       Text(
-                          CategoryInstance.instance()
+                          CategoryTypeInstance.instance()
                               .getModal(modal.categoryTypeRef!.id)
                               .toString(),
                           style: TextStyle(color: Colors.black))

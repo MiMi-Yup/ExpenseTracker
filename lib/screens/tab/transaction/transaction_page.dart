@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/color.dart';
 import 'package:expense_tracker/constants/enum/enum_route.dart';
-import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/category_type_instance.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
 import 'package:expense_tracker/modals/modal_transaction.dart';
@@ -156,12 +156,12 @@ class _TransactionPageState extends State<TransactionPage>
                                               crossAxisSpacing: 8.0,
                                               childAspectRatio: 3,
                                               shrinkWrap: true,
-                                              children: CategoryInstance
+                                              children: CategoryTypeInstance
                                                       .instance()
                                                   .modals!
                                                   .map<Widget>((e) {
                                                 ModalCategoryType? modal =
-                                                    CategoryInstance.instance()
+                                                    CategoryTypeInstance.instance()
                                                         .getModal(e!.id!);
                                                 return GestureDetector(
                                                   onTap: () {

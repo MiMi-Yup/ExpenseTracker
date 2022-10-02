@@ -1,4 +1,4 @@
-import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/category_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_budget.dart';
 import 'package:expense_tracker/modals/modal_category_type.dart';
@@ -12,7 +12,7 @@ class CategoryComponent {
 
   Widget nameCategoryBuilder() {
     ModalCategoryType? getModal =
-        CategoryInstance.instance().getModal(modal.categoryTypeRef!.id);
+        CategoryTypeInstance.instance().getModal(modal.categoryTypeRef!.id);
     return Container(
       padding: EdgeInsets.all(10.0),
       decoration: BoxDecoration(
@@ -23,7 +23,7 @@ class CategoryComponent {
           if (getModal != null)
             HintCategoryComponent(modal: getModal).getFullCategory(),
           Text(
-              '${CategoryInstance.instance().getModal(modal.categoryTypeRef!.id)?.name}',
+              '${CategoryTypeInstance.instance().getModal(modal.categoryTypeRef!.id)?.name}',
               style: TextStyle(color: Colors.black))
         ],
       ),
@@ -36,7 +36,7 @@ class CategoryComponent {
       Color valueColor = Colors.red}) {
     const height = 10.0;
     ModalCategoryType? getModal =
-        CategoryInstance.instance().getModal(modal.categoryTypeRef!.id);
+        CategoryTypeInstance.instance().getModal(modal.categoryTypeRef!.id);
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
@@ -48,7 +48,8 @@ class CategoryComponent {
                 HintCategoryComponent(modal: getModal).getMinCategory(),
               Text(
                   //now money query missing
-                  '${UserInstance.instance().getCurrency()?.currencyCode} ${modal.budget}',
+                  //'${UserInstance.instance().getCurrency()?.currencyCode} ${modal.budget}',
+                  "doanxem",
                   style: TextStyle(color: valueColor))
             ],
           ),
@@ -67,7 +68,7 @@ class CategoryComponent {
                 height: height,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(height * 2),
-                    color: CategoryInstance.instance()
+                    color: CategoryTypeInstance.instance()
                         .getModal(modal.categoryTypeRef!.id)
                         ?.color),
               )

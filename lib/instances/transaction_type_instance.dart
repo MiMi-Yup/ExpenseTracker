@@ -10,12 +10,10 @@ class TranasactionTypeInstance {
   static List<ModalTransactionType?>? _modals;
   static TranasactionTypeInstance? _instance;
   static StreamSubscription<QuerySnapshot>? _streamSubscriptionTransactionType;
-  static StreamSubscription<User?>? _streamSubscriptionUser;
 
   static TranasactionTypeInstance instance({bool renew = false}) {
     if (_instance != null && renew) {
       _streamSubscriptionTransactionType?.cancel();
-      _streamSubscriptionUser?.cancel();
       _instance = null;
       _modals = null;
       _service = null;
@@ -23,7 +21,7 @@ class TranasactionTypeInstance {
 
     if (_instance == null) {
       _instance = TranasactionTypeInstance();
-      FirebaseAuth.instance.userChanges().listen((event) {
+      FirebaseAuth.instance.authStateChanges().listen((event) {
         if (event == null) {
           _streamSubscriptionTransactionType?.cancel();
           _service = null;
@@ -34,8 +32,7 @@ class TranasactionTypeInstance {
               .getFirebaseRef()
               .snapshots(includeMetadataChanges: true)
               .listen((event) async {
-            _modals = null;
-            _modals ??= await _service?.read();
+            _modals = await _service?.read();
           }, onError: (error) {});
         }
       }, onError: (error) {});

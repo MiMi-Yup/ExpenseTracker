@@ -6,7 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:expense_tracker/constants/color.dart';
-import 'package:expense_tracker/instances/category_instance.dart';
+import 'package:expense_tracker/instances/category_type_instance.dart';
+import 'package:expense_tracker/instances/currency_type_instance.dart';
 import 'package:expense_tracker/instances/transaction_type_instance.dart';
 import 'package:expense_tracker/instances/user_instance.dart';
 import 'package:expense_tracker/modals/modal_account.dart';
@@ -191,7 +192,7 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
         choseAccount =
             await AccountFirestore().getModalFromRef(modal.accountRef!);
         choseCategoryType =
-            CategoryInstance.instance().getModal(modal.categoryTypeRef!.id);
+            CategoryTypeInstance.instance().getModal(modal.categoryTypeRef!.id);
       }
     }
     return isLoaded!;
@@ -233,8 +234,9 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                             keyboardType: TextInputType.number,
                             style: TextStyle(fontSize: 40.0),
                             decoration: InputDecoration(
-                                prefixText:
-                                    "${UserInstance.instance().getCurrency()?.currencyCode} ",
+                                prefixText: choseAccount == null
+                                    ? "${UserInstance.instance().defaultCurrencyAccount?.currencyCode} "
+                                    : "${CurrencyTypeInstance.instance().getModal(choseAccount!.currencyTypeRef!.id)?.currencyCode} ",
                                 isCollapsed: true,
                                 hintText: "0.00",
                                 border: InputBorder.none),
@@ -283,11 +285,12 @@ class _AddEditTransactionState extends State<AddEditTransaction> {
                                 initialData: [],
                                 builder: (context, snapshot) =>
                                     DropDown<ModalAccount>(
-                                        hint: "Choose account",
-                                        items: snapshot.data!,
-                                        choseValue: choseAccount,
-                                        onChanged: (value) =>
-                                            choseAccount = value).builder(),
+                                            hint: "Choose account",
+                                            items: snapshot.data!,
+                                            choseValue: choseAccount,
+                                            onChanged: (value) => setState(
+                                                () => choseAccount = value))
+                                        .builder(),
                               ),
                               (modal.attachments == null ||
                                       modal.attachments!.isEmpty)
