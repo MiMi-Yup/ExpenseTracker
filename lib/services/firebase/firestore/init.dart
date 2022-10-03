@@ -67,9 +67,15 @@ class InitializationFirestore {
       }
     });
 
-    instance
-        .doc(pathUser)
-        .set(ModalUser(id: null, email: null, password: null).toFirestore());
+    instance.doc(pathUser).set(ModalUser(
+            id: null,
+            email: null,
+            password: null,
+            currencyTypeDefaultRef: null,
+            displayName: null,
+            lastLoginDeviceId: null,
+            wasSetup: null)
+        .toFirestore());
   }
 
   void _createDefaultTransactionTypesCollection(WriteBatch batch) {

@@ -97,7 +97,14 @@ class _CodeAuthState extends State<CodeAuth>
             await _service.update(null, _modal!);
           } else {
             await _service.insert(ModalUser(
-                id: null, email: null, password: null, passcode: _code));
+                id: null,
+                email: null,
+                password: null,
+                passcode: _code,
+                lastLoginDeviceId: null,
+                currencyTypeDefaultRef: null,
+                displayName: null,
+                wasSetup: null));
             _service.read().then((value) {
               if (value != null && value.isNotEmpty) {
                 _modal = value.first;

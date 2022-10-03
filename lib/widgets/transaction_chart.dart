@@ -2,17 +2,47 @@ import 'package:expense_tracker/constants/asset/icon.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class _LineChart extends StatelessWidget {
-  const _LineChart({required this.isShowingMainData});
+abstract class LineChart1 extends StatelessWidget {
+  Map<Color, List<FlSpot>> lines;
+  bool showBarData;
+  double maxX = 0.0;
+  double maxY = 0.0;
+  String? currency;
+  double coefficientMoney = 1;
+  LineChart1(
+      {required this.lines,
+      required this.showBarData,
+      required this.currency}) {
+    maxX = _maxX;
+    maxY = _maxY;
+  }
 
-  final bool isShowingMainData;
+  double paddingRight = 16;
+  double paddingTop = 16;
 
   @override
   Widget build(BuildContext context) {
-    return LineChart(
-      isShowingMainData ? sampleData1 : sampleData2,
-      swapAnimationDuration: const Duration(milliseconds: 250),
+    return Padding(
+      padding: EdgeInsets.only(top: paddingTop, right: paddingRight),
+      child: LineChart(
+        sampleData1,
+        swapAnimationDuration: const Duration(milliseconds: 250),
+      ),
     );
+  }
+
+  double get _maxX;
+
+  double get _maxY {
+    double result = 0;
+    for (List<FlSpot> points in lines.values) {
+      for (FlSpot point in points) {
+        if (result < point.y) {
+          result = point.y;
+        }
+      }
+    }
+    return double.parse((result * coefficientMoney).toStringAsFixed(0)) + 1;
   }
 
   LineChartData get sampleData1 => LineChartData(
@@ -20,22 +50,10 @@ class _LineChart extends StatelessWidget {
         gridData: gridData,
         titlesData: titlesData1,
         borderData: borderData,
-        lineBarsData: lineBarsData1,
+        lineBarsData: lineChartBarData,
         minX: 0,
-        maxX: 14,
-        maxY: 4,
-        minY: 0,
-      );
-
-  LineChartData get sampleData2 => LineChartData(
-        lineTouchData: lineTouchData2,
-        gridData: gridData,
-        titlesData: titlesData2,
-        borderData: borderData,
-        lineBarsData: lineBarsData2,
-        minX: 0,
-        maxX: 14,
-        maxY: 6,
+        maxX: maxX,
+        maxY: maxY,
         minY: 0,
       );
 
@@ -61,63 +79,15 @@ class _LineChart extends StatelessWidget {
         ),
       );
 
-  List<LineChartBarData> get lineBarsData1 => [
-        lineChartBarData1_1,
-        lineChartBarData1_2,
-        lineChartBarData1_3,
-      ];
-
-  LineTouchData get lineTouchData2 => LineTouchData(
-        enabled: false,
-      );
-
-  FlTitlesData get titlesData2 => FlTitlesData(
-        bottomTitles: AxisTitles(
-          sideTitles: bottomTitles,
-        ),
-        rightTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: leftTitles(),
-        ),
-      );
-
-  List<LineChartBarData> get lineBarsData2 => [
-        lineChartBarData2_1,
-        lineChartBarData2_2,
-        lineChartBarData2_3,
-      ];
-
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff75729e),
+    bool isUnit = value.toInt() == maxY.toInt();
+    TextStyle style = TextStyle(
+      color: isUnit ? Colors.white : Color(0xff75729e),
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
     String text;
-    switch (value.toInt()) {
-      case 1:
-        text = '1m';
-        break;
-      case 2:
-        text = '2m';
-        break;
-      case 3:
-        text = '3m';
-        break;
-      case 4:
-        text = '5m';
-        break;
-      case 5:
-        text = '6m';
-        break;
-      default:
-        return Container();
-    }
+    text = isUnit ? currency ?? "" : value.toInt().toString();
 
     return Text(text, style: style, textAlign: TextAlign.center);
   }
@@ -129,34 +99,7 @@ class _LineChart extends StatelessWidget {
         reservedSize: 40,
       );
 
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff72719b),
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    );
-    Widget text;
-    switch (value.toInt()) {
-      case 2:
-        text = const Text('SEPT', style: style);
-        break;
-      case 7:
-        text = const Text('OCT', style: style);
-        break;
-      case 12:
-        text = const Text('DEC', style: style);
-        break;
-      default:
-        text = const Text('');
-        break;
-    }
-
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 10,
-      child: text,
-    );
-  }
+  Widget bottomTitleWidgets(double value, TitleMeta meta);
 
   SideTitles get bottomTitles => SideTitles(
         showTitles: true,
@@ -165,7 +108,7 @@ class _LineChart extends StatelessWidget {
         getTitlesWidget: bottomTitleWidgets,
       );
 
-  FlGridData get gridData => FlGridData(show: false);
+  FlGridData get gridData => FlGridData(show: true);
 
   FlBorderData get borderData => FlBorderData(
         show: true,
@@ -177,145 +120,142 @@ class _LineChart extends StatelessWidget {
         ),
       );
 
-  LineChartBarData get lineChartBarData1_1 => LineChartBarData(
-        isCurved: true,
-        color: const Color(0xff4af699),
-        barWidth: 8,
-        isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(show: false),
-        spots: const [
-          FlSpot(1, 1),
-          FlSpot(3, 1.5),
-          FlSpot(5, 1.4),
-          FlSpot(7, 3.4),
-          FlSpot(10, 2),
-          FlSpot(12, 2.2),
-          FlSpot(13, 1.8),
-        ],
-      );
-
-  LineChartBarData get lineChartBarData1_2 => LineChartBarData(
-        isCurved: true,
-        color: const Color(0xffaa4cfc),
-        barWidth: 8,
-        isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(
-          show: false,
-          color: const Color(0x00aa4cfc),
-        ),
-        spots: const [
-          FlSpot(1, 1),
-          FlSpot(3, 2.8),
-          FlSpot(7, 1.2),
-          FlSpot(10, 2.8),
-          FlSpot(12, 2.6),
-          FlSpot(13, 3.9),
-        ],
-      );
-
-  LineChartBarData get lineChartBarData1_3 => LineChartBarData(
-        isCurved: true,
-        color: const Color(0xff27b6fc),
-        barWidth: 8,
-        isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(show: false),
-        spots: const [
-          FlSpot(1, 2.8),
-          FlSpot(3, 1.9),
-          FlSpot(6, 3),
-          FlSpot(10, 1.3),
-          FlSpot(13, 2.5),
-        ],
-      );
-
-  LineChartBarData get lineChartBarData2_1 => LineChartBarData(
-        isCurved: true,
-        curveSmoothness: 0,
-        color: const Color(0x444af699),
-        barWidth: 4,
-        isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(show: false),
-        spots: const [
-          FlSpot(1, 1),
-          FlSpot(3, 4),
-          FlSpot(5, 1.8),
-          FlSpot(7, 5),
-          FlSpot(10, 2),
-          FlSpot(12, 2.2),
-          FlSpot(13, 1.8),
-        ],
-      );
-
-  LineChartBarData get lineChartBarData2_2 => LineChartBarData(
-        isCurved: true,
-        color: const Color(0x99aa4cfc),
-        barWidth: 4,
-        isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(
-          show: true,
-          color: const Color(0x33aa4cfc),
-        ),
-        spots: const [
-          FlSpot(1, 1),
-          FlSpot(3, 2.8),
-          FlSpot(7, 1.2),
-          FlSpot(10, 2.8),
-          FlSpot(12, 2.6),
-          FlSpot(13, 3.9),
-        ],
-      );
-
-  LineChartBarData get lineChartBarData2_3 => LineChartBarData(
-        isCurved: true,
-        curveSmoothness: 0,
-        color: const Color(0x4427b6fc),
-        barWidth: 2,
-        isStrokeCapRound: true,
-        dotData: FlDotData(show: true),
-        belowBarData: BarAreaData(show: false),
-        spots: const [
-          FlSpot(1, 3.8),
-          FlSpot(3, 1.9),
-          FlSpot(6, 5),
-          FlSpot(10, 3.3),
-          FlSpot(13, 4.5),
-        ],
-      );
+  List<LineChartBarData> get lineChartBarData => lines.keys
+      .map((e) => LineChartBarData(
+            isCurved: true,
+            color: e,
+            barWidth: 5,
+            isStrokeCapRound: true,
+            dotData: FlDotData(show: true),
+            belowBarData: BarAreaData(
+                show: showBarData,
+                color: showBarData ? e.withOpacity(0.5) : null),
+            spots: lines[e]
+                ?.map((e) => FlSpot(e.x,
+                    double.parse((e.y * coefficientMoney).toStringAsFixed(2))))
+                .toList(),
+          ))
+      .toList();
 }
 
-class LineChartSample1 extends StatefulWidget {
-  const LineChartSample1({Key? key}) : super(key: key);
+class TodayLineChart extends LineChart1 {
+  TodayLineChart(
+      {required super.lines,
+      required super.showBarData,
+      required super.currency});
+
+  final hourPerDay = 24;
+  final placeHolderForUnitHorizontal = 3;
 
   @override
-  State<StatefulWidget> createState() => LineChartSample1State();
+  double get _maxX => hourPerDay.toDouble() + placeHolderForUnitHorizontal;
+
+  @override
+  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    int _value = value.toInt();
+    bool isUnit = _value == maxX.toInt();
+    TextStyle style = TextStyle(
+      color: isUnit ? Colors.white : Color(0xff75729e),
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    );
+    Widget text;
+    if (isUnit) {
+      text = Text(
+        "Hour",
+        style: style,
+      );
+    } else if (_value % 2 == 0 && _value <= hourPerDay) {
+      text = Text(_value.toString(), style: style);
+    } else
+      text = SizedBox();
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 10,
+      child: text,
+    );
+  }
 }
 
-class LineChartSample1State extends State<LineChartSample1> {
-  late bool isShowingMainData;
+class WeekLineChart extends LineChart1 {
+  WeekLineChart(
+      {required super.lines,
+      required super.showBarData,
+      required super.currency});
+
+  final weekPerMonth = 4;
+  final placeHolderForUnitHorizontal = 1;
 
   @override
-  void initState() {
-    super.initState();
-    isShowingMainData = true;
+  double get _maxX => weekPerMonth.toDouble() + placeHolderForUnitHorizontal;
+
+  @override
+  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    int _value = value.toInt();
+    bool isUnit = _value == maxX.toInt();
+    TextStyle style = TextStyle(
+      color: isUnit ? Colors.white : Color(0xff75729e),
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    );
+    Widget text;
+    if (isUnit) {
+      text = Text(
+        "Week",
+        style: style,
+      );
+    } else if (_value <= weekPerMonth) {
+      text = Text(_value.toString(), style: style);
+    } else
+      text = SizedBox();
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 10,
+      child: text,
+    );
+  }
+}
+
+class MonthLineChart extends LineChart1 {
+  MonthLineChart(
+      {required super.lines,
+      required super.showBarData,
+      required super.currency}) {
+    paddingRight = 20;
   }
 
+  final monthPerYear = 12;
+  final placeHolderForUnitHorizontal = 2;
+
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: _LineChart(isShowingMainData: isShowingMainData),
-          ),
-        ),
-      ],
+  double get _maxX => monthPerYear.toDouble() + placeHolderForUnitHorizontal;
+
+  @override
+  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    int _value = value.toInt();
+    bool isUnit = _value == maxX.toInt();
+    TextStyle style = TextStyle(
+      color: isUnit ? Colors.white : Color(0xff75729e),
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    );
+    Widget text;
+    if (isUnit) {
+      text = Text(
+        "Month",
+        style: style,
+      );
+    } else if (_value <= monthPerYear) {
+      text = Text(_value.toString(), style: style);
+    } else
+      text = SizedBox();
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 10,
+      child: text,
     );
   }
 }

@@ -46,6 +46,8 @@ dependencies:
   flutter_colorpicker: ^1.0.3
   scrollable_positioned_list: ^0.3.2
   flutter_date_pickers: ^0.4.0
+  device_info_plus: ^4.1.2
+  intl: ^0.17.0
   
   flutter_local_notifications: ^9.9.1
 

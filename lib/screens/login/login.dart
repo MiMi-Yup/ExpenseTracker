@@ -19,7 +19,14 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final modal = ModalUser(email: null, password: null, id: '');
+  final modal = ModalUser(
+      email: null,
+      password: null,
+      id: '',
+      currencyTypeDefaultRef: null,
+      displayName: null,
+      lastLoginDeviceId: null,
+      wasSetup: null);
 
   String? errorEmail;
   String? errorPassword;

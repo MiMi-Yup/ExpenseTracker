@@ -3,6 +3,7 @@ import 'package:expense_tracker/constants/enum/enum_route.dart';
 import 'package:expense_tracker/routes/route.dart';
 import 'package:expense_tracker/widgets/dropdown.dart';
 import 'package:expense_tracker/widgets/transaction_chart.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class DetailReport extends StatefulWidget {
@@ -110,7 +111,38 @@ class _DetailReportState extends State<DetailReport> {
                 onPageChanged: (value) => setState(() => indexChart = value),
                 controller: _controllerChart,
                 physics: NeverScrollableScrollPhysics(),
-                children: [LineChartSample1(), PieChartImage()],
+                children: [
+                  // LineChart1(
+                  //   lines: {
+                  //     Color(0xff4af699): [
+                  //       FlSpot(1, 1),
+                  //       FlSpot(3, 1.5),
+                  //       FlSpot(5, 1.4),
+                  //       FlSpot(7, 3.4),
+                  //       FlSpot(10, 2),
+                  //       FlSpot(12, 2.2),
+                  //       FlSpot(13, 8),
+                  //     ],
+                  //     Color(0xffaa4cfc): [
+                  //       FlSpot(1, 1),
+                  //       FlSpot(3, 2.8),
+                  //       FlSpot(7, 1.2),
+                  //       FlSpot(10, 2.8),
+                  //       FlSpot(12, 2.6),
+                  //       FlSpot(13, 3.9),
+                  //     ],
+                  //     Color(0xff27b6fc): [
+                  //       FlSpot(1, 2.8),
+                  //       FlSpot(3, 1.9),
+                  //       FlSpot(6, 3),
+                  //       FlSpot(10, 1.3),
+                  //       FlSpot(13, 2.5),
+                  //     ]
+                  //   },
+                  //   showBarData: true,
+                  // ),
+                  PieChartImage()
+                ],
               ),
             ),
             Padding(

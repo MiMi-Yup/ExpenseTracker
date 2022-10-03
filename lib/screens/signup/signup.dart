@@ -20,7 +20,14 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  final modal = ModalUser(email: null, password: null, id: '');
+  final modal = ModalUser(
+      email: null,
+      password: null,
+      id: '',
+      currencyTypeDefaultRef: null,
+      displayName: null,
+      lastLoginDeviceId: null,
+      wasSetup: null);
   bool acceptTerm = false;
 
   String? errorEmail;

@@ -19,6 +19,7 @@ import 'package:expense_tracker/widgets/component/overview_transaction_component
 import 'package:expense_tracker/widgets/component/transaction_component.dart';
 import 'package:expense_tracker/widgets/section.dart';
 import 'package:expense_tracker/widgets/transaction_chart.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,20 +31,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage>
-    with AutomaticKeepAliveClientMixin {
-  late PageController _controller;
+    with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
+  late TabController _controller;
 
   final TransactionUtilities serviceTransaction = TransactionUtilities();
   final CurrentTransactionFirestore serviceLog = CurrentTransactionFirestore();
   final AccountFirestore serviceAccount = AccountFirestore();
   final NotificationFirestore serviceNotification = NotificationFirestore();
 
-  final List<Widget> _charts = [
-    LineChartSample1(),
-    Text("data"),
-    Text("data"),
-    Text("data")
-  ];
   int _currentIndex = 0;
   late double height = MediaQuery.of(context).size.height;
 
@@ -52,7 +47,11 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _controller = PageController(initialPage: _currentIndex);
+    _controller = TabController(
+        length: 3,
+        vsync: this,
+        initialIndex: _currentIndex,
+        animationDuration: const Duration(milliseconds: 250));
   }
 
   @override
@@ -63,6 +62,102 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _charts = [
+      TodayLineChart(
+        lines: {
+          Color(0xff4af699): [
+            FlSpot(1, 1),
+            FlSpot(2, 1.5),
+            FlSpot(3, 1.4),
+            FlSpot(5, 3.4),
+            FlSpot(7, 2),
+            FlSpot(9, 2.2),
+            FlSpot(12, 10),
+            FlSpot(14, 1),
+            FlSpot(16, 1.5),
+            FlSpot(18, 1.4),
+            FlSpot(20, 3.4),
+            FlSpot(22, 2),
+            FlSpot(24, 2.2)
+          ],
+          Color(0xffaa4cfc): [
+            FlSpot(1, 1),
+            FlSpot(2, 2.8),
+            FlSpot(3, 1.2),
+            FlSpot(5, 2.8),
+            FlSpot(6, 2.6),
+            FlSpot(9, 3.9),
+            FlSpot(10, 3.9),
+            FlSpot(12, 3.9),
+            FlSpot(14, 1),
+            FlSpot(16, 2.8),
+            FlSpot(18, 1.2),
+            FlSpot(20, 2.8),
+            FlSpot(22, 2.6),
+            FlSpot(24, 3.9)
+          ]
+        },
+        showBarData: true,
+        currency: UserInstance.instance().defaultCurrencyAccount?.currencyCode,
+      ),
+      WeekLineChart(
+        lines: {
+          Color(0xff4af699): [
+            FlSpot(1, 1),
+            FlSpot(1.2, 1.5),
+            FlSpot(1.5, 1.4),
+            FlSpot(2.5, 3.4),
+            FlSpot(3.5, 2),
+            FlSpot(3.8, 2.2)
+          ],
+          Color(0xffaa4cfc): [
+            FlSpot(1, 1),
+            FlSpot(1.5, 2.8),
+            FlSpot(2, 1.2),
+            FlSpot(2.5, 2.8),
+            FlSpot(3, 2.6),
+            FlSpot(3.5, 3.9),
+            FlSpot(4, 3.9),
+          ]
+        },
+        showBarData: true,
+        currency: UserInstance.instance().defaultCurrencyAccount?.currencyCode,
+      ),
+      MonthLineChart(
+        lines: {
+          Color(0xff4af699): [
+            FlSpot(1, 1),
+            FlSpot(2, 1.5),
+            FlSpot(3, 1.4),
+            FlSpot(4, 3.4),
+            FlSpot(5, 2),
+            FlSpot(6, 2.2),
+            FlSpot(7, 1),
+            FlSpot(8, 1.5),
+            FlSpot(9, 1.4),
+            FlSpot(10, 3.4),
+            FlSpot(11, 2),
+            FlSpot(12, 2.2)
+          ],
+          Color(0xffaa4cfc): [
+            FlSpot(1, 1),
+            FlSpot(2, 2.8),
+            FlSpot(3, 1.2),
+            FlSpot(4, 2.8),
+            FlSpot(5, 2.6),
+            FlSpot(6, 3.9),
+            FlSpot(7, 3.9),
+            FlSpot(8, 1),
+            FlSpot(9, 2.8),
+            FlSpot(10, 1.2),
+            FlSpot(11, 2.8),
+            FlSpot(12, 2.6)
+          ]
+        },
+        showBarData: true,
+        currency: UserInstance.instance().defaultCurrencyAccount?.currencyCode,
+      )
+    ];
     return Column(
       children: [
         Container(
@@ -242,22 +337,20 @@ class _HomePageState extends State<HomePage>
                 content: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Container(
-                          height: height / 4,
-                          child: PageView.builder(
-                            physics: BouncingScrollPhysics(),
-                            controller: _controller,
-                            itemCount: _charts.length,
-                            itemBuilder: (context, index) => _charts[index],
-                            onPageChanged: (value) =>
-                                setState(() => _currentIndex = value),
-                          )),
+                        height: height / 3.5,
+                        child: TabBarView(
+                          children: _charts,
+                          controller: _controller,
+                          physics: NeverScrollableScrollPhysics(),
+                        ),
+                      ),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: List<GestureDetector>.generate(
-                              4,
+                              _charts.length,
                               (index) => GestureDetector(
                                     child: Container(
                                       padding: EdgeInsets.only(
@@ -275,8 +368,8 @@ class _HomePageState extends State<HomePage>
                                     ),
                                     onTap: () {
                                       _currentIndex = index;
-                                      setState(() => _controller
-                                          .jumpToPage(_currentIndex));
+                                      setState(() =>
+                                          _controller.animateTo(_currentIndex));
                                     },
                                   )))
                     ],

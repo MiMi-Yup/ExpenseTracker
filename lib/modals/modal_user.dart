@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:expense_tracker/modals/modal.dart';
+import 'dart:io' show Platform;
+
+import 'package:expense_tracker/services/id_device.dart';
 
 class ModalUser extends IModal {
   String? displayName;
@@ -11,18 +15,20 @@ class ModalUser extends IModal {
   String? passcode;
   DocumentReference? currencyTypeDefaultRef;
   bool? wasSetup;
+  String? lastLoginDeviceId;
 
   ModalUser(
       {required super.id,
-      this.displayName,
+      required this.displayName,
       required this.email,
       required this.password,
       this.phoneNumber,
       this.photoURL,
       this.passcode,
-      this.currencyTypeDefaultRef,
+      required this.currencyTypeDefaultRef,
       this.emailVerified,
-      this.wasSetup});
+      required this.wasSetup,
+      required this.lastLoginDeviceId});
 
   ModalUser.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options)
@@ -31,6 +37,7 @@ class ModalUser extends IModal {
     passcode = data?['passcode'];
     currencyTypeDefaultRef = data?['currency_type_default_ref'];
     wasSetup = data?['was_setup'];
+    lastLoginDeviceId = data?['last_login_device_id'];
   }
 
   @override
@@ -38,7 +45,8 @@ class ModalUser extends IModal {
     return {
       'passcode': passcode,
       'currency_type_default_ref': currencyTypeDefaultRef,
-      'was_setup': wasSetup
+      'was_setup': wasSetup,
+      'last_login_device_id': lastLoginDeviceId
     };
   }
 
@@ -50,4 +58,7 @@ class ModalUser extends IModal {
       password != null &&
       email!.isNotEmpty &&
       password!.isNotEmpty;
+
+  Future<bool> get isLastLoginDevice async =>
+      lastLoginDeviceId == (await IdDevice.idDevice);
 }
