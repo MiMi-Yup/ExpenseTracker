@@ -73,12 +73,12 @@ class _HomePageState extends State<HomePage>
             FlSpot(7, 2),
             FlSpot(9, 2.2),
             FlSpot(12, 10),
-            FlSpot(14, 1),
+            FlSpot(14, 12),
             FlSpot(16, 1.5),
             FlSpot(18, 1.4),
             FlSpot(20, 3.4),
-            FlSpot(22, 2),
-            FlSpot(24, 2.2)
+            FlSpot(22, 18),
+            FlSpot(24, 22)
           ],
           Color(0xffaa4cfc): [
             FlSpot(1, 1),
@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage>
             FlSpot(3, 1.2),
             FlSpot(5, 2.8),
             FlSpot(6, 2.6),
-            FlSpot(9, 3.9),
+            FlSpot(9, 16),
             FlSpot(10, 3.9),
             FlSpot(12, 3.9),
             FlSpot(14, 1),
@@ -99,6 +99,7 @@ class _HomePageState extends State<HomePage>
         },
         showBarData: true,
         currency: UserInstance.instance().defaultCurrencyAccount?.currencyCode,
+        unitHorizontal: 'h',
       ),
       WeekLineChart(
         lines: {

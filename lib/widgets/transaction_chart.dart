@@ -9,12 +9,21 @@ abstract class LineChart1 extends StatelessWidget {
   double maxY = 0.0;
   String? currency;
   double coefficientMoney = 1;
+  final maxValueY = 10;
+  final placeHolderUnitVertical = 1;
+
   LineChart1(
       {required this.lines,
       required this.showBarData,
       required this.currency}) {
     maxX = _maxX;
-    maxY = _maxY;
+    double tempMaxY = _maxY;
+    coefficientMoney = maxValueY / tempMaxY;
+    if (coefficientMoney >= 1.0) {
+      maxY = tempMaxY.toDouble() + placeHolderUnitVertical;
+    } else {
+      maxY = maxValueY.toDouble() + placeHolderUnitVertical;
+    }
   }
 
   double paddingRight = 16;
@@ -32,6 +41,7 @@ abstract class LineChart1 extends StatelessWidget {
   }
 
   double get _maxX;
+  double get _calMaxXFromLines;
 
   double get _maxY {
     double result = 0;
@@ -42,14 +52,14 @@ abstract class LineChart1 extends StatelessWidget {
         }
       }
     }
-    return double.parse((result * coefficientMoney).toStringAsFixed(0)) + 1;
+    return result;
   }
 
   LineChartData get sampleData1 => LineChartData(
         lineTouchData: lineTouchData1,
         gridData: gridData,
         titlesData: titlesData1,
-        borderData: borderData,
+        borderData: FlBorderData(show: false),
         lineBarsData: lineChartBarData,
         minX: 0,
         maxX: maxX,
@@ -60,7 +70,21 @@ abstract class LineChart1 extends StatelessWidget {
   LineTouchData get lineTouchData1 => LineTouchData(
         handleBuiltInTouches: true,
         touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+          tooltipBgColor: Colors.black,
+          getTooltipItems: (touchedSpots) {
+            return touchedSpots.map((LineBarSpot touchedSpot) {
+              final textStyle = TextStyle(
+                color: touchedSpot.bar.gradient?.colors.first ??
+                    touchedSpot.bar.color ??
+                    Colors.blueGrey,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              );
+              return LineTooltipItem(
+                  (touchedSpot.y / coefficientMoney).toStringAsFixed(2),
+                  textStyle);
+            }).toList();
+          },
         ),
       );
 
@@ -86,8 +110,11 @@ abstract class LineChart1 extends StatelessWidget {
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
-    String text;
-    text = isUnit ? currency ?? "" : value.toInt().toString();
+    String text = isUnit
+        ? currency == null
+            ? ""
+            : "($currency)"
+        : (value ~/ coefficientMoney).toString();
 
     return Text(text, style: style, textAlign: TextAlign.center);
   }
@@ -110,16 +137,6 @@ abstract class LineChart1 extends StatelessWidget {
 
   FlGridData get gridData => FlGridData(show: true);
 
-  FlBorderData get borderData => FlBorderData(
-        show: true,
-        border: const Border(
-          bottom: BorderSide(color: Color(0xff4e4965), width: 4),
-          left: BorderSide(color: Colors.transparent),
-          right: BorderSide(color: Colors.transparent),
-          top: BorderSide(color: Colors.transparent),
-        ),
-      );
-
   List<LineChartBarData> get lineChartBarData => lines.keys
       .map((e) => LineChartBarData(
             isCurved: true,
@@ -131,24 +148,45 @@ abstract class LineChart1 extends StatelessWidget {
                 show: showBarData,
                 color: showBarData ? e.withOpacity(0.5) : null),
             spots: lines[e]
-                ?.map((e) => FlSpot(e.x,
-                    double.parse((e.y * coefficientMoney).toStringAsFixed(2))))
+                ?.map((e) => FlSpot(e.x, e.y * coefficientMoney))
                 .toList(),
           ))
       .toList();
 }
 
 class TodayLineChart extends LineChart1 {
+  double calMaxXFromLines = 0.0;
+  String? unitHorizontal;
   TodayLineChart(
       {required super.lines,
       required super.showBarData,
-      required super.currency});
+      required super.currency,
+      required this.unitHorizontal});
 
   final hourPerDay = 24;
-  final placeHolderForUnitHorizontal = 3;
+  final placeHolderForUnitHorizontal = 2;
 
   @override
-  double get _maxX => hourPerDay.toDouble() + placeHolderForUnitHorizontal;
+  double get _maxX {
+    calMaxXFromLines = _calMaxXFromLines;
+    return (calMaxXFromLines > hourPerDay
+            ? hourPerDay.toDouble()
+            : calMaxXFromLines) +
+        placeHolderForUnitHorizontal;
+  }
+
+  @override
+  double get _calMaxXFromLines {
+    double result = 0;
+    for (List<FlSpot> points in lines.values) {
+      for (FlSpot point in points) {
+        if (result < point.x) {
+          result = point.x;
+        }
+      }
+    }
+    return result + 1;
+  }
 
   @override
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
@@ -162,10 +200,10 @@ class TodayLineChart extends LineChart1 {
     Widget text;
     if (isUnit) {
       text = Text(
-        "Hour",
+        "($unitHorizontal)",
         style: style,
       );
-    } else if (_value % 2 == 0 && _value <= hourPerDay) {
+    } else if (_value % (maxX / 12).ceil() == 0 && _value <= hourPerDay) {
       text = Text(_value.toString(), style: style);
     } else
       text = SizedBox();
@@ -216,6 +254,9 @@ class WeekLineChart extends LineChart1 {
       child: text,
     );
   }
+
+  @override
+  double get _calMaxXFromLines => throw UnimplementedError();
 }
 
 class MonthLineChart extends LineChart1 {
@@ -258,6 +299,9 @@ class MonthLineChart extends LineChart1 {
       child: text,
     );
   }
+
+  @override
+  double get _calMaxXFromLines => throw UnimplementedError();
 }
 
 class PieChartImage extends StatefulWidget {
